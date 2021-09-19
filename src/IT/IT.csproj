@@ -10,10 +10,32 @@
     <RepositoryUrl>https://github.com/pairbit/IT</RepositoryUrl>
     <Authors>Ivan Tikhonov</Authors>
     <Copyright>Ivan Tikhonov © 2020</Copyright>
-    <Version>2.0.0-alpha</Version>
-    <PackageReleaseNotes>Experimental</PackageReleaseNotes>
+    <Version>2.0.1</Version>
+    <PackageReleaseNotes>add Comparing, Exceptions, Ext, Resources, Validation, ...</PackageReleaseNotes>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>IT.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;IDE1006;IDE0049</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Ext\Threading\xValueTask.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Res.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Reflection\" />
+  </ItemGroup>
 
 </Project>
