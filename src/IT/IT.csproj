@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company />
@@ -10,7 +10,10 @@
     <RepositoryUrl>https://github.com/pairbit/IT</RepositoryUrl>
     <Authors>Ivan Tikhonov</Authors>
     <Copyright>Ivan Tikhonov © 2020</Copyright>
-    <Version>1.0.1</Version>
+    <Version>2.0.0-alpha</Version>
+    <PackageReleaseNotes>Experimental</PackageReleaseNotes>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>IT.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
 </Project>
