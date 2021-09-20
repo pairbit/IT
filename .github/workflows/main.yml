@@ -38,8 +38,20 @@ jobs:
       - name: Tests
         run: dotnet test src/IT.Tests/IT.Tests.csproj
    
-      - name: Publish
+      - name: Publish IT
         uses: brandedoutcast/publish-nuget@v2.5.2
         with:
             PROJECT_FILE_PATH: src/IT/IT.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            
+      - name: Publish IT.AspNet
+        uses: brandedoutcast/publish-nuget@v2.5.2
+        with:
+            PROJECT_FILE_PATH: src/IT.AspNet/IT.AspNet.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            
+      - name: Publish IT.Security.Cryptography.JinnServer
+        uses: brandedoutcast/publish-nuget@v2.5.2
+        with:
+            PROJECT_FILE_PATH: src/IT.Security.Cryptography.JinnServer/IT.Security.Cryptography.JinnServer.csproj
             NUGET_KEY: ${{secrets.NUGET}}
