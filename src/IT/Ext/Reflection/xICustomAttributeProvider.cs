@@ -10,6 +10,8 @@ namespace IT.Ext
 {
     public static class xICustomAttributeProvider
     {
+        public static Boolean IsRequired(this ICustomAttributeProvider member, bool inherit = false) => member.IsDefined(typeof(RequiredAttribute), inherit);
+
         public static IEnumerable<TAttribute> GetAttributes<TAttribute>(this ICustomAttributeProvider member, bool inherit = false) where TAttribute : Attribute
         {
             Arg.NotNull(member, nameof(member));

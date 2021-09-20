@@ -22,5 +22,7 @@ namespace IT.Resources
             var manager = GetManager(null);
             return manager.GetString(key);
         }
+
+        public static String Get(Enum key) => Get(key.GetType().Name + "_" + key.ToString());
     }
 }

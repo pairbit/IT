@@ -1,0 +1,4 @@
+{
+  "validationUrl": "http://195.230.101.103:8080/tccs/SignatureValidationService",
+  "signingUrl": "http://195.230.101.103:8080/tccs/SigningService"
+}
