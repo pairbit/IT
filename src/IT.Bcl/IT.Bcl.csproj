@@ -11,13 +11,14 @@
 	<RepositoryUrl>https://github.com/pairbit/IT</RepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2020</Copyright>
-	<Version>2.0.1-rc5</Version>
+	<Version>2.0.1-rc6</Version>
 	<PackageReleaseNotes></PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
 	<IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	<Optimize>False</Optimize>
+	<DebugType>full</DebugType>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
