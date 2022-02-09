@@ -31,34 +31,30 @@ jobs:
         run: dotnet test src/IT.Tests/IT.Tests.csproj
         
       - name: Publish IT.Bcl
-        uses: Elskom/publish-nuget@main
+        uses: alirezanet/publish-nuget@v3
         with:
             PROJECT_FILE_PATH: src/IT.Bcl/IT.Bcl.csproj
-            PACKAGE_PATH: artifacts/
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             INCLUDE_SYMBOLS: true
    
       - name: Publish IT
-        uses: Elskom/publish-nuget@main
+        uses: alirezanet/publish-nuget@v3
         with:
             PROJECT_FILE_PATH: src/IT/IT.csproj
-            PACKAGE_PATH: artifacts/
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             
       - name: Publish IT.AspNet
-        uses: Elskom/publish-nuget@main
+        uses: alirezanet/publish-nuget@v3
         with:
             PROJECT_FILE_PATH: src/IT.AspNet/IT.AspNet.csproj
-            PACKAGE_PATH: artifacts/
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             
       - name: Publish IT.Security.Cryptography.JinnServer
-        uses: Elskom/publish-nuget@main
+        uses: alirezanet/publish-nuget@v3
         with:
             PROJECT_FILE_PATH: src/IT.Security.Cryptography.JinnServer/IT.Security.Cryptography.JinnServer.csproj
-            PACKAGE_PATH: artifacts/
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
