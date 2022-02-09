@@ -35,21 +35,26 @@ jobs:
         with:
             PROJECT_FILE_PATH: src/IT.Bcl/IT.Bcl.csproj
             NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
    
       - name: Publish IT
         uses: brandedoutcast/publish-nuget@v2.5.2
         with:
             PROJECT_FILE_PATH: src/IT/IT.csproj
             NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
             
       - name: Publish IT.AspNet
         uses: brandedoutcast/publish-nuget@v2.5.2
         with:
             PROJECT_FILE_PATH: src/IT.AspNet/IT.AspNet.csproj
             NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
             
       - name: Publish IT.Security.Cryptography.JinnServer
         uses: brandedoutcast/publish-nuget@v2.5.2
         with:
             PROJECT_FILE_PATH: src/IT.Security.Cryptography.JinnServer/IT.Security.Cryptography.JinnServer.csproj
             NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
