@@ -37,6 +37,12 @@ jobs:
     
       - name: Tests
         run: dotnet test src/IT.Tests/IT.Tests.csproj
+        
+      - name: Publish IT.Bcl
+        uses: brandedoutcast/publish-nuget@v2.5.2
+        with:
+            PROJECT_FILE_PATH: src/IT/IT.Bcl.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
    
       - name: Publish IT
         uses: brandedoutcast/publish-nuget@v2.5.2
