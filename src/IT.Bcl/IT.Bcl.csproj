@@ -11,14 +11,15 @@
 	<RepositoryUrl>https://github.com/pairbit/IT</RepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2020</Copyright>
-	<Version>2.0.1-rc2</Version>
+	<Version>2.0.1-rc3</Version>
 	<PackageReleaseNotes></PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
 	<IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	<Optimize>False</Optimize>
   </PropertyGroup>
-	
+
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
 	<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
 	<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
