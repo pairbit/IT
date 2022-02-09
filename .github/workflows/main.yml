@@ -31,7 +31,7 @@ jobs:
         run: dotnet test src/IT.Tests/IT.Tests.csproj
         
       - name: Publish IT.Bcl
-        uses: rohith/publish-nuget@v2.5.5
+        uses: Elskom/publish-nuget@main
         with:
             PROJECT_FILE_PATH: src/IT.Bcl/IT.Bcl.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -39,21 +39,21 @@ jobs:
             INCLUDE_SYMBOLS: true
    
       - name: Publish IT
-        uses: rohith/publish-nuget@v2.5.5
+        uses: Elskom/publish-nuget@main
         with:
             PROJECT_FILE_PATH: src/IT/IT.csproj
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             
       - name: Publish IT.AspNet
-        uses: rohith/publish-nuget@v2.5.5
+        uses: Elskom/publish-nuget@main
         with:
             PROJECT_FILE_PATH: src/IT.AspNet/IT.AspNet.csproj
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             
       - name: Publish IT.Security.Cryptography.JinnServer
-        uses: rohith/publish-nuget@v2.5.5
+        uses: Elskom/publish-nuget@main
         with:
             PROJECT_FILE_PATH: src/IT.Security.Cryptography.JinnServer/IT.Security.Cryptography.JinnServer.csproj
             NUGET_KEY: ${{secrets.NUGET}}
