@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31410.357
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT", "src\IT\IT.csproj", "{D9E3D9A3-D76B-4687-86FC-EFFF146A299C}"
 EndProject
@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Tests", "src\IT.Tests\IT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.AspNet", "src\IT.AspNet\IT.AspNet.csproj", "{186C98EB-8C1D-4BA3-9C0E-40AAF121AD66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Security.Cryptography.JinnServer", "src\IT.Security.Cryptography.JinnServer\IT.Security.Cryptography.JinnServer.csproj", "{2AF2DA96-E547-4597-969A-502AD277CEE6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Security.Cryptography.JinnServer", "src\IT.Security.Cryptography.JinnServer\IT.Security.Cryptography.JinnServer.csproj", "{2AF2DA96-E547-4597-969A-502AD277CEE6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Bcl", "src\IT.Bcl\IT.Bcl.csproj", "{078C2A6B-B19F-41DA-904E-9529F4EF6D2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{2AF2DA96-E547-4597-969A-502AD277CEE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AF2DA96-E547-4597-969A-502AD277CEE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2AF2DA96-E547-4597-969A-502AD277CEE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{078C2A6B-B19F-41DA-904E-9529F4EF6D2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{078C2A6B-B19F-41DA-904E-9529F4EF6D2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{078C2A6B-B19F-41DA-904E-9529F4EF6D2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{078C2A6B-B19F-41DA-904E-9529F4EF6D2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
