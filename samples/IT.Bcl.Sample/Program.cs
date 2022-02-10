@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-Console.WriteLine("Hello C# 9");
+Console.WriteLine("Hello C# 10");
 
 List<A> list = new()
 {
