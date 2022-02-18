@@ -1,18 +1,16 @@
 ﻿#if NETSTANDARD2_0
 
+namespace System.Collections.Generic;
 
-namespace System.Collections.Generic
+public static class _Dictionary
 {
-    public static class _Dictionary
+    public static Boolean TryAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
     {
-        public static Boolean TryAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
-        {
-            if (dictionary.ContainsKey(key)) return false;
+        if (dictionary.ContainsKey(key)) return false;
 
-            dictionary.Add(key, value);
+        dictionary.Add(key, value);
 
-            return true;
-        }
+        return true;
     }
 }
 

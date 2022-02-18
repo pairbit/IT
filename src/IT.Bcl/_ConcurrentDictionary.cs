@@ -1,9 +1,6 @@
 ﻿#if NETSTANDARD2_0
 
-using System;
-using System.Collections.Concurrent;
-
-namespace IT.Bcl;
+namespace System.Collections.Concurrent;
 
 public static class _ConcurrentDictionary
 {

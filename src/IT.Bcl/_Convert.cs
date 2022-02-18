@@ -1,33 +1,31 @@
-﻿using System.Text;
+﻿#if NETSTANDARD2_0 || NETSTANDARD2_1
 
-namespace System
+using System.Text;
+
+namespace System;
+
+public static class _Convert
 {
-    public static class _Convert
+    public static String ToHexString(Byte[] bytes)
     {
+        var hex = new StringBuilder(bytes.Length * 2);
 
-#if NETSTANDARD2_0 || NETSTANDARD2_1
+        foreach (byte b in bytes)
+            hex.Append(b.ToString("X2"));
 
-        public static String ToHexString(Byte[] bytes)
-        {
-            var hex = new StringBuilder(bytes.Length * 2);
+        return hex.ToString();
+    }
 
-            foreach (byte b in bytes)
-                hex.Append(b.ToString("X2"));
+    public static Byte[] FromHexString(String hex)
+    {
+        int len = hex.Length;
+        byte[] bytes = new byte[len / 2];
 
-            return hex.ToString();
-        }
+        for (int i = 0; i < len; i += 2)
+            bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
 
-        public static Byte[] FromHexString(String hex)
-        {
-            int len = hex.Length;
-            byte[] bytes = new byte[len / 2];
-
-            for (int i = 0; i < len; i += 2)
-                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
-
-            return bytes;
-        }
-
-#endif
+        return bytes;
     }
 }
+
+#endif

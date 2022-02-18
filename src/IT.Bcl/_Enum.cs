@@ -1,22 +1,22 @@
 ﻿#if NETSTANDARD2_0
 
-namespace System
+namespace System;
+
+public static class _Enum
 {
-    public static class _Enum
+    public static bool TryParse(Type enumType, string value, bool ignoreCase, out object result)
     {
-        public static bool TryParse(Type enumType, string value, bool ignoreCase, out object result)
+        try
         {
-            try
-            {
-                result = Enum.Parse(enumType, value, ignoreCase);
-                return true;
-            }
-            catch (OverflowException)
-            {
-                result = null;
-                return false;
-            }
+            result = Enum.Parse(enumType, value, ignoreCase);
+            return true;
+        }
+        catch (OverflowException)
+        {
+            result = null;
+            return false;
         }
     }
 }
+
 #endif
