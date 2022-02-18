@@ -28,7 +28,7 @@ jobs:
         run: dotnet build IT.sln --configuration Release --no-restore 
     
       - name: Tests
-        run: dotnet test src/IT.Tests/IT.Tests.csproj
+        run: dotnet test tests/IT.Tests/IT.Tests.csproj
         
       - name: Publish IT.Bcl
         uses: pairbit/publish-nuget@v2.5.6
