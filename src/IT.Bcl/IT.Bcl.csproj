@@ -12,7 +12,7 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2020</Copyright>
-	<Version>2.0.1-rc9</Version>
+	<Version>2.0.1</Version>
 	<PackageReleaseNotes></PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
