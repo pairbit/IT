@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-	<LangVersion>10.0</LangVersion>
+	<LangVersion>latest</LangVersion>
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<Company />
@@ -11,9 +11,9 @@
 	<RepositoryUrl>https://github.com/pairbit/IT</RepositoryUrl>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
-	<Copyright>Ivan Tikhonov © 2020</Copyright>
-	<Version>2.0.3</Version>
-	<PackageReleaseNotes>Add CallerArgumentExpressionAttribute</PackageReleaseNotes>
+	<Copyright>Ivan Tikhonov © 2022</Copyright>
+	<Version>2.0.4</Version>
+	<PackageReleaseNotes>Add Microsoft.CSharp 4.7.0</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
 	<IncludeSymbols>true</IncludeSymbols>
@@ -28,6 +28,10 @@
 	<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
 	<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
 	<PackageReference Include="System.Memory" Version="4.5.4" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0' or $(TargetFramework) == 'netstandard2.1'">
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>
