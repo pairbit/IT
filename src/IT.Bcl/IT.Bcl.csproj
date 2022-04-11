@@ -12,10 +12,9 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.5</Version>
+	<Version>2.0.6</Version>
 	<PackageReleaseNotes>
-		Add Microsoft.CSharp 4.7.0
-		Add System.Text.Json 6.0.2
+		add _String.Contains
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
