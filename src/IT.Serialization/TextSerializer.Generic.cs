@@ -16,6 +16,8 @@ public abstract class TextSerializer<T> : ITextSerializer<T>, ISerializer<T>
 
     #region ISerializer
 
+    Byte[] ISerializer<T>.Serialize(T value) => _encoding.GetBytes(Serialize(value));
+
     T? ISerializer<T>.Deserialize(ReadOnlySpan<Byte> value)
     {
         var chars = new Span<Char>();
@@ -23,15 +25,13 @@ public abstract class TextSerializer<T> : ITextSerializer<T>, ISerializer<T>
         return Deserialize(chars);
     }
 
-    Byte[]? ISerializer<T>.Serialize(T? value) => _encoding.GetBytes(Serialize(value));
-
     #endregion ISerializer
 
     #region ITextSerializer
 
-    public abstract T? Deserialize(ReadOnlySpan<Char> value);
+    public abstract String Serialize(T value);
 
-    public abstract String? Serialize(T? value);
+    public abstract T? Deserialize(ReadOnlySpan<Char> value);
 
     #endregion ITextSerializer
 }

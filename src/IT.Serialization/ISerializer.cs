@@ -4,9 +4,9 @@ namespace IT.Serialization;
 
 public interface ISerializer
 {
-    Byte[]? Serialize<T>(T? value);
+    Byte[] Serialize<T>(T value);
 
-    Byte[]? Serialize(Object? value);
+    Byte[] Serialize(Object value);
 
     Object? Deserialize(ReadOnlySpan<Byte> value, Type type);
 

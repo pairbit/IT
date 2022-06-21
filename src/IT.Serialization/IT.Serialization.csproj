@@ -13,7 +13,7 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.1</Version>
+	<Version>2.0.0-pre1</Version>
 	<PackageReleaseNotes>
 
 	</PackageReleaseNotes>
@@ -25,11 +25,6 @@
 	<DebugType>full</DebugType>
 	<NoWarn>$(NoWarn);1591;IDE1006;IDE0049</NoWarn>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="IAsyncSerializer.cs" />
-    <Compile Remove="IAsyncSerializer.Generic.cs" />
-  </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <ProjectReference Include="..\IT.Memory\IT.Memory.csproj" />
