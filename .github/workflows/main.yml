@@ -37,3 +37,19 @@ jobs:
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Locking
+        uses: pairbit/publish-nuget@v2.5.6
+        with:
+            PROJECT_FILE_PATH: src/IT.Locking/IT.Locking.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Locking.Redis
+        uses: pairbit/publish-nuget@v2.5.6
+        with:
+            PROJECT_FILE_PATH: src/IT.Locking.Redis/IT.Locking.Redis.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
