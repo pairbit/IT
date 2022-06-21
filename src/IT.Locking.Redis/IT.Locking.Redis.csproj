@@ -13,9 +13,9 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.0</Version>
+	<Version>2.0.1</Version>
 	<PackageReleaseNotes>
-
+		add EmbeddedResource StringDeleteIfEqual.lua
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
@@ -25,6 +25,14 @@
 	<DebugType>full</DebugType>
 	<NoWarn>$(NoWarn);1591;IDE1006;IDE0049</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="StringDeleteIfEqual.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="StringDeleteIfEqual.lua" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="StackExchange.Redis" Version="2.6.45" />
