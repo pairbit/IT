@@ -33,7 +33,7 @@ jobs:
       - name: Publish System.Memory.Extensions
         uses: pairbit/publish-nuget@v2.5.6
         with:
-            PROJECT_FILE_PATH: ext/System.Memory.Extensions/System.Memory.Extensions.csproj
+            PROJECT_FILE_PATH: src/IT.Memory.Extensions/IT.Memory.Extensions.csproj
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             INCLUDE_SYMBOLS: true
