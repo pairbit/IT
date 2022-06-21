@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Serialization.MessagePac
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2.0", "2.0", "{A664EDEE-E9FB-4164-B575-263DA7742688}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Memory.Extensions", "src\IT.Memory.Extensions\IT.Memory.Extensions.csproj", "{CCC11834-BF6E-46C7-911F-7933CE906853}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Memory", "src\IT.Memory\IT.Memory.csproj", "{CCC11834-BF6E-46C7-911F-7933CE906853}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
