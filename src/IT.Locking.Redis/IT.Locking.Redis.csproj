@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+	<LangVersion>latest</LangVersion>
+	<Nullable>enable</Nullable>
+	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<Company />
+	<Description>Simple locking implementation via redis</Description>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<RepositoryUrl>https://github.com/pairbit/IT</RepositoryUrl>
+	<PublishRepositoryUrl>true</PublishRepositoryUrl>
+	<Authors>Ivan Tikhonov</Authors>
+	<Copyright>Ivan Tikhonov © 2022</Copyright>
+	<Version>2.0.0</Version>
+	<PackageReleaseNotes>
+
+	</PackageReleaseNotes>
+	<SignAssembly>true</SignAssembly>
+	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	<EmbedUntrackedSources>true</EmbedUntrackedSources>
+	<DebugType>full</DebugType>
+	<NoWarn>$(NoWarn);1591;IDE1006;IDE0049</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" Version="2.6.45" />
+	<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IT.Locking\IT.Locking.csproj" />
+  </ItemGroup>
+
+</Project>
