@@ -16,7 +16,7 @@ public class Generator : IGenerator
 
     public T Generate<T>(String? rule = null)
     {
-        var generator = (IGenerator<T>)_serviceProvider.GetService(typeof(IGenerator<T>));
+        var generator = (IGenerator<T>?)_serviceProvider.GetService(typeof(IGenerator<T>));
         if (generator != null && !generator.GetType().GetGenericTypeDefinition().Equals(typeof(Generator<>))) return generator.Generate();
         
         var type = typeof(T);

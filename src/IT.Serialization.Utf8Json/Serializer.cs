@@ -7,9 +7,9 @@ namespace IT.Serialization.Utf8Json;
 
 public class Serializer : ISerializer, IAsyncSerializer, ITextSerializer
 {
-    private readonly IJsonFormatterResolver _resolver;
+    private readonly IJsonFormatterResolver? _resolver;
 
-    public Serializer(IJsonFormatterResolver resolver)
+    public Serializer(IJsonFormatterResolver? resolver = null)
     {
         _resolver = resolver;
     }

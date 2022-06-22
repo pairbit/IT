@@ -5,12 +5,12 @@ namespace IT.Tests.Generation;
 public class Bogus
 {
     private Random _random = new Random();
-    private Faker<User> _faker;
+    private Faker<Person> _faker;
 
     //[SetUp]
     public void Setup()
     {
-        _faker = new Faker<User>();
+        _faker = new Faker<Person>();
     }
 
     //[Test]

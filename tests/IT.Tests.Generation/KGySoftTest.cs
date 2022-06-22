@@ -17,13 +17,13 @@ public class KGySoftTest
     [Test]
     public void Test1()
     {
-        var user1 = _random.NextObject<User>();
-        var user2 = _generator.Generate<User>();
+        var user1 = _random.NextObject<Person>();
+        var user2 = _generator.Generate<Person>();
 
         Assert.IsFalse(user1.Equals(user2));
 
-        var user3 = _random.NextObject(typeof(User));
-        var user4 = _generator.Generate(typeof(User));
+        var user3 = _random.NextObject(typeof(Person));
+        var user4 = _generator.Generate(typeof(Person));
 
         Assert.IsFalse(user3.Equals(user4));
 
