@@ -18,7 +18,5 @@ public class DataGeneratorTest
         var user2 = Generator.Default.Single<User>();
 
         Assert.IsFalse(user1.Equals(user2));
-
-        Assert.Pass();
     }
 }

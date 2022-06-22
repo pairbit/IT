@@ -7,13 +7,13 @@ public class Bogus
     private Random _random = new Random();
     private Faker<User> _faker;
 
-    [SetUp]
+    //[SetUp]
     public void Setup()
     {
         _faker = new Faker<User>();
     }
 
-    [Test]
+    //[Test]
     public void Test1()
     {
         var user1 = _faker.Generate();
