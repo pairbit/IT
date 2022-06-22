@@ -2,12 +2,12 @@
 
   <PropertyGroup>
 	<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
-	<LangVersion>latest</LangVersion>
-	<Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<Company />
-	<Description>Implementation of binary serialization via MessagePack</Description>
+	<Description>Implementation of data generation via KGySoft.CoreLibraries</Description>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/pairbit/IT</RepositoryUrl>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -25,10 +25,14 @@
 	<DebugType>full</DebugType>
 	<NoWarn>$(NoWarn);1591;IDE1006;IDE0049</NoWarn>
   </PropertyGroup>
-
+	
   <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.3.112" />
-	<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="KGySoft.CoreLibraries" Version="6.0.2" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
-
+	
+  <ItemGroup>
+    <ProjectReference Include="..\IT.Generation\IT.Generation.csproj" />
+  </ItemGroup>
+	
 </Project>
