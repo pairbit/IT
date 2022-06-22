@@ -39,7 +39,14 @@ public class Generator : IGenerator
         if (generator != null)
         {
             var method = generatorType.GetMethod("Generate");
-            return method.Invoke(generator, Array.Empty<Object>());
+
+            if (method is null) throw new InvalidOperationException("Method 'Generate' not found");
+
+            var value = method.Invoke(generator, Array.Empty<Object>());
+
+            if (value is null) throw new InvalidOperationException("value is null");
+
+            return value;
         }
 
         return GenerateByType(Nullable.GetUnderlyingType(type) ?? type);
