@@ -27,10 +27,13 @@ jobs:
       - name: Build
         run: dotnet build IT.sln --configuration Release --no-restore 
     
-      - name: Tests
+      - name: IT.Tests
         run: dotnet test tests/IT.Tests/IT.Tests.csproj
+            
+      - name: IT.Tests.Generation
+        run: dotnet test tests/IT.Tests.Generation/IT.Tests.Generation.csproj
         
-      - name: Publish System.Memory.Extensions
+      - name: Publish IT.Memory
         uses: pairbit/publish-nuget@v2.5.6
         with:
             PROJECT_FILE_PATH: src/IT.Memory/IT.Memory.csproj
@@ -58,6 +61,22 @@ jobs:
         uses: pairbit/publish-nuget@v2.5.6
         with:
             PROJECT_FILE_PATH: src/IT.Locking.Redis/IT.Locking.Redis.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+
+      - name: Publish IT.Generation
+        uses: pairbit/publish-nuget@v2.5.6
+        with:
+            PROJECT_FILE_PATH: src/IT.Generation/IT.Generation.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Generation.KGySoft
+        uses: pairbit/publish-nuget@v2.5.6
+        with:
+            PROJECT_FILE_PATH: src/IT.Generation.KGySoft/IT.Generation.KGySoft.csproj
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             INCLUDE_SYMBOLS: true
