@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using StackExchange.Redis;
+﻿using StackExchange.Redis;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -9,14 +8,15 @@ namespace IT.Locking.Redis;
 public class Locker : ILocker
 {
     private static readonly TimeSpan ExpiryDebug = TimeSpan.FromMinutes(3);
-    protected readonly String _prefix;
     protected readonly IDatabase _db;
+    protected readonly String? _prefix;
+    protected readonly Func<Byte[]> _newId;
 
-    public Locker(IOptions<Options> options, IDatabase db)
+    public Locker(IDatabase db, Func<Options>? getOptions = null, Func<Byte[]>? newId = null)
     {
-        var value = options.Value;
-        _prefix = value.Prefix;
         _db = db;
+        _prefix = getOptions?.Invoke()?.Prefix;
+        _newId = newId ?? (() => Guid.NewGuid().ToByteArray());
     }
 
     #region ILocker
@@ -27,7 +27,7 @@ public class Locker : ILocker
         if (resource.Length == 0) throw new ArgumentException("is empty", nameof(resource));
 
         RedisKey key = _prefix is null ? resource : $"{_prefix}:{resource}";
-        RedisValue value = Guid.NewGuid().ToByteArray();
+        RedisValue value = _newId();
 
         return _db.StringSet(key, value, Debugger.IsAttached ? ExpiryDebug : expiry, when: When.NotExists) ? new _Lock(_db, key, value) : null;
     }
@@ -47,9 +47,9 @@ public class Locker : ILocker
         if (resource.Length == 0) throw new ArgumentException("is empty", nameof(resource));
 
         RedisKey key = _prefix is null ? resource : $"{_prefix}:{resource}";
-        RedisValue value = Guid.NewGuid().ToByteArray();
+        RedisValue value = _newId();
 
-        return await _db.StringSetAsync(key, value, Debugger.IsAttached ? ExpiryDebug : expiry, when: When.NotExists).ConfigureAwait(false) 
+        return await _db.StringSetAsync(key, value, Debugger.IsAttached ? ExpiryDebug : expiry, when: When.NotExists).ConfigureAwait(false)
             ? new _Lock(_db, key, value) : null;
     }
 

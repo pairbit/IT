@@ -13,9 +13,9 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.0-pre1</Version>
+	<Version>2.0.0-pre2</Version>
 	<PackageReleaseNotes>
-
+		remove dependency Microsoft.Extensions.Options
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
@@ -27,7 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0' or $(TargetFramework) == 'netstandard2.1'">
-    <PackageReference Include="System.Text.Json" Version="6.0.2" />
+    <PackageReference Include="System.Text.Json" Version="6.0.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,7 +37,6 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
 	<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 	

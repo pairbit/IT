@@ -13,9 +13,10 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.3</Version>
+	<Version>2.0.4</Version>
 	<PackageReleaseNotes>
-		change description
+		remove dependency Microsoft.Extensions.Options
+		add func new id
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
@@ -36,7 +37,6 @@
 
   <ItemGroup>
     <PackageReference Include="StackExchange.Redis" Version="2.6.45" />
-	<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
