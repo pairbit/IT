@@ -113,12 +113,18 @@ public static class Hash
 
         { "GOST3411", "1.2.643.2.2.9" },
         { "GOST_R3411_94", "1.2.643.2.2.9" },
+        { "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr3411", "1.2.643.2.2.9" },
+        { "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102001-gostr3411", "1.2.643.2.2.9" },
 
         { "GOST3411-2012-256", "1.2.643.7.1.1.2.2" },
         { "GOST_R3411_2012_256", "1.2.643.7.1.1.2.2" },
+        { "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34112012-256", "1.2.643.7.1.1.2.2" },
+        { "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012-256", "1.2.643.7.1.1.2.2" },
 
         { "GOST3411-2012-512", "1.2.643.7.1.1.2.3" },
         { "GOST_R3411_2012_512", "1.2.643.7.1.1.2.3" },
+        { "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34112012-512", "1.2.643.7.1.1.2.3" },
+        { "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012-512", "1.2.643.7.1.1.2.3" },
 
         { "MD2", "1.2.840.113549.2.2" },
         { "MD-2", "1.2.840.113549.2.2" },

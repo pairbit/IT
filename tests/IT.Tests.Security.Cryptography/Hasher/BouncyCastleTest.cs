@@ -15,7 +15,6 @@ public class BouncyCastleTest
         _hasher = new IT.Security.Cryptography.BouncyCastle.Hasher();
     }
 
-
     [Test]
     public void Test1()
     {
@@ -25,7 +24,7 @@ public class BouncyCastleTest
 
         foreach (String algo in DigestUtilities.Algorithms)
         {
-            var hashBytes = DigestUtilities.CalculateDigest(algo, _data);
+            var hashBytes = _hasher.Hash(algo, _data);
             var hash = Convert.ToHexString(hashBytes);
 
             var oid = DigestUtilities.GetObjectIdentifier(algo).ToString();
