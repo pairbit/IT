@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IT.Security.Cryptography.Impl;
+namespace IT.Security.Cryptography;
 
 public class Hasher : IHasher
 {
