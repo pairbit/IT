@@ -48,6 +48,16 @@ public unsafe class XXH32 : XXH
 
     public XXH32() => Reset();
 
+    #region HashAlgorithm
+
+    public override void Initialize() => Reset();
+
+    protected override void HashCore(byte[] array, int ibStart, int cbSize) => Update(array, ibStart, cbSize);
+
+    protected override byte[] HashFinal() => DigestBytes();
+
+    #endregion HashAlgorithm
+
     public unsafe void Reset()
     {
         fixed (XXH32_state* stateP = &_state)
@@ -82,7 +92,7 @@ public unsafe class XXH32 : XXH
 
     public byte[] DigestBytes() => BitConverter.GetBytes(Digest());
 
-    public HashAlgorithm AsHashAlgorithm() => new HashAlgorithmAdapter(sizeof(uint), Reset, Update, DigestBytes);
+    //public HashAlgorithm AsHashAlgorithm() => new HashAlgorithmAdapter(sizeof(uint), Reset, Update, DigestBytes);
 
     #endregion Public
 

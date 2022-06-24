@@ -8,7 +8,7 @@ public static class Hash
 {
     public static class Name
     {
-        public static String[] All { get; } = new[] { XXH32, XXH64, MD5, SHA1, SHA256, SHA384, SHA512, GOST_R3411_94, GOST_R3411_2012_256, GOST_R3411_2012_512 };
+        public static String[] All { get; } = new[] { XXH32, XXH64, MD5, SHA1, SHA256, SHA384, SHA512 };
 
         public const String XXH32 = nameof(XXH32);
         public const String XXH64 = nameof(XXH64);
@@ -269,6 +269,9 @@ public static class Hash
 
     static Hash()
     {
+        Add<XXH32>(Name.XXH32);
+        Add<XXH64>(Name.XXH64);
+
         foreach (var alg in _algs)
         {
             var name = alg.Key;
@@ -280,12 +283,6 @@ public static class Hash
     }
 
     public static void Add<T>(params String[] names) where T : HashAlgorithm => CryptoConfig.AddAlgorithm(typeof(T), names);
-
-    public static void Add<T>(String oid, params String[] names) where T : HashAlgorithm
-    {
-        Add<T>(names);
-        CryptoConfig.AddOID(oid, names);
-    }
 
     /// <summary>
     /// Получить результат вычислениях хеша от строки 'Empty'
@@ -313,9 +310,6 @@ public static class Hash
     /// </summary>
     public static HashAlgorithm? TryCreate(String alg)
     {
-        if (alg.Equals("XXH32", StringComparison.OrdinalIgnoreCase)) return new XXH32().AsHashAlgorithm();
-        if (alg.Equals("XXH64", StringComparison.OrdinalIgnoreCase)) return new XXH64().AsHashAlgorithm();
-
         var crypto = CryptoConfig.CreateFromName(alg);
 
         if (crypto == null) return null;

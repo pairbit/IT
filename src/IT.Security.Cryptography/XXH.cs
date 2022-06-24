@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 namespace IT.Security.Cryptography;
 
-public unsafe class XXH
+public abstract unsafe class XXH : HashAlgorithm
 {
-    protected XXH() { }
+    protected XXH() 
+    {
+        HashSizeValue = sizeof(uint);
+    }
+
+    #region static
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static uint XXH_read32(void* p) => *(uint*)p;
@@ -95,4 +101,6 @@ public unsafe class XXH
         if (bytes == null || offset < 0 || length < 0 || offset + length > bytes.Length)
             throw new ArgumentException("Invalid buffer boundaries");
     }
+
+    #endregion static
 }

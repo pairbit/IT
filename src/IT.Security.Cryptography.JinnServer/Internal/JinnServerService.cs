@@ -16,9 +16,9 @@ namespace IT.Security.Cryptography.JinnServer.Internal;
 internal class JinnServerService
 {
     private readonly String _url;
-    private readonly ILogger _logger;
+    private readonly ILogger? _logger;
 
-    public JinnServerService(String url, ILogger logger)
+    public JinnServerService(String url, ILogger? logger)
     {
         _url = url;
         _logger = logger;
@@ -67,7 +67,8 @@ internal class JinnServerService
 
     private String GetResponseText(String message, String soapAction, Encoding? encoding = null)
     {
-        if (_logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Request: {request}", message);
+        if (_logger is not null && _logger.IsEnabled(LogLevel.Debug)) 
+            _logger.LogDebug("Request: {request}", message);
 
         if (encoding == null) encoding = Encoding.ASCII;
         var messageBytes = encoding.GetBytes(message);
@@ -80,7 +81,7 @@ internal class JinnServerService
 
         using var response = (HttpWebResponse)TryGetResponse(request);
 
-        if (response.StatusCode != HttpStatusCode.OK)
+        if (_logger is not null && response.StatusCode != HttpStatusCode.OK)
             _logger.LogInformation("Response Code: {responseStatusCode} ({responseStatusDescription}), Size: {requestContentLength}",
                 response.StatusCode, response.StatusDescription, request.ContentLength);
 
@@ -92,7 +93,8 @@ internal class JinnServerService
 
     private async Task<String> GetResponseTextAsync(String message, String soapAction, Encoding? encoding = null)
     {
-        if (_logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Request: {request}", message);
+        if (_logger is not null && _logger.IsEnabled(LogLevel.Debug)) 
+            _logger.LogDebug("Request: {request}", message);
 
         if (encoding == null) encoding = Encoding.ASCII;
         var messageBytes = encoding.GetBytes(message);
@@ -105,7 +107,7 @@ internal class JinnServerService
 
         using var response = (HttpWebResponse)await TryGetResponseAsync(request).ConfigureAwait(false);
 
-        if (response.StatusCode != HttpStatusCode.OK)
+        if (_logger is not null && response.StatusCode != HttpStatusCode.OK)
             _logger.LogInformation("Response Code: {responseStatusCode} ({responseStatusDescription}), Size: {requestContentLength}",
                 response.StatusCode, response.StatusDescription, request.ContentLength);
 
@@ -117,7 +119,8 @@ internal class JinnServerService
 
     private Body ParseResponse(String responseText)
     {
-        if (_logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Response: {response}", responseText);
+        if (_logger is not null && _logger.IsEnabled(LogLevel.Debug)) 
+            _logger.LogDebug("Response: {response}", responseText);
 
         var envelope = Xml.Deserialize<Envelope>(responseText, findRoot: true);
         

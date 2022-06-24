@@ -31,6 +31,16 @@ public unsafe class XXH64 : XXH
 
     public XXH64() => Reset();
 
+    #region HashAlgorithm
+
+    public override void Initialize() => Reset();
+
+    protected override void HashCore(byte[] array, int ibStart, int cbSize) => Update(array, ibStart, cbSize);
+
+    protected override byte[] HashFinal() => DigestBytes();
+
+    #endregion HashAlgorithm
+
     public static unsafe ulong DigestOf(void* bytes, int length) => XXH64_hash(bytes, length, 0);
 
     public static unsafe ulong DigestOf(ReadOnlySpan<byte> bytes)
@@ -81,7 +91,7 @@ public unsafe class XXH64 : XXH
 
     public byte[] DigestBytes() => BitConverter.GetBytes(Digest());
 
-    public HashAlgorithm AsHashAlgorithm() => new HashAlgorithmAdapter(sizeof(uint), Reset, Update, DigestBytes);
+    //public HashAlgorithm AsHashAlgorithm() => new HashAlgorithmAdapter(sizeof(uint), Reset, Update, DigestBytes);
 
     #endregion
 

@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 
 namespace IT.Security.Cryptography;
 
-public class HashAlgorithmAdapter : HashAlgorithm
+internal class HashAlgorithmAdapter : HashAlgorithm
 {
     private readonly Action _reset;
     private readonly Action<byte[], int, int> _update;

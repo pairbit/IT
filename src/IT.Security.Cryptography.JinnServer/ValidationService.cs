@@ -15,9 +15,9 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 {
     private readonly JinnServerService _service;
     private readonly ValidationOptions _options;
-    private readonly ILogger _logger;
+    private readonly ILogger? _logger;
 
-    public ValidationService(Func<ValidationOptions> getOptions, ILogger<ValidationService> logger)
+    public ValidationService(Func<ValidationOptions> getOptions, ILogger<ValidationService>? logger = null)
     {
         if (getOptions is null) throw new ArgumentNullException(nameof(getOptions));
 

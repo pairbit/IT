@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace IT.Security.Cryptography.JinnServer;
 
@@ -12,15 +13,17 @@ using Options;
 
 public class SigningService : IHasher, ISigner
 {
+    private static readonly String[] _algs = new[] { "1.2.643.2.2.9", "1.2.643.7.1.1.2.2", "1.2.643.7.1.1.2.3" }; 
+
     private readonly ICryptoInformer _cryptoInformer;
-    private readonly ILogger _logger;
+    private readonly ILogger? _logger;
     private readonly JinnServerService _service;
     private readonly SigningOptions _options;
 
     public SigningService(
         Func<SigningOptions> getOptions,
         ICryptoInformer cryptoInformer,
-        ILogger<SigningService> logger)
+        ILogger<SigningService>? logger = null)
     {
         if (getOptions is null) throw new ArgumentNullException(nameof(getOptions));
 
@@ -34,9 +37,11 @@ public class SigningService : IHasher, ISigner
 
     #region IHasher
 
+    public IReadOnlyCollection<String> Algs => _algs;
+
     public Byte[] Hash(String alg, Stream data)
     {
-        var oid = _cryptoInformer.GetOid(alg);
+        var oid = _cryptoInformer.GetOid(alg) ?? alg;
 
         string? digest = null;
 
@@ -44,15 +49,15 @@ public class SigningService : IHasher, ISigner
 
         var parts = data.GetParts(partInBytesValue);
 
-        var moreOne = parts > 1;
+        var moreOne = parts > 1 && _logger is not null;
 
-        if (moreOne) _logger.LogInformation("Parts: {parts}", parts);
+        if (moreOne) _logger!.LogInformation("Parts: {parts}", parts);
 
         string? state = null;
 
         for (int part = 0; part < parts; part++)
         {
-            if (moreOne) _logger.LogInformation("Read {part} part", part);
+            if (moreOne) _logger!.LogInformation("Read {part} part", part);
 
             var bytes = data.ReadPartBytes(partInBytesValue, part);
 
@@ -79,7 +84,7 @@ public class SigningService : IHasher, ISigner
 
     public Byte[] Hash(String alg, ReadOnlySpan<Byte> data)
     {
-        var oid = _cryptoInformer.GetOid(alg);
+        var oid = _cryptoInformer.GetOid(alg) ?? alg;
 
         //TODO: ReadOnlySpan
         var dataBase64 = data.ToArray().ToBase64();
@@ -101,7 +106,7 @@ public class SigningService : IHasher, ISigner
 
     public async Task<Byte[]> HashAsync(String alg, Stream data, CancellationToken cancellationToken = default)
     {
-        var oid = _cryptoInformer.GetOid(alg);
+        var oid = _cryptoInformer.GetOid(alg) ?? alg;
 
         string? digest = null;
 
@@ -109,9 +114,9 @@ public class SigningService : IHasher, ISigner
 
         var parts = data.GetParts(partInBytesValue);
 
-        var moreOne = parts > 1;
+        var moreOne = parts > 1 && _logger is not null;
 
-        if (moreOne) _logger.LogInformation("Parts: {parts}", parts);
+        if (moreOne) _logger!.LogInformation("Parts: {parts}", parts);
 
         string? state = null;
 
@@ -119,7 +124,7 @@ public class SigningService : IHasher, ISigner
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (moreOne) _logger.LogInformation("Read {part} part", part);
+            if (moreOne) _logger!.LogInformation("Read {part} part", part);
 
             var bytes = await data.ReadPartBytesAsync(partInBytesValue, part).ConfigureAwait(false);
 
