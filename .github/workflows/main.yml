@@ -107,3 +107,43 @@ jobs:
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Security.Cryptography
+        uses: pairbit/publish-nuget@v2.5.6
+        with:
+            PROJECT_FILE_PATH: src/IT.Security.Cryptography/IT.Security.Cryptography.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Security.Cryptography.Xml
+        uses: pairbit/publish-nuget@v2.5.6
+        with:
+            PROJECT_FILE_PATH: src/IT.Security.Cryptography.Xml/IT.Security.Cryptography.Xml.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Security.Cryptography.Gost
+        uses: pairbit/publish-nuget@v2.5.6
+        with:
+            PROJECT_FILE_PATH: src/IT.Security.Cryptography.Gost/IT.Security.Cryptography.Gost.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Security.Cryptography.JinnServer
+        uses: pairbit/publish-nuget@v2.5.6
+        with:
+            PROJECT_FILE_PATH: src/IT.Security.Cryptography.JinnServer/IT.Security.Cryptography.JinnServer.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Security.Cryptography.BouncyCastle
+        uses: pairbit/publish-nuget@v2.5.6
+        with:
+            PROJECT_FILE_PATH: src/IT.Security.Cryptography.BouncyCastle/IT.Security.Cryptography.BouncyCastle.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
