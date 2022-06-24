@@ -1,36 +1,54 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
 namespace IT.Security.Cryptography;
 
 public static class Crypto
 {
-    private static readonly Type ConfigType = typeof(CryptoConfig);
+    private static readonly Type _configType = typeof(CryptoConfig);
 
-    public static ReadOnlyDictionary<String, Object> Names { get; }
+    public static ReadOnlyDictionary<String, Object>? DefaultNames { get; }
 
-    public static ReadOnlyDictionary<String, String> Oids { get; }
+    public static ReadOnlyDictionary<String, Type>? Names { get; }
 
-    private static Dictionary<String, Object> DefaultNameHT => GetProp<Dictionary<String, Object>>();
+    public static ReadOnlyDictionary<String, String>? DefaultOids { get; }
 
-    private static Dictionary<String, String> DefaultOidHT => GetProp<Dictionary<String, String>>();
+    public static ReadOnlyDictionary<String, String>? Oids { get; }
 
     static Crypto()
     {
-        //GostCryptoConfig.Initialize();
-        Names = new ReadOnlyDictionary<String, Object>(DefaultNameHT);
-        Oids = new ReadOnlyDictionary<String, String>(DefaultOidHT);
+        var defaultNameHT = GetProperty<Dictionary<String, Object>>("DefaultNameHT");
+
+        if (defaultNameHT is not null)
+            DefaultNames = new ReadOnlyDictionary<String, Object>(defaultNameHT);
+
+        var defaultOidHT = GetProperty<Dictionary<String, String>>("DefaultOidHT");
+
+        if (defaultOidHT is not null)
+            DefaultOids = new ReadOnlyDictionary<String, String>(defaultOidHT);
+
+        var appNameHT = GetField<ConcurrentDictionary<String, Type>>("appNameHT");
+
+        if (appNameHT is not null)
+            Names = new ReadOnlyDictionary<String, Type>(appNameHT);
+
+        var appOidHT = GetField<ConcurrentDictionary<String, String>>("appOidHT");
+
+        if (appOidHT is not null)
+            Oids = new ReadOnlyDictionary<String, String>(appOidHT);
     }
 
     public static void Init() { }
 
-    public static SignatureDescription CreateSignatureDescription(String name) => (SignatureDescription)CryptoConfig.CreateFromName(name);
+    public static SignatureDescription? CreateSignatureDescription(String name) => (SignatureDescription?)CryptoConfig.CreateFromName(name);
 
-    public static Object Create(String name) => CryptoConfig.CreateFromName(name);
+    public static Object? Create(String name) => CryptoConfig.CreateFromName(name);
 
-    private static T GetProp<T>([CallerMemberName] String? name = null) => (T)ConfigType.GetProperty(name, BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+    private static T? GetProperty<T>(String name) => (T?)_configType.GetProperty(name, BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null);
+
+    private static T? GetField<T>(String name) => (T?)_configType.GetField(name, BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null);
 }
