@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace System.IO;
 
-public static class xStream
+internal static class xStream
 {
     public static Int32 GetParts(this Stream stream, Int64 count) => (Int32)Math.Ceiling(stream.Length / (Double)count);
 

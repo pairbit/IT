@@ -6,7 +6,7 @@ namespace System;
 /// <summary>
 /// Markup language
 /// </summary>
-public static class Ml
+internal static class Ml
 {
     public const char Lt = '<';
     public const char Gt = '>';
