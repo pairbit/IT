@@ -16,6 +16,8 @@ public abstract class PdfConverterTest : IDisposable
     {
         var html = $"Простые данные для отображения в PDF ({Guid.NewGuid()})";
 
+        //var html = File.ReadAllText(@"D:\var\pdf\View2.txt");
+
         var bytes = _pdfConverter.Convert(html);
 
         Assert.True(bytes is not null);

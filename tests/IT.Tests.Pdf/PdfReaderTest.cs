@@ -33,6 +33,10 @@ public abstract class PdfReaderTest
                 Assert.True(pageBytes is not null);
 
                 Assert.True(pageBytes!.Length > 0);
+
+                var path = Path.Combine(dir, Path.GetFileNameWithoutExtension(file));
+                path += $".{page}.pdf";
+                //File.WriteAllBytes(path, pageBytes);
             }
         }
     }

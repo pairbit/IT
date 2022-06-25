@@ -47,7 +47,7 @@ public class PdfConverter : IPdfConverter, IDisposable
 
         var document = new HtmlToPdfDocument()
         {
-            GlobalSettings = _getGlobalSettings?.Invoke() ?? DefaultGlobalSettings,
+            GlobalSettings = GetGlobalSettings(),
             Objects = { GetObjectSettings(content) }
         };
 
@@ -62,7 +62,7 @@ public class PdfConverter : IPdfConverter, IDisposable
                 _logger.LogError(ex, "Ошибка генерации pdf: {viewHtml}", content);
             }
 
-            throw new InvalidOperationException("Сервер не смог сгенерировать PDF файл. Попробуйте создать HTML представление или обратитесь к администратору.");
+            throw new InvalidOperationException("Сервер не смог сгенерировать PDF файл. Попробуйте создать HTML представление или обратитесь к администратору.", ex);
         }
     }
 
@@ -72,6 +72,17 @@ public class PdfConverter : IPdfConverter, IDisposable
 
         _disposed = true;
         _converter.Dispose();
+    }
+
+    private GlobalSettings GetGlobalSettings()
+    {
+        var globalSettings = _getGlobalSettings?.Invoke();
+
+        if (globalSettings is null) return DefaultGlobalSettings;
+
+        if (globalSettings.PaperSize is null) globalSettings.PaperSize = PaperKind.A4;
+
+        return globalSettings;
     }
 
     private ObjectSettings GetObjectSettings(String content)
