@@ -46,7 +46,13 @@ public class PdfReader : IPdfReader
         }
         catch (NotSupportedException ex)
         {
+            if (_logger is not null && _logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning(ex, "Try RegisterProvider");
+
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            if (_logger is not null && _logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)");
 
             newDoc.Save(outStream);
         }
