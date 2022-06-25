@@ -16,4 +16,9 @@
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\IT.Pdf.PDFSharp\IT.Pdf.PDFSharp.csproj" />
+    <ProjectReference Include="..\..\src\IT.Pdf.WkHtmlToPdfDotNet\IT.Pdf.WkHtmlToPdfDotNet.csproj" />
+  </ItemGroup>
+
 </Project>
