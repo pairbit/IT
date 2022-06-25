@@ -27,8 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\IT.Pdf.DinkToPdf\IT.Pdf.DinkToPdf.csproj" />
     <ProjectReference Include="..\..\src\IT.Pdf.PDFSharp\IT.Pdf.PDFSharp.csproj" />
-    <ProjectReference Include="..\..\src\IT.Pdf.WkHtmlToPdfDotNet\IT.Pdf.WkHtmlToPdfDotNet.csproj" />
   </ItemGroup>
 
 </Project>

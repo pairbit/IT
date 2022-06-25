@@ -1,6 +1,6 @@
 ﻿using WkHtmlToPdfDotNet;
 
-namespace IT.Pdf.WkHtmlToPdfDotNet;
+namespace IT.Pdf.DinkToPdf;
 
 public class LocalSettings
 {

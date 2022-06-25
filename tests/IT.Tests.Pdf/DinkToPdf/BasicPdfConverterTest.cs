@@ -1,7 +1,7 @@
-using IT.Pdf.WkHtmlToPdfDotNet;
+using IT.Pdf.DinkToPdf;
 using WkHtmlToPdfDotNet;
 
-namespace IT.Tests.Pdf.WkHtmlToPdfDotNet;
+namespace IT.Tests.Pdf.DinkToPdf;
 
 public class BasicPdfConverterTest : PdfConverterTest
 {

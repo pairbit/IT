@@ -7,7 +7,7 @@
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<Company />
-	<Description>Implementation of conversion html to pdf via WkHtmlToPdfDotNet</Description>
+	<Description>Implementation of conversion html to pdf via DinkToPdf</Description>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/pairbit/IT</RepositoryUrl>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>

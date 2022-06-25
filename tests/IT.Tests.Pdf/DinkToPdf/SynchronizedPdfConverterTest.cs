@@ -1,6 +1,6 @@
-using IT.Pdf.WkHtmlToPdfDotNet;
+using IT.Pdf.DinkToPdf;
 
-namespace IT.Tests.Pdf.WkHtmlToPdfDotNet;
+namespace IT.Tests.Pdf.DinkToPdf;
 
 public class SynchronizedPdfConverterTest : PdfConverterTest
 {
