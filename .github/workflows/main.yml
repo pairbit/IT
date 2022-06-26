@@ -189,7 +189,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Pdf.PDFSharp
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Pdf.PDFSharp/IT.Pdf.PDFSharp.csproj
             NUGET_KEY: ${{secrets.NUGET}}
