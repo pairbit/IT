@@ -39,7 +39,7 @@ public class HashRepository<TId, TValue> : HashRepository,
 
     public async Task<TId> CreateAsync(TValue value)
     {
-        if (_newId is null) throw new NotSupportedException();
+        if (_newId is null) throw new NotSupportedException("_newId is null");
 
         TId id = _newId.Invoke();
 
@@ -61,7 +61,7 @@ public class HashRepository<TId, TValue> : HashRepository,
 
     public TId Create(TValue value)
     {
-        if (_newId is null) throw new NotSupportedException();
+        if (_newId is null) throw new NotSupportedException("_newId is null");
 
         TId id = _newId.Invoke();
 

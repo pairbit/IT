@@ -20,7 +20,8 @@ public abstract class TextSerializer<T> : ITextSerializer<T>, ISerializer<T>
 
     T? ISerializer<T>.Deserialize(ReadOnlySpan<Byte> value)
     {
-        var chars = new Span<Char>();
+        var charCount = _encoding.GetCharCount(value);
+        var chars = new Char[charCount].AsSpan();
         _encoding.GetChars(value, chars);
         return Deserialize(chars);
     }

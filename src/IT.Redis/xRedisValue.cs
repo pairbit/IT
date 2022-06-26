@@ -27,7 +27,7 @@ public static class xRedisValue
         if (value is DateTime dateTime) return dateTime.Ticks;
         if (value is TimeSpan timeSpan) return timeSpan.Ticks;
 
-        if (serialize is null) throw new NotSupportedException();
+        if (serialize is null) throw new NotSupportedException("serialize is null");
 
         return serialize(value);
     }
@@ -40,7 +40,7 @@ public static class xRedisValue
 
         if (val is null)
         {
-            if (deserialize is null) throw new NotSupportedException();
+            if (deserialize is null) throw new NotSupportedException("deserialize is null");
 
             return deserialize(value);
         }
