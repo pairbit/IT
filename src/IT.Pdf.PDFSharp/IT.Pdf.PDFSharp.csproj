@@ -13,7 +13,7 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.0-pre1</Version>
+	<Version>2.0.0-pre2</Version>
 	<PackageReleaseNotes>
 
 	</PackageReleaseNotes>
@@ -24,7 +24,6 @@
 	<EmbedUntrackedSources>true</EmbedUntrackedSources>
 	<DebugType>full</DebugType>
 	<NoWarn>$(NoWarn);1591;IDE1006;IDE0049</NoWarn>
-	<Optimize>False</Optimize>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0' or $(TargetFramework) == 'netstandard2.1'">
