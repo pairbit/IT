@@ -37,7 +37,7 @@ jobs:
         run: dotnet test tests/IT.Tests.Serialization/IT.Tests.Serialization.csproj
         
       - name: Publish IT.Memory
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Memory/IT.Memory.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -45,7 +45,7 @@ jobs:
             INCLUDE_SYMBOLS: true
         
       - name: Publish IT.Bcl
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Bcl/IT.Bcl.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -53,7 +53,7 @@ jobs:
             INCLUDE_SYMBOLS: true
       
       - name: Publish IT.Id
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Id/IT.Id.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -61,7 +61,7 @@ jobs:
             INCLUDE_SYMBOLS: true
       
       - name: Publish IT.Locking
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Locking/IT.Locking.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -69,7 +69,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Locking.Redis
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Locking.Redis/IT.Locking.Redis.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -77,7 +77,7 @@ jobs:
             INCLUDE_SYMBOLS: true
 
       - name: Publish IT.PubSub
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.PubSub/IT.PubSub.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -85,7 +85,7 @@ jobs:
             INCLUDE_SYMBOLS: true
 
       - name: Publish IT.PubSub.Redis
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.PubSub.Redis/IT.PubSub.Redis.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -93,7 +93,7 @@ jobs:
             INCLUDE_SYMBOLS: true
 
       - name: Publish IT.Generation
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Generation/IT.Generation.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -101,7 +101,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Generation.KGySoft
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Generation.KGySoft/IT.Generation.KGySoft.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -109,7 +109,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Serialization
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Serialization/IT.Serialization.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -117,7 +117,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Serialization.Json
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Serialization.Json/IT.Serialization.Json.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -125,7 +125,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Serialization.Utf8Json
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Serialization.Utf8Json/IT.Serialization.Utf8Json.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -133,7 +133,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Security.Cryptography
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Security.Cryptography/IT.Security.Cryptography.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -141,7 +141,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Security.Cryptography.Xml
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Security.Cryptography.Xml/IT.Security.Cryptography.Xml.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -149,7 +149,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Security.Cryptography.Gost
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Security.Cryptography.Gost/IT.Security.Cryptography.Gost.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -157,7 +157,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Security.Cryptography.JinnServer
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Security.Cryptography.JinnServer/IT.Security.Cryptography.JinnServer.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -165,7 +165,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Security.Cryptography.BouncyCastle
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Security.Cryptography.BouncyCastle/IT.Security.Cryptography.BouncyCastle.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -173,7 +173,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Pdf
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Pdf/IT.Pdf.csproj
             NUGET_KEY: ${{secrets.NUGET}}
@@ -181,7 +181,7 @@ jobs:
             INCLUDE_SYMBOLS: true
             
       - name: Publish IT.Pdf.DinkToPdf
-        uses: pairbit/publish-nuget@v2.5.6
+        uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Pdf.DinkToPdf/IT.Pdf.DinkToPdf.csproj
             NUGET_KEY: ${{secrets.NUGET}}
