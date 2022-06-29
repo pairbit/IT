@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+	<LangVersion>latest</LangVersion>
+	<Nullable>enable</Nullable>
+	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<Company />
+	<Description>Extensions of System to support latest language version</Description>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<RepositoryUrl>https://github.com/pairbit/IT</RepositoryUrl>
+	<PublishRepositoryUrl>true</PublishRepositoryUrl>
+	<Authors>Ivan Tikhonov</Authors>
+	<Copyright>Ivan Tikhonov © 2022</Copyright>
+	<Version>2.0.3</Version>
+	<PackageReleaseNotes>
+	  add Index and Range
+	</PackageReleaseNotes>
+	<SignAssembly>true</SignAssembly>
+	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	<EmbedUntrackedSources>true</EmbedUntrackedSources>
+	<DebugType>full</DebugType>
+	<NoWarn>$(NoWarn);1591;IDE1006;IDE0049</NoWarn>
+  </PropertyGroup>
+
+</Project>
