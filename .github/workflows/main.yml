@@ -219,3 +219,19 @@ jobs:
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Working
+        uses: pairbit/publish-nuget@v2.5.7
+        with:
+            PROJECT_FILE_PATH: src/IT.Working/IT.Working.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Working.Redis
+        uses: pairbit/publish-nuget@v2.5.7
+        with:
+            PROJECT_FILE_PATH: src/IT.Working.Redis/IT.Working.Redis.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
