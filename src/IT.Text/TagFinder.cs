@@ -210,16 +210,16 @@ public class TagFinder : ITagFinder
 
                     if (li == -1) break;
 
-                    Debug.Print(chars.ToString());
+                    //Debug.Print(chars.ToString());
 
                     if (li > 1)
                     {
-                        var gti = li + namelen;
+                        var i = li + namelen;
                         //">"
-                        if (gti < chars.Length && chars[gti] == Gt)
+                        if (i < chars.Length && chars[i] == Gt)
                         {
-                            var i = li;
-                            if (chars[--i] == Slash && chars[--i] == Lt) 
+                            i = li - 1;
+                            if (chars[i] == Slash && chars[--i] == Lt)
                                 return i;
                         }
                     }
@@ -235,35 +235,28 @@ public class TagFinder : ITagFinder
             if (chars.Length >= namelen + nslen + 4)
             {
                 //"</ns:"
-                var mi = nslen + 3;
+                var mi = nslen + 2;
                 do
                 {
                     var li = chars.LastIndexOf(name, comparison);
 
                     if (li == -1) break;
 
-                    Debug.Print(chars.ToString());
+                    //Debug.Print(chars.ToString());
 
                     if (li > mi)
                     {
-                        var gti = li + namelen;
-                        if (gti < chars.Length && chars[gti] == Gt)//>
+                        var i = li + namelen;
+                        if (i < chars.Length && chars[i] == Gt)//>
                         {
-                            var i = li;
-                            if (chars[--i] == Colon)//:
+                            i = li - 1;
+                            if (chars[i] == Colon)//:
                             {
                                 var si = i - nslen;
-                                var aa = chars[si..i];
-
-                                Debug.Print(aa.ToString());
-
-                                if (aa.SequenceEqual(ns))
-                                {
-                                    if (chars[--si] == Slash && chars[--si] == Lt)
-                                        return si;
-                                }
+                                if (chars[si..i].SequenceEqual(ns) && chars[--si] == Slash && chars[--si] == Lt)
+                                    return si;
                             }
-                                
+
                         }
                     }
                     chars = chars[..li];
@@ -293,16 +286,16 @@ public class TagFinder : ITagFinder
 
                 if (li == -1) break;
 
-                Debug.Print(chars.ToString());
+                //Debug.Print(chars.ToString());
 
                 if (li > 1)
                 {
-                    var gti = li + namelen;
+                    var i = li + namelen;
                     //">"
-                    if (gti < chars.Length && chars[gti] == Gt)
+                    if (i < chars.Length && chars[i] == Gt)
                     {
-                        var i = li;
-                        var ch = chars[--i];
+                        i = li - 1;
+                        var ch = chars[i];
 
                         //</Tag>
                         if (ch == Slash)
@@ -316,12 +309,11 @@ public class TagFinder : ITagFinder
                         //:Tag>
                         else if (ch == Colon)
                         {
-                            chars = chars[..i];
-                            i = chars.LastIndexOf(OpenCloser);
-                            if (i > -1)
+                            var si = chars[..i].LastIndexOf(OpenCloser);
+                            if (si > -1)
                             {
-                                index = i;
-                                return chars[(i + 2)..];
+                                index = si;
+                                return chars[(si + 2)..i];
                             }
                         }
                     }
@@ -353,16 +345,16 @@ public class TagFinder : ITagFinder
 
                 if (index == -1) break;
 
-                Debug.Print(chars.ToString());
+                //Debug.Print(chars.ToString());
 
                 if (index > 1)
                 {
-                    var gti = index + namelen;
+                    var i = index + namelen;
                     //">"
-                    if (gti < chars.Length && chars[gti] == Gt)
+                    if (i < chars.Length && chars[i] == Gt)
                     {
-                        var i = index;
-                        var ch = chars[--i];
+                        i = index - 1;
+                        var ch = chars[i];
 
                         //</Tag>
                         if (ch == Slash)
@@ -372,8 +364,7 @@ public class TagFinder : ITagFinder
                         //:Tag>
                         else if (ch == Colon)
                         {
-                            chars = chars[..i];
-                            i = chars.LastIndexOf(OpenCloser);
+                            i = chars[..i].LastIndexOf(OpenCloser);
                             if (i > -1) return i;
                         }
                     }

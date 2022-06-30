@@ -4,9 +4,8 @@ namespace IT.Tests.Text;
 
 public class TagFinderTest
 {
-    private ITagFinder _tagFinder = new TagFinder();
-    private const String ML = "p<p p>1</p><p a=p>2</p><p b=/p>3</p><p>4</p><p>5</p>p";
-    private const String MLNS = "p<p p>1</p><p a=p>2</p><p b=/p>3</p><p>4</p><ns:p>5</ns:p>p";
+    private static ITagFinder _tagFinder = new TagFinder();
+
 
     [SetUp]
     public void Setup()
@@ -23,29 +22,20 @@ public class TagFinderTest
     [Test]
     public void LastCloseTest()
     {
-        var comparison = StringComparison.Ordinal;
+        //"p<p p>1</p><p a=p>2</p><p b=/p>3</p><p>4</p><p>5</p>p"
+        //"p<p p>1</p><p a=p>2</p><p b=/p>3</p><p>4</p><ns:p>5</ns:p>p"
 
-        var lastIndex = ML.LastIndexOf("</p>", comparison);
-        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(ML, "p", comparison)));
+        LastClose("<p>5</p>", "</p>", "p", "", StringComparison.Ordinal);
+        LastClose("<ns:p>5</ns:p>", "</ns:p>", "p", "ns", StringComparison.Ordinal);
 
-        var ns = _tagFinder.LastClose(ML, "p", out var index, comparison);
-        Assert.That(lastIndex, Is.EqualTo(index));
-        Assert.True(ns == default);
+        LastClose("</p>", "</p>", "p", "", StringComparison.Ordinal);
+        LastClose("</ns:p>", "</ns:p>", "p", "ns", StringComparison.Ordinal);
 
-        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(ML, "p", default, comparison)));
+        LastClose("/p>", "</p>", "p", "", StringComparison.Ordinal);
+        LastClose("/ns:p>", "</ns:p>", "p", "", StringComparison.Ordinal);
 
-        //with namespace
-        lastIndex = MLNS.LastIndexOf("</ns:p>", comparison);
-        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(MLNS, "p", comparison)));
-
-        ns = _tagFinder.LastClose(MLNS, "p", out index, comparison);
-        Assert.That(lastIndex, Is.EqualTo(index));
-        Assert.True(ns.SequenceEqual("ns"));
-
-        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(MLNS, "p", "ns", comparison)));
-
-        lastIndex = MLNS.LastIndexOf("</p>", comparison);
-        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(MLNS, "p", default, comparison)));
+        LastClose("</p", "</p>", "p", "", StringComparison.Ordinal);
+        LastClose("</ns:p", "</ns:p>", "p", "", StringComparison.Ordinal);
     }
 
     //[Test]
@@ -131,4 +121,16 @@ public class TagFinderTest
     //    //Arg.Eq(ml, Tag.Remove(ml, "MyTag"));
     //    //Arg.Eq(ml, Tag.Remove(ml, "MyTag", null));
     //}
+
+    private static void LastClose(ReadOnlySpan<char> chars, string tagFull, string tagName, string tagNS, StringComparison comparison)
+    {
+        var lastIndex = chars.LastIndexOf(tagFull, comparison);
+        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(chars, tagName, comparison)));
+
+        var ns = _tagFinder.LastClose(chars, tagName, out var index, comparison);
+        Assert.That(lastIndex, Is.EqualTo(index));
+        Assert.True(ns.SequenceEqual(tagNS));
+
+        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(chars, tagName, ns, comparison)));
+    }
 }
