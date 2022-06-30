@@ -309,6 +309,53 @@ public class TagFinder : ITagFinder
         return -1;
     }
 
+    public Int32 LastClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
+    {
+        //Close tags
+        //Example1: "</ns:Tag>"
+        //Example2: "</*:Tag>"
+        //Example3: "</Tag>"
+        //Template: "Tag>"
+
+        var namelen = name.Length;
+
+        if (chars.Length >= namelen + 3)
+        {
+            do
+            {
+                //"Tag"
+                var index = chars.LastIndexOf(name, comparison);
+
+                if (index < 2) break;
+
+                //Debug.Print(chars.ToString());
+
+                var i = index + namelen;
+                //">"
+                if (i < chars.Length && chars[i] == Gt)
+                {
+                    i = index - 1;
+                    var ch = chars[i];
+
+                    //</Tag>
+                    if (ch == Slash)
+                    {
+                        if (chars[--i] == Lt) return i;
+                    }
+                    //:Tag>
+                    else if (ch == Colon)
+                    {
+                        i = chars[..i].LastIndexOf(OpenCloser);
+                        if (i > -1) return i;
+                    }
+                }
+
+                chars = chars[..index];
+            } while (true);
+        }
+        return -1;
+    }
+
     public ReadOnlySpan<Char> LastClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Int32 index, StringComparison comparison)
     {
         //Close tags
@@ -363,52 +410,5 @@ public class TagFinder : ITagFinder
         }
         index = -1;
         return default;
-    }
-
-    public Int32 LastClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
-    {
-        //Close tags
-        //Example1: "</ns:Tag>"
-        //Example2: "</*:Tag>"
-        //Example3: "</Tag>"
-        //Template: "Tag>"
-
-        var namelen = name.Length;
-
-        if (chars.Length >= namelen + 3)
-        {
-            do
-            {
-                //"Tag"
-                var index = chars.LastIndexOf(name, comparison);
-
-                if (index < 2) break;
-
-                //Debug.Print(chars.ToString());
-
-                var i = index + namelen;
-                //">"
-                if (i < chars.Length && chars[i] == Gt)
-                {
-                    i = index - 1;
-                    var ch = chars[i];
-
-                    //</Tag>
-                    if (ch == Slash)
-                    {
-                        if (chars[--i] == Lt) return i;
-                    }
-                    //:Tag>
-                    else if (ch == Colon)
-                    {
-                        i = chars[..i].LastIndexOf(OpenCloser);
-                        if (i > -1) return i;
-                    }
-                }
-
-                chars = chars[..index];
-            } while (true);
-        }
-        return -1;
     }
 }
