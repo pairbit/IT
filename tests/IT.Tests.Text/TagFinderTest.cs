@@ -20,6 +20,25 @@ public class TagFinderTest
     }
 
     [Test]
+    public void LastOuterTest()
+    {
+        LastOuter("<p>5</p>", "<p>", "p", "", StringComparison.Ordinal);
+        LastOuter("<ns:p>5</ns:p>", "<ns:p>", "p", "ns", StringComparison.Ordinal);
+
+        LastOuter("<p>", "<p>", "p", "", StringComparison.Ordinal);
+        LastOuter("<ns:p>", "<ns:p>", "p", "", StringComparison.Ordinal);
+
+        LastOuter("<body><p>5</p></body>", "<p>", "p", "", StringComparison.Ordinal);
+        LastOuter("<body><ns:p>5</ns:p></body>", "<ns:p>", "p", "ns", StringComparison.Ordinal);
+
+        LastOuter("<body><p>5</p><ns:p>6</ns:p></body>", "<ns:p>", "p", "ns", StringComparison.Ordinal);
+        LastOuter("<body><ns:p>5</ns:p><p>6</p></body>", "<p>", "p", "", StringComparison.Ordinal);
+
+        LastOuterExact("<body><p>5</p><ns:p>6</ns:p></body>", "<p>", "p", "", StringComparison.Ordinal);
+        LastOuterExact("<body><ns:p>5</ns:p><p>6</p></body>", "<ns:p>", "p", "ns", StringComparison.Ordinal);
+    }
+
+    [Test]
     public void LastOpenTest()
     {
         LastOpenExact("<p>5</p>", "<p>", "p", "", StringComparison.Ordinal);
@@ -175,5 +194,39 @@ public class TagFinderTest
         var lastIndex = chars.LastIndexOf(tagFull, comparison);
 
         Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastOpen(chars, tagName, tagNS, comparison)));
+    }
+
+    private static void LastOuter(ReadOnlySpan<char> chars, string tagFull, string tagName, string tagNS, StringComparison comparison)
+    {
+        var startIndex = chars.LastIndexOf(tagFull, comparison);
+        var endIndex = chars.LastIndexOf(tagFull.Insert(1, "/"), comparison);
+        if (endIndex > -1) endIndex += tagFull.Length + 1;
+        var outer1 = startIndex == -1 || endIndex == -1 ? string.Empty : chars[startIndex..endIndex];
+
+        var ns = _tagFinder.LastOuter(chars, tagName, out var range, comparison);
+        var outer2 = chars[range];
+
+        Assert.True(ns.SequenceEqual(tagNS));
+        Assert.True(outer1.SequenceEqual(outer2));
+
+        var outer3 = chars[_tagFinder.LastOuter(chars, tagName, comparison)];
+        Assert.True(outer1.SequenceEqual(outer3));
+
+        Console.WriteLine(outer1.ToString());
+    }
+
+    private static void LastOuterExact(ReadOnlySpan<char> chars, string tagFull, string tagName, string tagNS, StringComparison comparison)
+    {
+        var startIndex = chars.LastIndexOf(tagFull, comparison);
+        var endIndex = chars.LastIndexOf(tagFull.Insert(1, "/"), comparison);
+        if (endIndex > -1) endIndex += tagFull.Length + 1;
+        var outer1 = startIndex == -1 || endIndex == -1 ? string.Empty : chars[startIndex..endIndex];
+
+        var range = _tagFinder.LastOuter(chars, tagName, tagNS, comparison);
+        var outer2 = chars[range];
+
+        Assert.True(outer1.SequenceEqual(outer2));
+
+        Console.WriteLine(outer1.ToString());
     }
 }

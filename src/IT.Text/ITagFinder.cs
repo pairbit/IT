@@ -12,10 +12,6 @@ public interface ITagFinder
 
     //Range First(ReadOnlySpan<Char> chars, String name, StringComparison comparison = StringComparison.Ordinal);
 
-    //Range Last(ReadOnlySpan<Char> chars, String name, String? ns, StringComparison comparison = StringComparison.Ordinal);
-
-    //Range Last(ReadOnlySpan<Char> chars, String name, StringComparison comparison = StringComparison.Ordinal);
-
     //Int32 FirstOpen(ReadOnlySpan<Char> chars, String name, String? ns, StringComparison comparison = StringComparison.Ordinal);
 
     //Int32 FirstClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlyMemory<Char>? ns, StringComparison comparison = StringComparison.Ordinal);
@@ -23,6 +19,12 @@ public interface ITagFinder
     //Int32 FirstClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out ReadOnlyMemory<Char>? ns, StringComparison comparison = StringComparison.Ordinal);
 
     //Int32 FirstClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison = StringComparison.Ordinal);
+
+    Range LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison);
+
+    Range LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison);
+
+    ReadOnlySpan<Char> LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison);
 
     Int32 LastOpen(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison);
 

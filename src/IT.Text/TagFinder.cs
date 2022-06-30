@@ -17,61 +17,6 @@ public class TagFinder : ITagFinder
     public const String OpenCloser = "</";
     public const String EndCloser = "/>";
 
-    //    public Range Find(ReadOnlySpan<Char> chars, string name, string? ns, StringComparison comparison)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public Range Find(ReadOnlySpan<Char> chars, string name, StringComparison comparison)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    //public static String Remove(String ml, String name, String? ns, StringComparison comparison = StringComparison.Ordinal)
-    //    //{
-    //    //    var namelen = name.Length;
-
-    //    //    //<Tag></Tag>
-    //    //    if (ml.Length >= (namelen * 2) + 5)
-    //    //    {
-    //    //        var closeIndex = FindClose(ml, name, ns, comparison);
-
-    //    //        //<Tag>
-    //    //        if (closeIndex >= namelen + 2)
-    //    //        {
-    //    //            var openIndex = FindOpen(ml, name, ns, comparison);
-    //    //            if (openIndex > -1)
-    //    //            {
-    //    //                closeIndex += namelen + 3 + (ns == null ? 0 : ns.Length + 1);
-    //    //                ml = ml.Remove(openIndex, closeIndex - openIndex);
-    //    //            }
-    //    //        }
-    //    //    }
-    //    //    return ml;
-    //    //}
-
-    //    //public static String Remove(String ml, String name, StringComparison comparison = StringComparison.Ordinal)
-    //    //{
-    //    //    var namelen = name.Length;
-
-    //    //    //<Tag></Tag>
-    //    //    if (ml.Length >= (namelen * 2) + 5)
-    //    //    {
-    //    //        var closeIndex = FindClose(ml, name, out var ns, comparison);
-
-    //    //        //<Tag>
-    //    //        if (closeIndex >= namelen + 2)
-    //    //        {
-    //    //            var openIndex = FindOpen(ml, name, ns, comparison);
-    //    //            if (openIndex > -1)
-    //    //            {
-    //    //                closeIndex += namelen + 3 + (ns == null ? 0 : ns.Length + 1);
-    //    //                ml = ml.Remove(openIndex, closeIndex - openIndex);
-    //    //            }
-    //    //        }
-    //    //    }
-    //    //    return ml;
-    //    //}
 
     //    public Boolean Contains(ReadOnlySpan<Char> chars, String name, String? ns, StringComparison comparison = StringComparison.Ordinal)
     //    {
@@ -161,6 +106,83 @@ public class TagFinder : ITagFinder
     //    }
     //    return -1;
     //}
+
+    public Range LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
+    {
+        var namelen = name.Length;
+
+        //<Tag></Tag>
+        if (chars.Length >= (namelen * 2) + 5)
+        {
+            var closeIndex = LastClose(chars, name, ns, comparison);
+
+            //<Tag>
+            if (closeIndex >= namelen + 2)
+            {
+                chars = chars[..closeIndex];
+
+                var openIndex = LastOpen(chars, name, ns, comparison);
+                if (openIndex > -1)
+                {
+                    var nslen = ns.Length;
+                    return new Range(openIndex, closeIndex + namelen + (nslen == 0 ? 3 : nslen + 4));
+                }
+            }
+        }
+        return default;
+    }
+
+    public Range LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
+    {
+        var namelen = name.Length;
+
+        //<Tag></Tag>
+        if (chars.Length >= (namelen * 2) + 5)
+        {
+            var ns = LastClose(chars, name, out var closeIndex, comparison);
+
+            //<Tag>
+            if (closeIndex >= namelen + 2)
+            {
+                chars = chars[..closeIndex];
+
+                var openIndex = LastOpen(chars, name, ns, comparison);
+                if (openIndex > -1)
+                {
+                    var nslen = ns.Length;
+                    return new Range(openIndex, closeIndex + namelen + (nslen == 0 ? 3 : nslen + 4));
+                }
+            }
+        }
+        return default;
+    }
+
+    public ReadOnlySpan<Char> LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison)
+    {
+        var namelen = name.Length;
+
+        //<Tag></Tag>
+        if (chars.Length >= (namelen * 2) + 5)
+        {
+            var ns = LastClose(chars, name, out var closeIndex, comparison);
+
+            //<Tag>
+            if (closeIndex >= namelen + 2)
+            {
+                chars = chars[..closeIndex];
+
+                var openIndex = LastOpen(chars, name, ns, comparison);
+                if (openIndex > -1)
+                {
+                    var nslen = ns.Length;
+                    range = new Range(openIndex, closeIndex + namelen + (nslen == 0 ? 3 : nslen + 4));
+                    return ns;
+                }
+            }
+        }
+        range = default;
+        return default;
+    }
 
     public Int32 LastOpen(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
     {
