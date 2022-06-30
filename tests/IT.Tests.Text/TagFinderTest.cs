@@ -20,6 +20,28 @@ public class TagFinderTest
     }
 
     [Test]
+    public void LastOpenTest()
+    {
+        LastOpenExact("<p>5</p>", "<p>", "p", "", StringComparison.Ordinal);
+        LastOpenExact("<ns:p>5</ns:p>", "<ns:p>", "p", "ns", StringComparison.Ordinal);
+
+        LastOpenExact("<p>", "<p>", "p", "", StringComparison.Ordinal);
+        LastOpenExact("<ns:p>", "<ns:p>", "p", "ns", StringComparison.Ordinal);
+
+        LastOpenExact("p>", "<p>", "p", "", StringComparison.Ordinal);
+        LastOpenExact("ns:p>", "<ns:p>", "p", "ns", StringComparison.Ordinal);
+
+        LastOpenExact("p>---", "<p>", "p", "", StringComparison.Ordinal);
+        LastOpenExact("ns:p>---", "<ns:p>", "p", "ns", StringComparison.Ordinal);
+
+        LastOpenExact("<p", "<p>", "p", "", StringComparison.Ordinal);
+        LastOpenExact("<ns:p", "<ns:p>", "p", "ns", StringComparison.Ordinal);
+
+        LastOpenExact("<p----", "<p>", "p", "", StringComparison.Ordinal);
+        LastOpenExact("<ns:p----", "<ns:p>", "p", "ns", StringComparison.Ordinal);
+    }
+
+    [Test]
     public void LastCloseTest()
     {
         //"p<p p>1</p><p a=p>2</p><p b=/p>3</p><p>4</p><p>5</p>p"
@@ -131,13 +153,14 @@ public class TagFinderTest
     private static void LastClose(ReadOnlySpan<char> chars, string tagFull, string tagName, string tagNS, StringComparison comparison)
     {
         var lastIndex = chars.LastIndexOf(tagFull, comparison);
-        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(chars, tagName, comparison)));
-
+        
         var ns = _tagFinder.LastClose(chars, tagName, out var index, comparison);
         Assert.That(lastIndex, Is.EqualTo(index));
         Assert.True(ns.SequenceEqual(tagNS));
 
-        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(chars, tagName, ns, comparison)));
+        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(chars, tagName, comparison)));
+
+        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(chars, tagName, tagNS, comparison)));
     }
 
     private static void LastCloseExact(ReadOnlySpan<char> chars, string tagFull, string tagName, string tagNS, StringComparison comparison)
@@ -145,5 +168,12 @@ public class TagFinderTest
         var lastIndex = chars.LastIndexOf(tagFull, comparison);
 
         Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(chars, tagName, tagNS, comparison)));
+    }
+
+    private static void LastOpenExact(ReadOnlySpan<char> chars, string tagFull, string tagName, string tagNS, StringComparison comparison)
+    {
+        var lastIndex = chars.LastIndexOf(tagFull, comparison);
+
+        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastOpen(chars, tagName, tagNS, comparison)));
     }
 }
