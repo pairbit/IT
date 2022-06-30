@@ -33,9 +33,15 @@ public class TagFinderTest
 
         LastClose("/p>", "</p>", "p", "", StringComparison.Ordinal);
         LastClose("/ns:p>", "</ns:p>", "p", "", StringComparison.Ordinal);
+        LastCloseExact("/ns:p>", "</ns:p>", "p", "ns", StringComparison.Ordinal);
+
+        LastClose("/p>----", "</p>", "p", "", StringComparison.Ordinal);
+        LastClose("/ns:p>----", "</ns:p>", "p", "", StringComparison.Ordinal);
+        LastCloseExact("/ns:p>----", "</ns:p>", "p", "ns", StringComparison.Ordinal);
 
         LastClose("</p", "</p>", "p", "", StringComparison.Ordinal);
         LastClose("</ns:p", "</ns:p>", "p", "", StringComparison.Ordinal);
+        LastCloseExact("</ns:p", "</ns:p>", "p", "ns", StringComparison.Ordinal);
     }
 
     //[Test]
@@ -132,5 +138,12 @@ public class TagFinderTest
         Assert.True(ns.SequenceEqual(tagNS));
 
         Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(chars, tagName, ns, comparison)));
+    }
+
+    private static void LastCloseExact(ReadOnlySpan<char> chars, string tagFull, string tagName, string tagNS, StringComparison comparison)
+    {
+        var lastIndex = chars.LastIndexOf(tagFull, comparison);
+
+        Assert.That(lastIndex, Is.EqualTo(_tagFinder.LastClose(chars, tagName, tagNS, comparison)));
     }
 }
