@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace IT.Text;
 
@@ -21,6 +22,7 @@ public class BaseEncoding : IEncoding
 
     public string GetString(ReadOnlySpan<byte> bytes)
     {
+        //Encoding.Default.GetChars()
         throw new NotImplementedException();
     }
 }

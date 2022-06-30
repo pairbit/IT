@@ -1,4 +1,6 @@
-﻿namespace System.Text;
+﻿#if NETSTANDARD2_0
+
+namespace System.Text;
 
 public static class _Encoding
 {
@@ -36,3 +38,5 @@ public static class _Encoding
             return encoding.GetString(bytesPtr, bytes.Length);
     }
 }
+
+#endif
