@@ -12,11 +12,35 @@ public class TagFinderTest
     {
     }
 
+    //[Test]
+    //public void FirstCloseTest()
+    //{
+    //    //Assert.That(ML.IndexOf("</p>"), Is.EqualTo(_tagFinder.FirstClose(ML, "p")));
+    //    //Assert.That(MLNS.IndexOf("</ns:p>"), Is.EqualTo(_tagFinder.FirstClose(MLNS, "p")));
+    //}
+
     [Test]
-    public void FirstCloseTest()
+    public void LastInnerTest()
     {
-        //Assert.That(ML.IndexOf("</p>"), Is.EqualTo(_tagFinder.FirstClose(ML, "p")));
-        //Assert.That(MLNS.IndexOf("</ns:p>"), Is.EqualTo(_tagFinder.FirstClose(MLNS, "p")));
+        LastInner("<p>1</p>", "<p", "p", "", StringComparison.Ordinal);
+        LastInner("<ns:p>2</ns:p>", "<ns:p", "p", "ns", StringComparison.Ordinal);
+
+        LastInner("<p>", "<p>", "p", "", StringComparison.Ordinal);
+        LastInner("<ns:p>", "<ns:p>", "p", "", StringComparison.Ordinal);
+
+        LastInner("<body><p>3</p></body>", "<p", "p", "", StringComparison.Ordinal);
+        LastInner("<body><ns:p>4</ns:p></body>", "<ns:p", "p", "ns", StringComparison.Ordinal);
+
+        LastInner("<body><p>_</p><ns:p>5</ns:p></body>", "<ns:p", "p", "ns", StringComparison.Ordinal);
+        LastInner("<body><ns:p>_</ns:p><p>6</p></body>", "<p", "p", "", StringComparison.Ordinal);
+
+        LastInnerExact("<body><p>7</p><ns:p>_</ns:p></body>", "<p", "p", "", StringComparison.Ordinal);
+        LastInnerExact("<body><ns:p>8</ns:p><p>_</p></body>", "<ns:p", "p", "ns", StringComparison.Ordinal);
+
+        LastInner("<p a=1>9</p>", "<p", "p", "", StringComparison.Ordinal);
+        LastInner("<ns:p p=2>10</ns:p>", "<ns:p", "p", "ns", StringComparison.Ordinal);
+
+
     }
 
     [Test]
@@ -223,6 +247,40 @@ public class TagFinderTest
         var outer1 = startIndex == -1 || endIndex == -1 ? string.Empty : chars[startIndex..endIndex];
 
         var range = _tagFinder.LastOuter(chars, tagName, tagNS, comparison);
+        var outer2 = chars[range];
+
+        Assert.True(outer1.SequenceEqual(outer2));
+
+        Console.WriteLine(outer1.ToString());
+    }
+
+    private static void LastInner(ReadOnlySpan<char> chars, string tagFull, string tagName, string tagNS, StringComparison comparison)
+    {
+        var startIndex = chars.LastIndexOf(tagFull, comparison);
+        var endIndex = chars.LastIndexOf(tagFull.Insert(1, "/") + ">", comparison);
+        if (startIndex > -1) startIndex = chars.ToString().IndexOf(">", startIndex + 1) + 1;
+        var outer1 = startIndex == -1 || endIndex == -1 ? string.Empty : chars[startIndex..endIndex];
+
+        var ns = _tagFinder.LastInner(chars, tagName, out var range, comparison);
+        var outer2 = chars[range];
+
+        Assert.True(ns.SequenceEqual(tagNS));
+        Assert.True(outer1.SequenceEqual(outer2));
+
+        var outer3 = chars[_tagFinder.LastInner(chars, tagName, comparison)];
+        Assert.True(outer1.SequenceEqual(outer3));
+
+        Console.WriteLine(outer1.ToString());
+    }
+
+    private static void LastInnerExact(ReadOnlySpan<char> chars, string tagFull, string tagName, string tagNS, StringComparison comparison)
+    {
+        var startIndex = chars.LastIndexOf(tagFull, comparison);
+        var endIndex = chars.LastIndexOf(tagFull.Insert(1, "/") + ">", comparison);
+        if (startIndex > -1) startIndex = chars.ToString().IndexOf(">", startIndex + 1) + 1;
+        var outer1 = startIndex == -1 || endIndex == -1 ? string.Empty : chars[startIndex..endIndex];
+
+        var range = _tagFinder.LastInner(chars, tagName, tagNS, comparison);
         var outer2 = chars[range];
 
         Assert.True(outer1.SequenceEqual(outer2));

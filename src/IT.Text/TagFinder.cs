@@ -107,6 +107,104 @@ public class TagFinder : ITagFinder
     //    return -1;
     //}
 
+    public Range LastInner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
+    {
+        var namelen = name.Length;
+
+        //<Tag></Tag>
+        if (chars.Length >= (namelen * 2) + 5)
+        {
+            var closeIndex = LastClose(chars, name, ns, comparison);
+
+            //<Tag>
+            if (closeIndex >= namelen + 2)
+            {
+                chars = chars[..closeIndex];
+
+                var openIndex = LastOpen(chars, name, ns, comparison);
+                if (openIndex > -1)
+                {
+                    var nslen = ns.Length;
+                    var offset = openIndex + namelen + (nslen == 0 ? 1 : nslen + 2);
+
+                    chars = chars[offset..];
+
+                    openIndex = chars.IndexOf(Gt);
+
+                    if (openIndex > -1) return new Range(openIndex + offset + 1, closeIndex);
+                }
+            }
+        }
+        return default;
+    }
+
+    public Range LastInner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
+    {
+        var namelen = name.Length;
+
+        //<Tag></Tag>
+        if (chars.Length >= (namelen * 2) + 5)
+        {
+            var ns = LastClose(chars, name, out var closeIndex, comparison);
+
+            //<Tag>
+            if (closeIndex >= namelen + 2)
+            {
+                chars = chars[..closeIndex];
+
+                var openIndex = LastOpen(chars, name, ns, comparison);
+                if (openIndex > -1)
+                {
+                    var nslen = ns.Length;
+                    var offset = openIndex + namelen + (nslen == 0 ? 1 : nslen + 2);
+
+                    chars = chars[offset..];
+
+                    openIndex = chars.IndexOf(Gt);
+
+                    if (openIndex > -1) return new Range(openIndex + offset + 1, closeIndex);
+                }
+            }
+        }
+        return default;
+    }
+
+    public ReadOnlySpan<Char> LastInner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison)
+    {
+        var namelen = name.Length;
+
+        //<Tag></Tag>
+        if (chars.Length >= (namelen * 2) + 5)
+        {
+            var ns = LastClose(chars, name, out var closeIndex, comparison);
+
+            //<Tag>
+            if (closeIndex >= namelen + 2)
+            {
+                chars = chars[..closeIndex];
+
+                var openIndex = LastOpen(chars, name, ns, comparison);
+                if (openIndex > -1)
+                {
+                    var nslen = ns.Length;
+                    var offset = openIndex + namelen + (nslen == 0 ? 1 : nslen + 2);
+
+                    chars = chars[offset..];
+
+                    openIndex = chars.IndexOf(Gt);
+
+                    if (openIndex > -1)
+                    {
+                        range = new Range(openIndex + offset + 1, closeIndex);
+                        return ns;
+                    }
+                }
+            }
+        }
+        range = default;
+        return default;
+    }
+
     public Range LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
     {
         var namelen = name.Length;
@@ -258,6 +356,109 @@ public class TagFinder : ITagFinder
 
         return -1;
     }
+
+    //public Int32 LastOpen(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, out Int32 end, StringComparison comparison)
+    //{
+    //    var namelen = name.Length;
+    //    var nslen = ns.Length;
+
+    //    //Example1: "<Tag>"
+    //    //Example2: "<Tag "
+    //    if (nslen == 0)
+    //    {
+    //        if (chars.Length >= namelen + 2)
+    //        {
+    //            do
+    //            {
+    //                var li = chars.LastIndexOf(name, comparison);
+
+    //                if (li < 1) break;
+
+    //                //Debug.Print(chars.ToString());
+
+    //                var i = li + namelen;
+    //                //">"
+    //                if (i < chars.Length)
+    //                {
+    //                    var ch = chars[i];
+    //                    if (ch == Gt)
+    //                    {
+    //                        end = i;
+    //                        i = li - 1;
+    //                        if (chars[i] == Lt) return i;
+    //                    }
+    //                    else if (ch == Space)
+    //                    {
+    //                        end = i;
+    //                        i = li - 1;
+    //                        if (chars[i] == Lt)
+    //                        {
+    //                            var temp = chars[end..];
+    //                            end = temp.IndexOf(Gt);
+    //                            return i;
+    //                        }
+    //                    }
+    //                }
+
+    //                chars = chars[..li];
+    //            } while (true);
+    //        }
+    //    }
+    //    //Example1: "<ns:Tag "
+    //    //Example3: "<ns:Tag>"
+    //    else
+    //    {
+    //        if (chars.Length >= namelen + nslen + 3)
+    //        {
+    //            //"<ns:"
+    //            var mi = nslen + 2;
+    //            do
+    //            {
+    //                var li = chars.LastIndexOf(name, comparison);
+
+    //                if (li < mi) break;
+
+    //                //Debug.Print(chars.ToString());
+
+    //                var i = li + namelen;
+    //                if (i < chars.Length)
+    //                {
+    //                    var ch = chars[i];
+    //                    if (ch == Gt)
+    //                    {
+    //                        end = i;
+    //                        i = li - 1;
+    //                        if (chars[i] == Colon)//:
+    //                        {
+    //                            var si = i - nslen;
+    //                            if (chars[si..i].SequenceEqual(ns) && chars[--si] == Lt)
+    //                                return si;
+    //                        }
+    //                    }
+    //                    else if (ch == Space)
+    //                    {
+    //                        end = i;
+    //                        i = li - 1;
+    //                        if (chars[i] == Colon)//:
+    //                        {
+    //                            var si = i - nslen;
+    //                            if (chars[si..i].SequenceEqual(ns) && chars[--si] == Lt)
+    //                            {
+    //                                var temp = chars[end..];
+    //                                end = temp.IndexOf(Gt);
+    //                                return si;
+    //                            }
+    //                        }
+    //                    }
+    //                }
+
+    //                chars = chars[..li];
+    //            } while (true);
+    //        }
+    //    }
+    //    end = -1;
+    //    return -1;
+    //}
 
     public Int32 LastClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
     {
