@@ -36,6 +36,14 @@ jobs:
       - name: Test Serialization
         run: dotnet test tests/IT.Tests.Serialization/IT.Tests.Serialization.csproj
         
+      - name: Publish IT
+        uses: pairbit/publish-nuget@v2.5.7
+        with:
+            PROJECT_FILE_PATH: src/IT/IT.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+        
       - name: Publish IT.Memory
         uses: pairbit/publish-nuget@v2.5.7
         with:
