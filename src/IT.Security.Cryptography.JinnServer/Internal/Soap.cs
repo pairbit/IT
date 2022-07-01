@@ -4,6 +4,9 @@ namespace IT.Security.Cryptography.JinnServer.Internal;
 
 internal static class Soap
 {
+    public const String Envelope = "Envelope";
+    public const String Namespace = "soapenv";
+
     public static class NS
     {
         public const String Envelope = "http://schemas.xmlsoap.org/soap/envelope/";

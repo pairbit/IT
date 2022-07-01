@@ -43,42 +43,52 @@ public class SigningService : IHasher, ISigner
     {
         var oid = _cryptoInformer.GetOid(alg) ?? alg;
 
-        string? digest = null;
-
         var partInBytesValue = _options.PartInBytesValue;
 
         var parts = data.GetParts(partInBytesValue);
 
-        var moreOne = parts > 1 && _logger is not null;
-
-        if (moreOne) _logger!.LogInformation("Parts: {parts}", parts);
-
-        string? state = null;
-
-        for (int part = 0; part < parts; part++)
+        if (parts > 1)
         {
-            if (moreOne) _logger!.LogInformation("Read {part} part", part);
+            _logger?.LogInformation("Parts: {parts}", parts);
 
-            var bytes = data.ReadPartBytes(partInBytesValue, part);
+            _logger?.LogInformation("Read {part} part", 0);
 
-            var dataBase64 = bytes.ToBase64();
+            var bytesBase64 = data.ReadPartBytes(partInBytesValue, 0).ToBase64();
 
-            var request = state is null ? Soap.Request.GetDigest(dataBase64, oid) : Soap.Request.GetDigest(dataBase64, oid, state);
+            var response = _service.GetResponseText(Soap.Request.GetDigest(bytesBase64, oid), Soap.Actions.Digest);
 
-            var response = _service.GetResponse(request, Soap.Actions.Digest);
+            var state = ParseState(response);
 
-            var digestResponse = response?.DigestResponseType;
+            parts--;
 
-            if (digestResponse is null) throw new InvalidOperationException($"'{nameof(Body.DigestResponseType)}' is null");
+            if (parts > 1)
+            {
+                for (int part = 1; part < parts; part++)
+                {
+                    _logger?.LogInformation("Read {part} part", part);
 
-            digest = digestResponse.Digest;
+                    bytesBase64 = data.ReadPartBytes(partInBytesValue, part).ToBase64();
 
-            state = digestResponse.State;
+                    response = _service.GetResponseText(Soap.Request.GetDigest(bytesBase64, oid, state), Soap.Actions.Digest);
+
+                    state = ParseState(response);
+                }
+            }
+
+            bytesBase64 = data.ReadPartBytes(partInBytesValue, parts).ToBase64();
+
+            response = _service.GetResponseText(Soap.Request.GetDigest(bytesBase64, oid, state), Soap.Actions.Digest);
+
+            return ParseDigest(response);
         }
+        else
+        {
+            var bytesBase64 = data.ReadBytes().ToBase64();
 
-        if (digest is null) throw new InvalidOperationException($"'{nameof(DigestResponse.Digest)}' is null");
+            var response = _service.GetResponseText(Soap.Request.GetDigest(bytesBase64, oid), Soap.Actions.Digest);
 
-        return Convert.FromBase64String(digest);
+            return ParseDigest(response);
+        }
     }
 
     public Byte[] Hash(String alg, ReadOnlySpan<Byte> data)
@@ -90,63 +100,107 @@ public class SigningService : IHasher, ISigner
 
         var request = Soap.Request.GetDigest(dataBase64, oid);
 
-        var response = _service.GetResponse(request, Soap.Actions.Digest);
+        var response = _service.GetResponseText(request, Soap.Actions.Digest);
 
-        var digestResponse = response?.DigestResponseType;
-
-        if (digestResponse is null) throw new InvalidOperationException($"'{nameof(Body.DigestResponseType)}' is null");
-
-        var digest = digestResponse.Digest;
-
-        if (digest is null) throw new InvalidOperationException($"'{nameof(DigestResponse.Digest)}' is null");
-
-        return Convert.FromBase64String(digest);
+        return ParseDigest(response);
     }
 
     public async Task<Byte[]> HashAsync(String alg, Stream data, CancellationToken cancellationToken = default)
     {
         var oid = _cryptoInformer.GetOid(alg) ?? alg;
 
-        string? digest = null;
-
         var partInBytesValue = _options.PartInBytesValue;
 
         var parts = data.GetParts(partInBytesValue);
 
-        var moreOne = parts > 1 && _logger is not null;
-
-        if (moreOne) _logger!.LogInformation("Parts: {parts}", parts);
-
-        string? state = null;
-
-        for (int part = 0; part < parts; part++)
+        if (parts > 1)
         {
+            _logger?.LogInformation("Parts: {parts}", parts);
+
+            _logger?.LogInformation("Read {part} part", 0);
+
+            var bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, 0).ConfigureAwait(false)).ToBase64();
+
+            var response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid), Soap.Actions.Digest).ConfigureAwait(false);
+
+            var state = ParseState(response);
+
+            parts--;
+
+            if (parts > 1)
+            {
+                for (int part = 1; part < parts; part++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    _logger?.LogInformation("Read {part} part", part);
+
+                    bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, part).ConfigureAwait(false)).ToBase64();
+
+                    response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid, state), Soap.Actions.Digest).ConfigureAwait(false);
+
+                    state = ParseState(response);
+                }
+            }
+
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (moreOne) _logger!.LogInformation("Read {part} part", part);
+            _logger?.LogInformation("Read {part} part", parts);
 
-            var bytes = await data.ReadPartBytesAsync(partInBytesValue, part).ConfigureAwait(false);
+            bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, parts).ConfigureAwait(false)).ToBase64();
 
-            var dataBase64 = bytes.ToBase64();
+            response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid, state), Soap.Actions.Digest).ConfigureAwait(false);
 
-            var request = state is null ? Soap.Request.GetDigest(dataBase64, oid) : Soap.Request.GetDigest(dataBase64, oid, state);
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var response = await _service.GetResponseAsync(request, Soap.Actions.Digest).ConfigureAwait(false);
-
-            var digestResponse = response.DigestResponseType;
-
-            if (digestResponse is null) throw new InvalidOperationException($"{nameof(response.DigestResponseType)} is null");
-
-            digest = digestResponse.Digest;
-
-            state = digestResponse.State;
+            return ParseDigest(response);
         }
+        else
+        {
+            var bytesBase64 = (await data.ReadBytesAsync().ConfigureAwait(false)).ToBase64();
 
-        if (digest is null) throw new InvalidOperationException($"'{nameof(DigestResponse.Digest)}' is null");
+            var response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid), Soap.Actions.Digest).ConfigureAwait(false);
+
+            return ParseDigest(response);
+        }
+    }
+
+    private ReadOnlySpan<Char> ParseDigestResponseType(ReadOnlySpan<Char> response)
+    {
+        response = _service.ParseEnvelope(response);
+
+        var range = TagFinder.Outer(response, "DigestResponseType".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        if (range.Equals(default)) throw new InvalidOperationException($"'DigestResponseType' is null");
+
+        return response[range];
+    }
+
+    private Byte[] ParseDigest(String response)
+    {
+        var span = response.AsSpan();
+        span = ParseDigestResponseType(span);
+
+        var range = TagFinder.Inner(span, "Digest".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        if (range.Equals(default)) throw new InvalidOperationException("'DigestResponse.Digest' is null");
+
+        var digest = span[range].ToString();
 
         return Convert.FromBase64String(digest);
+    }
+
+    private String ParseState(String response)
+    {
+        var span = response.AsSpan();
+
+        span = ParseDigestResponseType(span);
+
+        var range = TagFinder.Inner(span, "State".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        if (range.Equals(default)) throw new InvalidOperationException("'DigestResponse.State' is null");
+
+        var state = span[range].ToString();
+
+        return state;
     }
 
     #endregion IHasher

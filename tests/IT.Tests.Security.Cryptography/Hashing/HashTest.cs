@@ -18,7 +18,47 @@ public abstract class HashTest
     }
 
     [Test]
-    public void TestHash()
+    public async Task StreamTest()
+    {
+        //using var stream = File.OpenRead(@"S:\Videos\grip_legend\Vano_RT.mp4");//1.6MB - 3parts
+        using var stream = File.OpenRead(@"S:\Videos\grip_legend\2parts");//1MB - 2part
+        //using var stream = File.OpenRead(@"S:\Videos\grip_legend\schwartz.mp4");//534KB - 1part
+
+        var hashes = new Dictionary<String, String>();
+
+        foreach (String alg in _hasher.Algs)
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            var hashBytes = _hasher.Hash(alg, stream);
+            var hash = Convert.ToHexString(hashBytes);
+            hashes.Add(alg, hash);
+        }
+
+        foreach (String alg in _hasher.Algs)
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            var hashBytes = await _hasher.HashAsync(alg, stream).ConfigureAwait(false);
+            var hash = Convert.ToHexString(hashBytes);
+
+            if (!hashes[alg].Equals(hash))
+                throw new InvalidOperationException();
+        }
+
+        var comparer = StringComparer.OrdinalIgnoreCase;
+
+        foreach (var item in hashes.OrderBy(x => x.Key))
+        {
+            var alg = item.Key;
+            var hash = item.Value;
+
+            var oid = _cryptoInformer.GetOid(alg) ?? alg;
+
+            Console.WriteLine($"{oid,-26} | {alg,20} | {hash}");
+        }
+    }
+
+    [Test]
+    public void BytesTest()
     {
         var hashes = new Dictionary<String, String>();
 

@@ -15,12 +15,10 @@ internal class Body
     /// </summary>
     public FaultInfo ServiceFaultInfo { get; set; }
 
-    public DigestResponse DigestResponseType { get; set; }
-
     public SimpleValidationResponse ValidationResponseType { get; set; }
 
     public String SigningResponseType { get; set; }
 
     [JsonIgnore]
-    public Object[] Responses => new Object[] { DigestResponseType, SigningResponseType, ValidationResponseType };
+    public Object[] Responses => new Object[] {  SigningResponseType, ValidationResponseType };
 }

@@ -26,6 +26,68 @@ internal class JinnServerService
 
     #region Public Methods
 
+    public String GetResponseText(String message, String soapAction, Encoding? encoding = null)
+    {
+        if (_logger is not null && _logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Request: {request}", message);
+
+        if (encoding == null) encoding = Encoding.ASCII;
+        var messageBytes = encoding.GetBytes(message);
+
+        var request = CreateWebRequest(soapAction);
+        request.ContentLength = messageBytes.Length;
+
+        using var requestStream = request.GetRequestStream();
+        requestStream.Write(messageBytes, 0, messageBytes.Length);
+
+        using var response = (HttpWebResponse)TryGetResponse(request);
+
+        if (_logger is not null && _logger.IsEnabled(LogLevel.Information) && response.StatusCode != HttpStatusCode.OK)
+            _logger.LogInformation("Response Code: {responseStatusCode} ({responseStatusDescription}), Size: {requestContentLength}",
+                response.StatusCode, response.StatusDescription, request.ContentLength);
+
+        using var responseStream = response.GetResponseStream();
+        using var responseReader = new StreamReader(responseStream);
+
+        var responseText = responseReader.ReadToEnd();
+
+        if (_logger is not null && _logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Response: {response}", responseText);
+
+        return responseText;
+    }
+
+    public async Task<String> GetResponseTextAsync(String message, String soapAction, Encoding? encoding = null)
+    {
+        if (_logger is not null && _logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Request: {request}", message);
+
+        if (encoding == null) encoding = Encoding.ASCII;
+        var messageBytes = encoding.GetBytes(message);
+
+        var request = CreateWebRequest(soapAction);
+        request.ContentLength = messageBytes.Length;
+
+        using var requestStream = await request.GetRequestStreamAsync().ConfigureAwait(false);
+        await requestStream.WriteAsync(messageBytes, 0, messageBytes.Length).ConfigureAwait(false);
+
+        using var response = (HttpWebResponse)await TryGetResponseAsync(request).ConfigureAwait(false);
+
+        if (_logger is not null && _logger.IsEnabled(LogLevel.Information) && response.StatusCode != HttpStatusCode.OK)
+            _logger.LogInformation("Response Code: {responseStatusCode} ({responseStatusDescription}), Size: {requestContentLength}",
+                response.StatusCode, response.StatusDescription, request.ContentLength);
+
+        using var responseStream = response.GetResponseStream();
+        using var responseReader = new StreamReader(responseStream);
+
+        var responseText = await responseReader.ReadToEndAsync().ConfigureAwait(false);
+
+        if (_logger is not null && _logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Response: {response}", responseText);
+
+        return responseText;
+    }
+
     public ValidationResponseType GetResponseValidation(String message, String soapAction, Encoding? encoding = null)
     {
         var responseText = GetResponseText(message, soapAction, encoding);
@@ -52,6 +114,32 @@ internal class JinnServerService
         return ParseResponse(responseText);
     }
 
+    public Body ParseResponse(String responseText)
+    {
+        responseText = JsonConvert.SerializeXmlNode(LoadDocument(responseText), Newtonsoft.Json.Formatting.None, true);
+
+        var envelope = JsonConvert.DeserializeObject<Envelope>(responseText);
+
+        var body = envelope?.Body;
+
+        if (body is null) throw new InvalidOperationException($"{nameof(Envelope.Body)} is null");
+
+        if (body.ServiceFaultInfo is not null) throw new InvalidOperationException(body.ServiceFaultInfo.ToString());
+
+        if (body.Fault is not null) throw new InvalidOperationException(body.Fault.ToString());
+
+        //Arg.NotNull(body.Responses.Where(x => x is not null).SingleOrDefault(), "Parse response error!");
+
+        return body;
+    }
+
+    public ReadOnlySpan<Char> ParseEnvelope(ReadOnlySpan<Char> response)
+    {
+        var range = TagFinder.Outer(response, Soap.Envelope.AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        return response[range];
+    }
+
     #endregion Public Methods
 
     #region Private Methods
@@ -63,84 +151,6 @@ internal class JinnServerService
         request.ContentType = "text/xml;charset=UTF-8";
         request.Headers.Add("SOAPAction:" + soapAction);
         return request;
-    }
-
-    private String GetResponseText(String message, String soapAction, Encoding? encoding = null)
-    {
-        if (_logger is not null && _logger.IsEnabled(LogLevel.Debug)) 
-            _logger.LogDebug("Request: {request}", message);
-
-        if (encoding == null) encoding = Encoding.ASCII;
-        var messageBytes = encoding.GetBytes(message);
-
-        var request = CreateWebRequest(soapAction);
-        request.ContentLength = messageBytes.Length;
-
-        using var requestStream = request.GetRequestStream();
-        requestStream.Write(messageBytes, 0, messageBytes.Length);
-
-        using var response = (HttpWebResponse)TryGetResponse(request);
-
-        if (_logger is not null && response.StatusCode != HttpStatusCode.OK)
-            _logger.LogInformation("Response Code: {responseStatusCode} ({responseStatusDescription}), Size: {requestContentLength}",
-                response.StatusCode, response.StatusDescription, request.ContentLength);
-
-        using var responseStream = response.GetResponseStream();
-        using var responseReader = new StreamReader(responseStream);
-
-        return responseReader.ReadToEnd();
-    }
-
-    private async Task<String> GetResponseTextAsync(String message, String soapAction, Encoding? encoding = null)
-    {
-        if (_logger is not null && _logger.IsEnabled(LogLevel.Debug)) 
-            _logger.LogDebug("Request: {request}", message);
-
-        if (encoding == null) encoding = Encoding.ASCII;
-        var messageBytes = encoding.GetBytes(message);
-
-        var request = CreateWebRequest(soapAction);
-        request.ContentLength = messageBytes.Length;
-
-        using var requestStream = await request.GetRequestStreamAsync().ConfigureAwait(false);
-        await requestStream.WriteAsync(messageBytes, 0, messageBytes.Length).ConfigureAwait(false);
-
-        using var response = (HttpWebResponse)await TryGetResponseAsync(request).ConfigureAwait(false);
-
-        if (_logger is not null && response.StatusCode != HttpStatusCode.OK)
-            _logger.LogInformation("Response Code: {responseStatusCode} ({responseStatusDescription}), Size: {requestContentLength}",
-                response.StatusCode, response.StatusDescription, request.ContentLength);
-
-        using var responseStream = response.GetResponseStream();
-        using var responseReader = new StreamReader(responseStream);
-
-        return await responseReader.ReadToEndAsync().ConfigureAwait(false);
-    }
-
-    private Body ParseResponse(String responseText)
-    {
-        if (_logger is not null && _logger.IsEnabled(LogLevel.Debug)) 
-            _logger.LogDebug("Response: {response}", responseText);
-
-        var range = TagFinder.Outer(responseText.AsSpan(), "Envelope".AsSpan(), "soapenv".AsSpan(), StringComparison.OrdinalIgnoreCase);
-
-        responseText = responseText[range];
-
-        responseText = JsonConvert.SerializeXmlNode(LoadDocument(responseText), Newtonsoft.Json.Formatting.None, true);
-
-        var envelope = JsonConvert.DeserializeObject<Envelope>(responseText);
-        
-        var body = envelope?.Body;
-        
-        if (body is null) throw new InvalidOperationException($"{nameof(Envelope.Body)} is null");
-        
-        if (body.ServiceFaultInfo is not null) throw new InvalidOperationException(body.ServiceFaultInfo.ToString());
-        
-        if (body.Fault is not null) throw new InvalidOperationException(body.Fault.ToString());
-        
-        //Arg.NotNull(body.Responses.Where(x => x is not null).SingleOrDefault(), "Parse response error!");
-        
-        return body;
     }
 
     private ValidationResponseType ParseResponseValidation(String responseText)
