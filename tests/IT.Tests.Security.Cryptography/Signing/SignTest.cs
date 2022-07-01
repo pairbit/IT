@@ -17,26 +17,24 @@ public abstract class SignTest
     {
         var data = Convert.ToBase64String(Encoding.UTF8.GetBytes("<Doc>My Data for Sign</Doc>"));
 
+        var alg = _signer.Algs.First();
+
         foreach (var format in _signer.Formats)
         {
-            foreach (var alg in _signer.Algs)
+            Console.Write($"[{alg}][{format}]: ");
+            try
             {
-                Console.Write($"[{format}][{alg}]: ");
-                try
-                {
-                    var sign = _signer.Sign(alg, data, format, detached: false);
+                var sign = _signer.Sign(alg, data, format, detached: false);
 
-                    Console.Write($"{format}: {sign}");
-                }
-                catch (Exception ex)
-                {
-                    Console.BackgroundColor = ConsoleColor.DarkRed;
-                    Console.Write(ex.Message);
-                    Console.ResetColor();
-                }
-                Console.WriteLine();
+                Console.Write($"{format}: {sign}");
             }
+            catch (Exception ex)
+            {
+                Console.BackgroundColor = ConsoleColor.DarkRed;
+                Console.Write(ex.Message);
+                Console.ResetColor();
+            }
+            Console.WriteLine();
         }
-
     }
 }

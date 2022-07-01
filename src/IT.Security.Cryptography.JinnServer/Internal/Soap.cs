@@ -53,6 +53,9 @@ internal static class Soap
 
         public static String Signing(String algorithmId, String data, String signatureType)
             => $@"{Begin}<SigningRequestType {NS}><data>{data}</data><signatureType>{signatureType}</signatureType><algorithmId>{algorithmId}</algorithmId></SigningRequestType>{End}";
+
+        public static String SigningDetached(String algorithmId, String data, String signatureType)
+            => $@"{Begin}<SigningRequestType {NS}><data>{data}</data><signatureType>{signatureType}</signatureType><algorithmId>{algorithmId}</algorithmId><detached>true</detached></SigningRequestType>{End}";
     }
 
     public static class Regex

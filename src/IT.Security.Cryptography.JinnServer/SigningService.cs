@@ -12,9 +12,9 @@ using Options;
 
 public class SigningService : IHasher, ISigner
 {
-    private static readonly String[] _hashAlgs = new[] { "1.2.643.2.2.9", "1.2.643.7.1.1.2.2", "1.2.643.7.1.1.2.3" };
-    //private static readonly String[] _signAlgs = new[] { "1.2.643.2.2.3", "1.2.643.7.1.1.3.2", "1.2.643.7.1.1.3.3" };
-    private static readonly String[] _signAlgs = new[] { "1.2.643.2.2.19", "1.2.643.7.1.1.1.1", "1.2.643.7.1.1.1.2" };
+    //private static readonly String[] _signAlgs = new[] { "1.2.643.7.1.1.3.2", "1.2.643.7.1.1.3.3", "1.2.643.2.2.3" };
+    private static readonly String[] _hashAlgs = new[] { "1.2.643.7.1.1.2.2", "1.2.643.7.1.1.2.3", "1.2.643.2.2.9" };
+    private static readonly String[] _signAlgs = new[] { "1.2.643.7.1.1.1.1", "1.2.643.7.1.1.1.2", "1.2.643.2.2.19" };
     private static readonly String[] _formats = new[] {
         "cms", "xmldsig", "wssecurity", 
         //должна быть сформирована под-пись в формате CMS-SignedData,
@@ -239,7 +239,8 @@ public class SigningService : IHasher, ISigner
     {
         //if (!detached) data = String.Format(Soap.Request.SignMessage, data).ToBase64();
 
-        var request = Soap.Request.Signing(alg, data.TryToBase64(), format);
+        var request = detached ? Soap.Request.SigningDetached(alg, data.TryToBase64(), format) 
+                               : Soap.Request.Signing(alg, data.TryToBase64(), format);
 
         var response = _service.GetResponseText(request, Soap.Actions.Sign);
 
@@ -252,7 +253,8 @@ public class SigningService : IHasher, ISigner
 
         //actor = http://smev.gosuslugi.ru/actors/smev
 
-        var request = Soap.Request.Signing(alg, data.TryToBase64(), format);
+        var request = detached ? Soap.Request.SigningDetached(alg, data.TryToBase64(), format)
+                               : Soap.Request.Signing(alg, data.TryToBase64(), format);
 
         var response = await _service.GetResponseTextAsync(request, Soap.Actions.Sign).ConfigureAwait(false);
 
