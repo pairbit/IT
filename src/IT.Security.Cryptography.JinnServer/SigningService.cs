@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace IT.Security.Cryptography.JinnServer;
 
@@ -13,7 +13,7 @@ using Options;
 
 public class SigningService : IHasher, ISigner
 {
-    private static readonly String[] _algs = new[] { "1.2.643.2.2.9", "1.2.643.7.1.1.2.2", "1.2.643.7.1.1.2.3" }; 
+    private static readonly String[] _algs = new[] { "1.2.643.2.2.9", "1.2.643.7.1.1.2.2", "1.2.643.7.1.1.2.3" };
 
     private readonly ICryptoInformer _cryptoInformer;
     private readonly ILogger? _logger;
@@ -63,8 +63,7 @@ public class SigningService : IHasher, ISigner
 
             var dataBase64 = bytes.ToBase64();
 
-            var request = state is null ? String.Format(Soap.Request.Digest, dataBase64, oid) :
-                                          String.Format(Soap.Request.DigestPart, dataBase64, oid, state);
+            var request = state is null ? Soap.Request.GetDigest(dataBase64, oid) : Soap.Request.GetDigest(dataBase64, oid, state);
 
             var response = _service.GetResponse(request, Soap.Actions.Digest);
 
@@ -89,7 +88,7 @@ public class SigningService : IHasher, ISigner
         //TODO: ReadOnlySpan
         var dataBase64 = data.ToArray().ToBase64();
 
-        var request = String.Format(Soap.Request.Digest, dataBase64, oid);
+        var request = Soap.Request.GetDigest(dataBase64, oid);
 
         var response = _service.GetResponse(request, Soap.Actions.Digest);
 
@@ -97,7 +96,7 @@ public class SigningService : IHasher, ISigner
 
         if (digestResponse is null) throw new InvalidOperationException($"'{nameof(Body.DigestResponseType)}' is null");
 
-        var digest = digestResponse!.Digest;
+        var digest = digestResponse.Digest;
 
         if (digest is null) throw new InvalidOperationException($"'{nameof(DigestResponse.Digest)}' is null");
 
@@ -130,8 +129,7 @@ public class SigningService : IHasher, ISigner
 
             var dataBase64 = bytes.ToBase64();
 
-            var request = state is null ? String.Format(Soap.Request.Digest, dataBase64, oid) :
-                                          String.Format(Soap.Request.DigestPart, dataBase64, oid, state);
+            var request = state is null ? Soap.Request.GetDigest(dataBase64, oid) : Soap.Request.GetDigest(dataBase64, oid, state);
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -141,7 +139,7 @@ public class SigningService : IHasher, ISigner
 
             if (digestResponse is null) throw new InvalidOperationException($"{nameof(response.DigestResponseType)} is null");
 
-            digest = digestResponse!.Digest;
+            digest = digestResponse.Digest;
 
             state = digestResponse.State;
         }

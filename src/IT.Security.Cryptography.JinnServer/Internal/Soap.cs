@@ -20,8 +20,8 @@ internal static class Soap
 
     public static class Request
     {
-        public const String Digest = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><DigestRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><dataBytes>{0}</dataBytes><algorithmId>{1}</algorithmId></DigestRequestType></s:Body></s:Envelope>";
-        public const String DigestPart = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><DigestRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><dataBytes>{0}</dataBytes><algorithmId>{1}</algorithmId><state>{2}</state></DigestRequestType></s:Body></s:Envelope>";
+        //private const String Digest = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><DigestRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><dataBytes>{0}</dataBytes><algorithmId>{1}</algorithmId></DigestRequestType></s:Body></s:Envelope>";
+        //private const String DigestPart = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><DigestRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><dataBytes>{0}</dataBytes><algorithmId>{1}</algorithmId><state>{2}</state></DigestRequestType></s:Body></s:Envelope>";
 
         public const String Sign = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><SigningRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><data>{0}</data><signatureType>{1}</signatureType><actor>http://smev.gosuslugi.ru/actors/smev</actor><algorithmId>{2}</algorithmId></SigningRequestType></s:Body></s:Envelope>";
         public const String SignMessage = @"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:cst=""http://www.roskazna.ru/eb/sign/types/cryptoserver"" xmlns:sgv=""http://www.roskazna.ru/eb/sign/types/sgv""><soapenv:Body>{0}</soapenv:Body></soapenv:Envelope>";
@@ -34,6 +34,14 @@ internal static class Soap
 
         public const String ValidationWithoutAlg = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><ValidationRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><signedData>{0}</signedData><createAdvanced>{1}</createAdvanced></ValidationRequestType></s:Body></s:Envelope>";
         public const String ValidationWithDetachedWithoutAlg = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><ValidationRequestType xmlns = ""http://www.roskazna.ru/eb/sign/types/sgv""><signedData>{0}</signedData><externalData>{1}</externalData><createAdvanced>{2}</createAdvanced></ValidationRequestType></s:Body></s:Envelope>";
+
+        public static String GetDigest(String dataBytes, String algorithmId)
+            => $@"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><DigestRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><dataBytes>{dataBytes}</dataBytes><algorithmId>{algorithmId}</algorithmId></DigestRequestType></s:Body></s:Envelope>";
+
+        public static String GetDigest(String dataBytes, String algorithmId, String state) 
+            => $@"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><DigestRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><dataBytes>{dataBytes}</dataBytes><algorithmId>{algorithmId}</algorithmId><state>{state}</state></DigestRequestType></s:Body></s:Envelope>";
+        
+
     }
 
     public static class Regex
