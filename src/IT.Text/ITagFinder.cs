@@ -32,6 +32,9 @@ public interface ITagFinder
 
     ReadOnlySpan<Char> LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison);
 
+    /// <summary>
+    /// Данный метод ищет только начало открывающегося тега, последний '&gt;' не ищет!!!
+    /// </summary>
     Int32 LastOpen(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison);
 
     Int32 LastClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison);

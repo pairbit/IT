@@ -39,8 +39,21 @@ public class TagFinderTest
 
         LastInner("<p a=1>9</p>", "<p", "p", "", StringComparison.Ordinal);
         LastInner("<ns:p p=2>10</ns:p>", "<ns:p", "p", "ns", StringComparison.Ordinal);
+        
+        LastInner("<p a=1>_</p><p a=1>11</p>", "<p", "p", "", StringComparison.Ordinal);
+        LastInner("<ns:p p=2>_</ns:p><ns:p p=2>12</ns:p>", "<ns:p", "p", "ns", StringComparison.Ordinal);
 
+        LastInner("<p><p>13</p></p>", "<p", "p", "", StringComparison.Ordinal);
+        LastInner("<p>14</p><p><p>15</p></p>", "<p", "p", "", StringComparison.Ordinal);
 
+        //Еще один баг с вложенными тегами, можно решить если искать
+        //<ns:p><ns:p>13</ns:p></ns:p>
+        //<ns:p>14</ns:p><ns:p><ns:p>15</ns:p></ns:p>
+
+        //Ниже приведена тяжелая ситуация, где в атрибуте тега в ковычках используется закрывающийся тег,
+        //которую не возможно решить простым способом? Решение игнорировать все что внутри ковычек.
+        //<p a="<p></p>"></p>
+        //<p a='<p></p>'></p>
     }
 
     [Test]
