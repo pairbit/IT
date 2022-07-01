@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IT.Security.Cryptography.JinnServer.Options;
+namespace IT.Security.Cryptography.JinnServer;
 
 public record ValidationOptions
 {
