@@ -49,10 +49,15 @@ public class SigningService : IHasher, ISigner
 
         if (parts > 1)
         {
-            _logger?.LogInformation("Parts: {parts}", parts);
+            var logger = _logger;
+            var canInfo = logger is not null && logger.IsEnabled(LogLevel.Information);
 
-            _logger?.LogInformation("Read {part} part", 0);
+            if (canInfo)
+            {
+                logger!.LogInformation("Parts: {parts}", parts);
 
+                logger!.LogInformation("Read {part} part", 0);
+            }
             var bytesBase64 = data.ReadPartBytes(partInBytesValue, 0).ToBase64();
 
             var response = _service.GetResponseText(Soap.Request.GetDigest(bytesBase64, oid), Soap.Actions.Digest);
@@ -65,7 +70,7 @@ public class SigningService : IHasher, ISigner
             {
                 for (int part = 1; part < parts; part++)
                 {
-                    _logger?.LogInformation("Read {part} part", part);
+                    if (canInfo) logger!.LogInformation("Read {part} part", part);
 
                     bytesBase64 = data.ReadPartBytes(partInBytesValue, part).ToBase64();
 
@@ -74,6 +79,8 @@ public class SigningService : IHasher, ISigner
                     state = ParseState(response);
                 }
             }
+
+            if (canInfo) logger!.LogInformation("Read {part} part", parts);
 
             bytesBase64 = data.ReadPartBytes(partInBytesValue, parts).ToBase64();
 
@@ -115,11 +122,16 @@ public class SigningService : IHasher, ISigner
 
         if (parts > 1)
         {
-            _logger?.LogInformation("Parts: {parts}", parts);
+            var logger = _logger;
+            var canInfo = logger is not null && logger.IsEnabled(LogLevel.Information);
 
-            _logger?.LogInformation("Read {part} part", 0);
+            if (canInfo)
+            {
+                logger!.LogInformation("Parts: {parts}", parts);
 
-            var bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, 0).ConfigureAwait(false)).ToBase64();
+                logger!.LogInformation("Read {part} part", 0);
+            }
+            var bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, 0, cancellationToken: cancellationToken).ConfigureAwait(false)).ToBase64();
 
             var response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid), Soap.Actions.Digest).ConfigureAwait(false);
 
@@ -133,9 +145,9 @@ public class SigningService : IHasher, ISigner
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    _logger?.LogInformation("Read {part} part", part);
+                    if (canInfo) logger!.LogInformation("Read {part} part", part);
 
-                    bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, part).ConfigureAwait(false)).ToBase64();
+                    bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, part, cancellationToken: cancellationToken).ConfigureAwait(false)).ToBase64();
 
                     response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid, state), Soap.Actions.Digest).ConfigureAwait(false);
 
@@ -145,9 +157,9 @@ public class SigningService : IHasher, ISigner
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            _logger?.LogInformation("Read {part} part", parts);
+            if (canInfo) logger!.LogInformation("Read {part} part", parts);
 
-            bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, parts).ConfigureAwait(false)).ToBase64();
+            bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, parts, cancellationToken: cancellationToken).ConfigureAwait(false)).ToBase64();
 
             response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid, state), Soap.Actions.Digest).ConfigureAwait(false);
 
@@ -155,7 +167,7 @@ public class SigningService : IHasher, ISigner
         }
         else
         {
-            var bytesBase64 = (await data.ReadBytesAsync().ConfigureAwait(false)).ToBase64();
+            var bytesBase64 = (await data.ReadBytesAsync(cancellationToken: cancellationToken).ConfigureAwait(false)).ToBase64();
 
             var response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid), Soap.Actions.Digest).ConfigureAwait(false);
 
