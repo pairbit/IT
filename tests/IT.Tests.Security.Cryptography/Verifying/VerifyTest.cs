@@ -5,30 +5,48 @@ namespace IT.Tests.Security.Cryptography.Verifying;
 public abstract class VerifyTest
 {
     private readonly ISignVerifier _verifier;
+    private readonly ISignEnhancer _enhancer;
 
-    public VerifyTest(ISignVerifier verifier)
+    public VerifyTest(ISignVerifier verifier, ISignEnhancer enhancer)
     {
         _verifier = verifier;
+        _enhancer = enhancer;
     }
 
     [Test]
     public void Verify()
     {
-        foreach (var signature in GetSignatures())
+        var signatures = GetSignatures().ToArray();
+        for (int i = 0; i < signatures.Length; i++)
         {
+            Console.Write($"[{i + 1}] ");
+            var signature = signatures[i];
             try
             {
                 var isVerified = _verifier.IsVerified(signature);
 
-                Console.Write(isVerified);
+                Console.Write($"{isVerified}");
             }
             catch (Exception ex)
             {
-                Console.BackgroundColor = ConsoleColor.DarkRed;
                 Console.Write(ex.Message);
-                Console.ResetColor();
             }
             Console.WriteLine();
+            foreach (var format in _enhancer.Formats)
+            {
+                try
+                {
+                    Console.Write($"[{format}]: ");
+                    var enhanced = _enhancer.Enhance(signature, format);
+                    Console.Write(enhanced);
+                }
+                catch (Exception ex)
+                {
+                    Console.Write(ex.Message);
+                }
+
+                Console.WriteLine();
+            }
         }
     }
 

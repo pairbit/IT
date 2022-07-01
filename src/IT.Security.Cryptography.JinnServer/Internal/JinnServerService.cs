@@ -196,7 +196,7 @@ internal class JinnServerService
         return request;
     }
 
-    private ValidationResponseType ParseResponseValidation(String responseText)
+    internal ValidationResponseType ParseResponseValidation(String responseText)
     {
         var body = ParseResponse(responseText);
 

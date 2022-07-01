@@ -32,11 +32,11 @@ internal static class Soap
         //public const String AutoSign = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><SigningRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><data>{0}</data><signatureType>{1}</signatureType><algorithmId>{2}</algorithmId></SigningRequestType></s:Body></s:Envelope>";
         //public const String SignWithTransforms = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><SigningRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><data>{0}</data><signatureType>{1}</signatureType><detached>{2}</detached><xmlPartID>{3}</xmlPartID><transforms>{4}</transforms><businessProcessId>{5}</businessProcessId></SigningRequestType></s:Body></s:Envelope>";
 
-        public const String Validation = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><ValidationRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><signedData>{0}</signedData><createAdvanced>{1}</createAdvanced><algorithmId>{2}</algorithmId></ValidationRequestType></s:Body></s:Envelope>";
-        public const String ValidationWithDetached = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><ValidationRequestType xmlns = ""http://www.roskazna.ru/eb/sign/types/sgv""><signedData>{0}</signedData><externalData>{1}</externalData><createAdvanced>{2}</createAdvanced><algorithmId>{3}</algorithmId></ValidationRequestType></s:Body></s:Envelope>";
+        //public const String Validation = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><ValidationRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><signedData>{0}</signedData><createAdvanced>{1}</createAdvanced><algorithmId>{2}</algorithmId></ValidationRequestType></s:Body></s:Envelope>";
+        //public const String ValidationWithDetached = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><ValidationRequestType xmlns = ""http://www.roskazna.ru/eb/sign/types/sgv""><signedData>{0}</signedData><externalData>{1}</externalData><createAdvanced>{2}</createAdvanced><algorithmId>{3}</algorithmId></ValidationRequestType></s:Body></s:Envelope>";
 
-        public const String ValidationWithoutAlg = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><ValidationRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><signedData>{0}</signedData><createAdvanced>{1}</createAdvanced></ValidationRequestType></s:Body></s:Envelope>";
-        public const String ValidationWithDetachedWithoutAlg = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><ValidationRequestType xmlns = ""http://www.roskazna.ru/eb/sign/types/sgv""><signedData>{0}</signedData><externalData>{1}</externalData><createAdvanced>{2}</createAdvanced></ValidationRequestType></s:Body></s:Envelope>";
+        //public const String ValidationWithoutAlg = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><ValidationRequestType xmlns=""http://www.roskazna.ru/eb/sign/types/sgv""><signedData>{0}</signedData><createAdvanced>{1}</createAdvanced></ValidationRequestType></s:Body></s:Envelope>";
+        //public const String ValidationWithDetachedWithoutAlg = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema""><ValidationRequestType xmlns = ""http://www.roskazna.ru/eb/sign/types/sgv""><signedData>{0}</signedData><externalData>{1}</externalData><createAdvanced>{2}</createAdvanced></ValidationRequestType></s:Body></s:Envelope>";
 
         private const String Begin = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">";
         private const String End = "</s:Body></s:Envelope>";
@@ -56,6 +56,18 @@ internal static class Soap
 
         public static String SigningDetached(String algorithmId, String data, String signatureType)
             => $@"{Begin}<SigningRequestType {NS}><data>{data}</data><signatureType>{signatureType}</signatureType><algorithmId>{algorithmId}</algorithmId><detached>true</detached></SigningRequestType>{End}";
+
+        public static String Validation(String signedData)
+            => $@"{Begin}<ValidationRequestType {NS}><signedData>{signedData}</signedData></ValidationRequestType>{End}";
+
+        public static String Validation(String signedData, String externalData)
+            => $@"{Begin}<ValidationRequestType {NS}><signedData>{signedData}</signedData><externalData>{externalData}</externalData></ValidationRequestType>{End}";
+
+        public static String Enhance(String signedData, String createAdvanced)
+            => $@"{Begin}<ValidationRequestType {NS}><signedData>{signedData}</signedData><createAdvanced>{createAdvanced}</createAdvanced></ValidationRequestType>{End}";
+
+        public static String Enhance(String signedData, String createAdvanced, String externalData)
+            => $@"{Begin}<ValidationRequestType {NS}><signedData>{signedData}</signedData><createAdvanced>{createAdvanced}</createAdvanced><externalData>{externalData}</externalData></ValidationRequestType>{End}";
     }
 
     public static class Regex

@@ -12,9 +12,17 @@ using Models;
 
 public class ValidationService : ISignEnhancer, ISignVerifier
 {
+    //private static readonly String[] _signAlgs = new[] { "1.2.643.7.1.1.3.2", "1.2.643.7.1.1.3.3", "1.2.643.2.2.3" };
+    private static readonly String[] _formats = new[] { 
+        "cades-t", "xades-t", "wssec-t",
+        "cades-c", "xades-c", "wssec-c",
+        "cades-a", "xades-a", "wssec-a"
+    };
     private readonly JinnServerService _service;
     private readonly ValidationOptions _options;
     private readonly ILogger? _logger;
+
+    public IReadOnlyCollection<String> Formats => _formats;
 
     public ValidationService(Func<ValidationOptions> getOptions, ILogger<ValidationService>? logger = null)
     {
@@ -30,69 +38,85 @@ public class ValidationService : ISignEnhancer, ISignVerifier
     #region ISignVerifier
 
     public Boolean IsVerified(String signature, String? detachedData)
-    {
-        String? alg = null;//TODO: Зачем?
-        return IsVerified(_service.GetResponseValidation(GetRequest(signature, alg, detachedData, false), Soap.Actions.Validate));
-    }
+        => IsVerified(_service.GetResponseText(GetRequestValidation(signature, detachedData), Soap.Actions.Validate));
 
     public VerifySignatureResult Verify(String signature, String? detachedData)
-    {
-        String? alg = null;//TODO: Зачем?
-        return GetVerifySignatureResult(_service.GetResponseValidation(GetRequest(signature, alg, detachedData, false), Soap.Actions.Validate));
-    }
+        => GetVerifySignatureResult(_service.GetResponseText(GetRequestValidation(signature, detachedData), Soap.Actions.Validate));
 
     public async Task<Boolean> IsVerifiedAsync(String signature, String? detachedData, CancellationToken cancellationToken)
-    {
-        String? alg = null;//TODO: Зачем?
-        return IsVerified(await _service.GetResponseValidationAsync(GetRequest(signature, alg, detachedData, false), Soap.Actions.Validate).ConfigureAwait(false));
-    }
+        => IsVerified(await _service.GetResponseTextAsync(GetRequestValidation(signature, detachedData), Soap.Actions.Validate).ConfigureAwait(false));
 
     public async Task<VerifySignatureResult> VerifyAsync(String signature, String? detachedData, CancellationToken cancellationToken)
+        => GetVerifySignatureResult(await _service.GetResponseTextAsync(GetRequestValidation(signature, detachedData), Soap.Actions.Validate).ConfigureAwait(false));
+
+    private static Boolean IsVerified(String response)
     {
-        String? alg = null;//TODO: Зачем?
-        var response = await _service.GetResponseValidationAsync(GetRequest(signature, alg, detachedData, false), Soap.Actions.Validate).ConfigureAwait(false);
-        return GetVerifySignatureResult(response);
+        var span = response.AsSpan();
+
+        span = ParseValidationResponseType(span);
+
+        var range = TagFinder.Inner(span, "globalStatus".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        if (range.Equals(default)) throw new InvalidOperationException("'ValidationResponseType.globalStatus' not found");
+
+        return span[range].SequenceEqual("valid".AsSpan());
+    }
+
+    private VerifySignatureResult GetVerifySignatureResult(String response)
+    {
+        var result = _service.ParseResponseValidation(response);
+
+        return result.ToVerifySignatureResult();
     }
 
     #endregion ISignVerifier
 
     #region ISignEnhancer
 
-    public String Enhance(String signature, String? detachedData)
-    {
-        String? alg = null;//TODO: Зачем?
-        return GetEnhanced(_service.GetResponse(GetRequest(signature, alg, detachedData, true), Soap.Actions.Validate));
-    }
+    public String Enhance(String signature, String format, String? detachedData)
+        => GetEnhanced(_service.GetResponseText(GetRequestEnhance(signature, format, detachedData), Soap.Actions.Validate));
 
-    public async Task<String> EnhanceAsync(String signature, String? detachedData, CancellationToken cancellationToken)
+    public async Task<String> EnhanceAsync(String signature, String format, String? detachedData, CancellationToken cancellationToken)
+        => GetEnhanced(await _service.GetResponseTextAsync(GetRequestEnhance(signature, format, detachedData), Soap.Actions.Validate).ConfigureAwait(false));
+
+    private static String GetEnhanced(String response)
     {
-        String? alg = null;//TODO: Зачем?
-        var response = await _service.GetResponseAsync(GetRequest(signature, alg, detachedData, true), Soap.Actions.Validate).ConfigureAwait(false);
-        return GetEnhanced(response);
+        var span = response.AsSpan();
+
+        span = ParseValidationResponseType(span);
+
+        var range = TagFinder.Inner(span, "advanced".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        if (range.Equals(default)) throw new InvalidOperationException("'ValidationResponseType.advanced' not found");
+
+        return span[range].ToString();
     }
 
     #endregion ISignEnhancer
 
     #region Private Methods
 
-    private String GetRequest(String sign, String? alg, String? detachedData, Boolean enhance)
+    private static ReadOnlySpan<Char> ParseValidationResponseType(ReadOnlySpan<Char> response)
     {
-        if (sign is null) throw new ArgumentNullException(nameof(sign));
+        var range = TagFinder.Outer(response, "ValidationResponseType".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
-        sign = sign.TryToBase64();
+        if (range.Equals(default) && JinnServerService.NotFound(response)) throw new InvalidOperationException("'ValidationResponseType' not found");
 
-        var enhanceLower = enhance.ToString().ToLower();
+        return response[range];
+    }
 
-        if (alg is null)
-        {
-            return detachedData is null || detachedData.Length == 0
-                ? String.Format(Soap.Request.ValidationWithoutAlg, sign, enhanceLower)
-                : String.Format(Soap.Request.ValidationWithDetachedWithoutAlg, sign, detachedData!.TryToBase64(), enhanceLower);
-        }
-
+    private String GetRequestValidation(String sign, String? detachedData)
+    {
         return detachedData is null || detachedData.Length == 0
-            ? String.Format(Soap.Request.Validation, sign, enhanceLower, alg)
-            : String.Format(Soap.Request.ValidationWithDetached, sign, detachedData!.TryToBase64(), enhanceLower, alg);
+            ? Soap.Request.Validation(sign.TryToBase64())
+            : Soap.Request.Validation(sign.TryToBase64(), detachedData.TryToBase64());
+    }
+
+    private String GetRequestEnhance(String sign, String format, String? detachedData)
+    {
+        return detachedData is null || detachedData.Length == 0
+            ? Soap.Request.Enhance(sign.TryToBase64(), format)
+            : Soap.Request.Enhance(sign.TryToBase64(), format, detachedData.TryToBase64());
     }
 
     private void CheckStatus(GlobalStatus status, SimpleSignatureInfos signatureInfos)
@@ -146,20 +170,6 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         if (advanced is null || advanced.Length == 0) throw new InvalidOperationException("Internal Error JinnServer");
 
         return advanced.ToBase64();
-    }
-
-    private Boolean IsVerified(ValidationResponseType response)
-    {
-        //CheckStatus(response.GlobalStatus, response.SignatureInfos);
-
-        return response.GlobalStatus == GlobalStatus.valid;
-    }
-
-    private VerifySignatureResult GetVerifySignatureResult(ValidationResponseType response)
-    {
-        //CheckStatus(response.GlobalStatus, response.SignatureInfos);
-
-        return response.ToVerifySignatureResult();
     }
 
     #endregion Private Methods

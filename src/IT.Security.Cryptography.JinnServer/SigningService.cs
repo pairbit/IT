@@ -11,7 +11,6 @@ using Internal;
 
 public class SigningService : IHasher, ISigner
 {
-    //private static readonly String[] _signAlgs = new[] { "1.2.643.7.1.1.3.2", "1.2.643.7.1.1.3.3", "1.2.643.2.2.3" };
     private static readonly String[] _hashAlgs = new[] { "1.2.643.7.1.1.2.2", "1.2.643.7.1.1.2.3", "1.2.643.2.2.9" };
     private static readonly String[] _signAlgs = new[] { "1.2.643.7.1.1.1.1", "1.2.643.7.1.1.1.2", "1.2.643.2.2.19" };
     private static readonly String[] _formats = new[] {
@@ -189,7 +188,7 @@ public class SigningService : IHasher, ISigner
         }
     }
 
-    private ReadOnlySpan<Char> ParseDigestResponseType(ReadOnlySpan<Char> response)
+    private static ReadOnlySpan<Char> ParseDigestResponseType(ReadOnlySpan<Char> response)
     {
         var range = TagFinder.Outer(response, "DigestResponseType".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
@@ -198,7 +197,7 @@ public class SigningService : IHasher, ISigner
         return response[range];
     }
 
-    private Byte[] ParseDigest(String response)
+    private static Byte[] ParseDigest(String response)
     {
         var span = response.AsSpan();
 
@@ -206,14 +205,14 @@ public class SigningService : IHasher, ISigner
 
         var range = TagFinder.Inner(span, "Digest".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
-        if (range.Equals(default) && JinnServerService.NotFound(span)) throw new InvalidOperationException("'DigestResponseType.Digest' not found");
+        if (range.Equals(default)) throw new InvalidOperationException("'DigestResponseType.Digest' not found");
 
         var digest = span[range].ToString();
 
         return Convert.FromBase64String(digest);
     }
 
-    private String ParseState(String response)
+    private static String ParseState(String response)
     {
         var span = response.AsSpan();
 
@@ -221,7 +220,7 @@ public class SigningService : IHasher, ISigner
 
         var range = TagFinder.Inner(span, "State".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
-        if (range.Equals(default) && JinnServerService.NotFound(span)) throw new InvalidOperationException("'DigestResponseType.State' not found");
+        if (range.Equals(default)) throw new InvalidOperationException("'DigestResponseType.State' not found");
 
         var state = span[range].ToString();
 
@@ -260,7 +259,7 @@ public class SigningService : IHasher, ISigner
         return ParseSigningResponseType(response);
     }
 
-    private String ParseSigningResponseType(String response)
+    private static String ParseSigningResponseType(String response)
     {
         var span = response.AsSpan();
 

@@ -6,7 +6,7 @@ public class JinnServerVerifyer : VerifyTest
 {
     private static readonly ValidationService _verifier = new(GetOptions);
 
-    public JinnServerVerifyer() : base(_verifier)
+    public JinnServerVerifyer() : base(_verifier, _verifier)
     {
 
     }

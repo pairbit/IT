@@ -17,7 +17,7 @@ public abstract class SignTest
     {
         var data = Convert.ToBase64String(Encoding.UTF8.GetBytes("<Doc>My Data for Sign</Doc>"));
 
-        var alg = _signer.Algs.First();
+        var alg = _signer.Algs.ToArray()[0];
 
         foreach (var format in _signer.Formats)
         {
