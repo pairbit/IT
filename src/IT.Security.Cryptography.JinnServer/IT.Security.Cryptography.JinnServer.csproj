@@ -32,7 +32,12 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
-	
+
+  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0' or $(TargetFramework) == 'netstandard2.1'">
+    <ProjectReference Include="..\IT\IT.csproj" />
+    <ProjectReference Include="..\IT.Memory\IT.Memory.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\IT.Security.Cryptography\IT.Security.Cryptography.csproj" />
   </ItemGroup>

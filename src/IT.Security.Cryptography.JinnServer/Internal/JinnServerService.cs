@@ -122,7 +122,13 @@ internal class JinnServerService
         if (_logger is not null && _logger.IsEnabled(LogLevel.Debug)) 
             _logger.LogDebug("Response: {response}", responseText);
 
-        var envelope = Xml.Deserialize<Envelope>(responseText, findRoot: true);
+        var range = TagFinder.Outer(responseText.AsSpan(), "Envelope".AsSpan(), "soapenv".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        responseText = responseText[range];
+
+        responseText = JsonConvert.SerializeXmlNode(LoadDocument(responseText), Newtonsoft.Json.Formatting.None, true);
+
+        var envelope = JsonConvert.DeserializeObject<Envelope>(responseText);
         
         var body = envelope?.Body;
         
@@ -155,54 +161,6 @@ internal class JinnServerService
         var serializer = new XmlSerializer(typeof(ValidationResponseType));
         using var reader = new StringReader(xml);
         return (ValidationResponseType)serializer.Deserialize(reader);
-    }
-
-    public static class Xml
-    {
-        //public static String Serialize(Object obj, JsonFields fields, Formatting? formatting = null, String root = null)
-        //{
-        //    var json = JsonConvert.SerializeObject(obj, fields, formatting);
-        //    var xnode = JsonConvert.DeserializeXNode(json, root ?? GetRoot(obj.GetType()));
-        //    return xnode.ToString();
-        //}
-
-        //public static String Serialize(Object obj, Formatting? formatting = null, JsonSerializerSettings settings = null, String root = null)
-        //{
-        //    var json = JsonConvert.SerializeObject(obj, formatting, settings);
-        //    var xnode = JsonConvert.DeserializeXNode(json, root ?? GetRoot(obj.GetType()));
-        //    return xnode.ToString();
-        //}
-
-        //public static Object Deserialize(String value, Type type, JsonSerializerSettings settings = null, Boolean ignoreRoot = true, Boolean findRoot = false)
-        //{
-        //    return JsonConvert.DeserializeObject(XmlToJson(value, type, settings, ignoreRoot, findRoot), type, settings);
-        //}
-
-        public static T Deserialize<T>(String value, JsonSerializerSettings? settings = null, Boolean ignoreRoot = true, Boolean findRoot = false)
-        {
-            var json = XmlToJson(value, typeof(T), settings, ignoreRoot, findRoot);
-
-            return JsonConvert.DeserializeObject<T>(json, settings);
-        }
-
-        //private static String GetRoot(Type type)
-        //{
-        //    var xmlRoot = type.GetCustomAttributes(typeof(XmlRootAttribute), false).Cast<XmlRootAttribute>().SingleOrDefault();
-        //    if (xmlRoot is not null)
-        //    {
-        //        var elementName = xmlRoot.ElementName;
-        //        if (elementName is not null && elementName.Length > 0) return elementName;
-        //    }
-        //    return type.Name;
-        //}
-
-        private static String XmlToJson(String value, Type type, JsonSerializerSettings settings, Boolean ignoreRoot, Boolean findRoot)
-        {
-            if (findRoot) value = Ml.FindRoot(value, type);
-            var doc = LoadDocument(value);
-            var formatting = settings?.Formatting ?? Newtonsoft.Json.Formatting.None;
-            return JsonConvert.SerializeXmlNode(doc, formatting, ignoreRoot);
-        }
     }
 
     private static XmlDocument LoadDocument(String xml)
