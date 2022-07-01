@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace IT.Security.Cryptography;
 
-using Models;
-
 public interface IAsyncSigner
 {
-    Task<String> SignAsync(String alg, String data, SignFormat format = SignFormat.XadesBES, Boolean detached = true, CancellationToken cancellationToken = default);
+    IReadOnlyCollection<String> Algs { get; }
+
+    IReadOnlyCollection<String> Formats { get; }
+
+    Task<String> SignAsync(String alg, String data, String format, Boolean detached, CancellationToken cancellationToken);
 }

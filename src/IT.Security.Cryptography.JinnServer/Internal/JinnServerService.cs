@@ -114,6 +114,56 @@ internal class JinnServerService
         return ParseResponse(responseText);
     }
 
+    public static Boolean NotFound(ReadOnlySpan<Char> response)
+    {
+        var range = TagFinder.Outer(response, Soap.Envelope.AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        if (range.Equals(default)) throw new InvalidOperationException("'Envelope' not found");
+
+        response = response[range];
+
+        range = TagFinder.Outer(response, "Body".AsSpan(), StringComparison.OrdinalIgnoreCase);
+        
+        if (range.Equals(default)) throw new InvalidOperationException("'Body' not found");
+
+        response = response[range];
+
+        range = TagFinder.Outer(response, "ServiceFaultInfo".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        if (!range.Equals(default))
+        {
+            response = response[range];
+
+            range = TagFinder.Inner(response, "type".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+            var type = range.Equals(default) ? null : response[range].ToString();
+
+            range = TagFinder.Inner(response, "comment".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+            var comment = range.Equals(default) ? null : response[range].ToString();
+
+            throw new InvalidOperationException($"[ServiceFaultInfo][{type}] {comment}");
+        }
+
+        //range = TagFinder.Outer(response, "Fault".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        //if (!range.Equals(default))
+        //{
+        //    response = response[range];
+
+        //    range = TagFinder.Inner(response, "type".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        //    var type = range.Equals(default) ? null : response[range];
+
+        //    range = TagFinder.Inner(response, "comment".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        //    var comment = range.Equals(default) ? null : response[range];
+
+        //    throw new InvalidOperationException($"'ServiceFaultInfo' type '{type}' comment '{comment}'");
+        //}
+        return true;
+    }
+
     public Body ParseResponse(String responseText)
     {
         responseText = JsonConvert.SerializeXmlNode(LoadDocument(responseText), Newtonsoft.Json.Formatting.None, true);
@@ -131,13 +181,6 @@ internal class JinnServerService
         //Arg.NotNull(body.Responses.Where(x => x is not null).SingleOrDefault(), "Parse response error!");
 
         return body;
-    }
-
-    public ReadOnlySpan<Char> ParseEnvelope(ReadOnlySpan<Char> response)
-    {
-        var range = TagFinder.Outer(response, Soap.Envelope.AsSpan(), StringComparison.OrdinalIgnoreCase);
-
-        return response[range];
     }
 
     #endregion Public Methods

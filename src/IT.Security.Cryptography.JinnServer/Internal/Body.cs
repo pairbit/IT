@@ -17,8 +17,6 @@ internal class Body
 
     public SimpleValidationResponse ValidationResponseType { get; set; }
 
-    public String SigningResponseType { get; set; }
-
     [JsonIgnore]
-    public Object[] Responses => new Object[] {  SigningResponseType, ValidationResponseType };
+    public Object[] Responses => new Object[] { ValidationResponseType };
 }

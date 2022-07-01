@@ -8,17 +8,32 @@ using System.Threading.Tasks;
 namespace IT.Security.Cryptography.JinnServer;
 
 using Internal;
-using Models;
 using Options;
 
 public class SigningService : IHasher, ISigner
 {
-    private static readonly String[] _algs = new[] { "1.2.643.2.2.9", "1.2.643.7.1.1.2.2", "1.2.643.7.1.1.2.3" };
+    private static readonly String[] _hashAlgs = new[] { "1.2.643.2.2.9", "1.2.643.7.1.1.2.2", "1.2.643.7.1.1.2.3" };
+    //private static readonly String[] _signAlgs = new[] { "1.2.643.2.2.3", "1.2.643.7.1.1.3.2", "1.2.643.7.1.1.3.3" };
+    private static readonly String[] _signAlgs = new[] { "1.2.643.2.2.19", "1.2.643.7.1.1.1.1", "1.2.643.7.1.1.1.2" };
+    private static readonly String[] _formats = new[] {
+        "cms", "xmldsig", "wssecurity", 
+        //должна быть сформирована под-пись в формате CMS-SignedData,
+        //усиленная в необходимом объеме (допол-ненная атрибутами) в соответствии с ETSI TS 101 733 (CAdES)
+        "cades-bes", "cades-c", "cades-t", "cades-a",
+        //должна быть сформирована подпись в формате XMLDsig,
+        //усиленная в необходимом объеме (дополненная атрибутами) в соответствии с ETSI TS 101 903 (XadES)
+        "xades-bes", "xades-c", "xades-t", "xades-a",
+        //должна быть сформирована подпись в формате WS-Security,
+        //усиленная в необходимом объеме (дополненная атрибутами) в соответствии с ETSI TS 101 903 (XadES)
+        "wssec-bes", "wssec-c", "wssec-t", "wssec-a"
+    };
 
     private readonly ICryptoInformer _cryptoInformer;
     private readonly ILogger? _logger;
     private readonly JinnServerService _service;
     private readonly SigningOptions _options;
+
+    public IReadOnlyCollection<String> Formats => _formats;
 
     public SigningService(
         Func<SigningOptions> getOptions,
@@ -37,7 +52,7 @@ public class SigningService : IHasher, ISigner
 
     #region IHasher
 
-    public IReadOnlyCollection<String> Algs => _algs;
+    IReadOnlyCollection<String> IAsyncHasher.Algs => _hashAlgs;
 
     public Byte[] Hash(String alg, Stream data)
     {
@@ -60,7 +75,7 @@ public class SigningService : IHasher, ISigner
             }
             var bytesBase64 = data.ReadPartBytes(partInBytesValue, 0).ToBase64();
 
-            var response = _service.GetResponseText(Soap.Request.GetDigest(bytesBase64, oid), Soap.Actions.Digest);
+            var response = _service.GetResponseText(Soap.Request.Digest(bytesBase64, oid), Soap.Actions.Digest);
 
             var state = ParseState(response);
 
@@ -74,7 +89,7 @@ public class SigningService : IHasher, ISigner
 
                     bytesBase64 = data.ReadPartBytes(partInBytesValue, part).ToBase64();
 
-                    response = _service.GetResponseText(Soap.Request.GetDigest(bytesBase64, oid, state), Soap.Actions.Digest);
+                    response = _service.GetResponseText(Soap.Request.Digest(bytesBase64, oid, state), Soap.Actions.Digest);
 
                     state = ParseState(response);
                 }
@@ -84,7 +99,7 @@ public class SigningService : IHasher, ISigner
 
             bytesBase64 = data.ReadPartBytes(partInBytesValue, parts).ToBase64();
 
-            response = _service.GetResponseText(Soap.Request.GetDigest(bytesBase64, oid, state), Soap.Actions.Digest);
+            response = _service.GetResponseText(Soap.Request.Digest(bytesBase64, oid, state), Soap.Actions.Digest);
 
             return ParseDigest(response);
         }
@@ -92,7 +107,7 @@ public class SigningService : IHasher, ISigner
         {
             var bytesBase64 = data.ReadBytes().ToBase64();
 
-            var response = _service.GetResponseText(Soap.Request.GetDigest(bytesBase64, oid), Soap.Actions.Digest);
+            var response = _service.GetResponseText(Soap.Request.Digest(bytesBase64, oid), Soap.Actions.Digest);
 
             return ParseDigest(response);
         }
@@ -105,7 +120,7 @@ public class SigningService : IHasher, ISigner
         //TODO: ReadOnlySpan
         var dataBase64 = data.ToArray().ToBase64();
 
-        var request = Soap.Request.GetDigest(dataBase64, oid);
+        var request = Soap.Request.Digest(dataBase64, oid);
 
         var response = _service.GetResponseText(request, Soap.Actions.Digest);
 
@@ -133,7 +148,7 @@ public class SigningService : IHasher, ISigner
             }
             var bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, 0, cancellationToken: cancellationToken).ConfigureAwait(false)).ToBase64();
 
-            var response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid), Soap.Actions.Digest).ConfigureAwait(false);
+            var response = await _service.GetResponseTextAsync(Soap.Request.Digest(bytesBase64, oid), Soap.Actions.Digest).ConfigureAwait(false);
 
             var state = ParseState(response);
 
@@ -149,7 +164,7 @@ public class SigningService : IHasher, ISigner
 
                     bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, part, cancellationToken: cancellationToken).ConfigureAwait(false)).ToBase64();
 
-                    response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid, state), Soap.Actions.Digest).ConfigureAwait(false);
+                    response = await _service.GetResponseTextAsync(Soap.Request.Digest(bytesBase64, oid, state), Soap.Actions.Digest).ConfigureAwait(false);
 
                     state = ParseState(response);
                 }
@@ -161,7 +176,7 @@ public class SigningService : IHasher, ISigner
 
             bytesBase64 = (await data.ReadPartBytesAsync(partInBytesValue, parts, cancellationToken: cancellationToken).ConfigureAwait(false)).ToBase64();
 
-            response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid, state), Soap.Actions.Digest).ConfigureAwait(false);
+            response = await _service.GetResponseTextAsync(Soap.Request.Digest(bytesBase64, oid, state), Soap.Actions.Digest).ConfigureAwait(false);
 
             return ParseDigest(response);
         }
@@ -169,7 +184,7 @@ public class SigningService : IHasher, ISigner
         {
             var bytesBase64 = (await data.ReadBytesAsync(cancellationToken: cancellationToken).ConfigureAwait(false)).ToBase64();
 
-            var response = await _service.GetResponseTextAsync(Soap.Request.GetDigest(bytesBase64, oid), Soap.Actions.Digest).ConfigureAwait(false);
+            var response = await _service.GetResponseTextAsync(Soap.Request.Digest(bytesBase64, oid), Soap.Actions.Digest).ConfigureAwait(false);
 
             return ParseDigest(response);
         }
@@ -177,11 +192,9 @@ public class SigningService : IHasher, ISigner
 
     private ReadOnlySpan<Char> ParseDigestResponseType(ReadOnlySpan<Char> response)
     {
-        response = _service.ParseEnvelope(response);
-
         var range = TagFinder.Outer(response, "DigestResponseType".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
-        if (range.Equals(default)) throw new InvalidOperationException($"'DigestResponseType' is null");
+        if (range.Equals(default) && JinnServerService.NotFound(response)) throw new InvalidOperationException("'DigestResponseType' not found");
 
         return response[range];
     }
@@ -189,11 +202,12 @@ public class SigningService : IHasher, ISigner
     private Byte[] ParseDigest(String response)
     {
         var span = response.AsSpan();
+
         span = ParseDigestResponseType(span);
 
         var range = TagFinder.Inner(span, "Digest".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
-        if (range.Equals(default)) throw new InvalidOperationException("'DigestResponse.Digest' is null");
+        if (range.Equals(default) && JinnServerService.NotFound(span)) throw new InvalidOperationException("'DigestResponseType.Digest' not found");
 
         var digest = span[range].ToString();
 
@@ -208,7 +222,7 @@ public class SigningService : IHasher, ISigner
 
         var range = TagFinder.Inner(span, "State".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
-        if (range.Equals(default)) throw new InvalidOperationException("'DigestResponse.State' is null");
+        if (range.Equals(default) && JinnServerService.NotFound(span)) throw new InvalidOperationException("'DigestResponseType.State' not found");
 
         var state = span[range].ToString();
 
@@ -219,36 +233,41 @@ public class SigningService : IHasher, ISigner
 
     #region ISigner
 
-    public String Sign(String alg, String data, SignFormat format, Boolean detached)
+    IReadOnlyCollection<String> IAsyncSigner.Algs => _signAlgs;
+
+    public String Sign(String alg, String data, String format, Boolean detached)
     {
-        if (!detached) data = String.Format(Soap.Request.SignMessage, data).ToBase64();
+        //if (!detached) data = String.Format(Soap.Request.SignMessage, data).ToBase64();
 
-        var request = String.Format(Soap.Request.Sign, data, format.GetCode(), alg);
+        var request = Soap.Request.Signing(alg, data.TryToBase64(), format);
 
-        var response = _service.GetResponse(request, Soap.Actions.Sign);
+        var response = _service.GetResponseText(request, Soap.Actions.Sign);
 
-        var signingResponseType = response.SigningResponseType;
-
-        if (signingResponseType is null || signingResponseType.Length == 0)
-            throw new InvalidOperationException($"{nameof(Body.SigningResponseType)} is null");
-
-        return signingResponseType;
+        return ParseSigningResponseType(response);
     }
 
-    public async Task<String> SignAsync(String alg, String data, SignFormat format, Boolean detached, CancellationToken cancellationToken)
+    public async Task<String> SignAsync(String alg, String data, String format, Boolean detached, CancellationToken cancellationToken)
     {
-        if (!detached) data = String.Format(Soap.Request.SignMessage, data).ToBase64();
+        //if (!detached) data = String.Format(Soap.Request.SignMessage, data).ToBase64();
 
-        var request = String.Format(Soap.Request.Sign, data, format.GetCode(), alg);
+        //actor = http://smev.gosuslugi.ru/actors/smev
 
-        var response = await _service.GetResponseAsync(request, Soap.Actions.Sign).ConfigureAwait(false);
+        var request = Soap.Request.Signing(alg, data.TryToBase64(), format);
 
-        var signingResponseType = response.SigningResponseType;
+        var response = await _service.GetResponseTextAsync(request, Soap.Actions.Sign).ConfigureAwait(false);
 
-        if (signingResponseType is null || signingResponseType.Length == 0)
-            throw new InvalidOperationException($"{nameof(Body.SigningResponseType)} is null");
+        return ParseSigningResponseType(response);
+    }
 
-        return signingResponseType;
+    private String ParseSigningResponseType(String response)
+    {
+        var span = response.AsSpan();
+
+        var range = TagFinder.Inner(span, "SigningResponseType".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        if (range.Equals(default) && JinnServerService.NotFound(span)) throw new InvalidOperationException("'SigningResponseType' not found");
+
+        return response[range].ToString();
     }
 
     #endregion ISigner
