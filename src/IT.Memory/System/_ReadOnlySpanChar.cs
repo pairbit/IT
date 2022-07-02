@@ -16,7 +16,14 @@ public static class _ReadOnlySpanChar
 #if NETSTANDARD2_0
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int IndexOf(this ReadOnlySpan<Char> span, String value, StringComparison comparisonType) => span.IndexOf(value.AsSpan(), comparisonType);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int LastIndexOf(this ReadOnlySpan<Char> span, String value) => span.LastIndexOf(value.AsSpan());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool Equals(this ReadOnlySpan<Char> span, String value, StringComparison comparisonType)
+        => span.Equals(value.AsSpan(), comparisonType);
 
 #endif
 }

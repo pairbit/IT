@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 
-namespace IT.Security.Cryptography.JinnServer.Internal;
+namespace IT.Text;
 
-internal class TagFinder
+internal class TagFinder : ITagFinder
 {
     public const Char Lt = '<';
     public const Char Gt = '>';
@@ -16,7 +17,97 @@ internal class TagFinder
     public const String OpenCloser = "</";
     public const String EndCloser = "/>";
 
-    public static Range Inner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
+
+    //    public Boolean Contains(ReadOnlySpan<Char> chars, String name, String? ns, StringComparison comparison = StringComparison.Ordinal)
+    //    {
+    //        var namelen = name.Length;
+
+    //        //<Tag></Tag>
+    //        if (chars.Length >= (namelen * 2) + 5)
+    //        {
+    //            var closeIndex = FindClose(chars, name, ns, comparison);
+
+    //            //<Tag>
+    //            if (closeIndex >= namelen + 2)
+    //            {
+    //                var openIndex = FindOpen(chars, name, ns, comparison);
+    //                if (openIndex > -1) return true;
+    //            }
+    //        }
+    //        return false;
+    //    }
+
+    //    public Boolean Contains(ReadOnlySpan<Char> chars, String name, StringComparison comparison = StringComparison.Ordinal)
+    //    {
+    //        var namelen = name.Length;
+
+    //        //<Tag></Tag>
+    //        if (chars.Length >= (namelen * 2) + 5)
+    //        {
+    //            var closeIndex = FindClose(chars, name, out var ns, comparison);
+
+    //            //<Tag>
+    //            if (closeIndex >= namelen + 2)
+    //            {
+    //                var openIndex = FindOpen(chars, name, ns, comparison);
+    //                if (openIndex > -1) return true;
+    //            }
+    //        }
+    //        return false;
+    //    }
+
+    //public Int32 FirstClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison = StringComparison.Ordinal)
+    //{
+    //    //Close tags
+    //    //Example1: "</ns:Tag>"
+    //    //Example2: "</*:Tag>"
+    //    //Example3: "</Tag>"
+    //    //Template: "Tag>"
+
+    //    var namelen = name.Length;
+    //    var len = chars.Length;
+
+    //    if (len >= namelen + 3)
+    //    {
+    //        do
+    //        {
+    //            //"Tag>"
+    //            var index = chars.IndexOf(name, comparison);
+
+    //            if (index == -1) break;
+
+    //            if (index > 1)
+    //            {
+    //                var i = index;
+
+    //                i--;
+    //                var ch = chars[i];
+
+    //                //</Tag>
+    //                if (ch == Slash)
+    //                {
+    //                    i--;
+    //                    if (chars[i] == Lt) return i + (len - chars.Length);
+    //                }
+    //                //:Tag>
+    //                else if (ch == Colon)
+    //                {
+    //                    i--;
+    //                    chars = chars[..i];
+    //                    i = chars.LastIndexOf(OpenCloser.AsSpan());
+    //                    if (i > -1) return i + (len - chars.Length);
+    //                }
+    //            }
+
+    //            chars = chars[(index + namelen + 1)..];
+
+    //            Debug.Print(chars.ToString());
+    //        } while (true);
+    //    }
+    //    return -1;
+    //}
+
+    public Range Inner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -45,7 +136,7 @@ internal class TagFinder
         return default;
     }
 
-    public static Range Inner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
+    public Range Inner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -74,7 +165,7 @@ internal class TagFinder
         return default;
     }
 
-    public static ReadOnlySpan<Char> Inner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison)
+    public ReadOnlySpan<Char> Inner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -108,7 +199,7 @@ internal class TagFinder
         return default;
     }
 
-    public static Range Outer(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
+    public Range Outer(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -131,7 +222,7 @@ internal class TagFinder
         return default;
     }
 
-    public static Range Outer(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
+    public Range Outer(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -154,7 +245,7 @@ internal class TagFinder
         return default;
     }
 
-    public static ReadOnlySpan<Char> Outer(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison)
+    public ReadOnlySpan<Char> Outer(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -179,7 +270,7 @@ internal class TagFinder
         return default;
     }
 
-    public static Int32 FirstOpen(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
+    public Int32 FirstOpen(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
     {
         var len = chars.Length;
         var namelen = name.Length;
@@ -255,7 +346,7 @@ internal class TagFinder
         return -1;
     }
 
-    public static Range LastInner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
+    public Range LastInner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -286,7 +377,7 @@ internal class TagFinder
         return default;
     }
 
-    public static Range LastInner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
+    public Range LastInner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -317,7 +408,7 @@ internal class TagFinder
         return default;
     }
 
-    public static ReadOnlySpan<Char> LastInner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison)
+    public ReadOnlySpan<Char> LastInner(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -353,7 +444,7 @@ internal class TagFinder
         return default;
     }
 
-    public static Range LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
+    public Range LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -378,7 +469,7 @@ internal class TagFinder
         return default;
     }
 
-    public static Range LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
+    public Range LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -403,7 +494,7 @@ internal class TagFinder
         return default;
     }
 
-    public static ReadOnlySpan<Char> LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison)
+    public ReadOnlySpan<Char> LastOuter(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Range range, StringComparison comparison)
     {
         var namelen = name.Length;
 
@@ -430,7 +521,7 @@ internal class TagFinder
         return default;
     }
 
-    public static Int32 LastOpen(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
+    public Int32 LastOpen(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
     {
         var namelen = name.Length;
         var nslen = ns.Length;
@@ -505,7 +596,110 @@ internal class TagFinder
         return -1;
     }
 
-    public static Int32 LastClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
+    //public Int32 LastOpen(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, out Int32 end, StringComparison comparison)
+    //{
+    //    var namelen = name.Length;
+    //    var nslen = ns.Length;
+
+    //    //Example1: "<Tag>"
+    //    //Example2: "<Tag "
+    //    if (nslen == 0)
+    //    {
+    //        if (chars.Length >= namelen + 2)
+    //        {
+    //            do
+    //            {
+    //                var li = chars.LastIndexOf(name, comparison);
+
+    //                if (li < 1) break;
+
+    //                //Debug.Print(chars.ToString());
+
+    //                var i = li + namelen;
+    //                //">"
+    //                if (i < chars.Length)
+    //                {
+    //                    var ch = chars[i];
+    //                    if (ch == Gt)
+    //                    {
+    //                        end = i;
+    //                        i = li - 1;
+    //                        if (chars[i] == Lt) return i;
+    //                    }
+    //                    else if (ch == Space)
+    //                    {
+    //                        end = i;
+    //                        i = li - 1;
+    //                        if (chars[i] == Lt)
+    //                        {
+    //                            var temp = chars[end..];
+    //                            end = temp.IndexOf(Gt);
+    //                            return i;
+    //                        }
+    //                    }
+    //                }
+
+    //                chars = chars[..li];
+    //            } while (true);
+    //        }
+    //    }
+    //    //Example1: "<ns:Tag "
+    //    //Example3: "<ns:Tag>"
+    //    else
+    //    {
+    //        if (chars.Length >= namelen + nslen + 3)
+    //        {
+    //            //"<ns:"
+    //            var mi = nslen + 2;
+    //            do
+    //            {
+    //                var li = chars.LastIndexOf(name, comparison);
+
+    //                if (li < mi) break;
+
+    //                //Debug.Print(chars.ToString());
+
+    //                var i = li + namelen;
+    //                if (i < chars.Length)
+    //                {
+    //                    var ch = chars[i];
+    //                    if (ch == Gt)
+    //                    {
+    //                        end = i;
+    //                        i = li - 1;
+    //                        if (chars[i] == Colon)//:
+    //                        {
+    //                            var si = i - nslen;
+    //                            if (chars[si..i].SequenceEqual(ns) && chars[--si] == Lt)
+    //                                return si;
+    //                        }
+    //                    }
+    //                    else if (ch == Space)
+    //                    {
+    //                        end = i;
+    //                        i = li - 1;
+    //                        if (chars[i] == Colon)//:
+    //                        {
+    //                            var si = i - nslen;
+    //                            if (chars[si..i].SequenceEqual(ns) && chars[--si] == Lt)
+    //                            {
+    //                                var temp = chars[end..];
+    //                                end = temp.IndexOf(Gt);
+    //                                return si;
+    //                            }
+    //                        }
+    //                    }
+    //                }
+
+    //                chars = chars[..li];
+    //            } while (true);
+    //        }
+    //    }
+    //    end = -1;
+    //    return -1;
+    //}
+
+    public Int32 LastClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, ReadOnlySpan<Char> ns, StringComparison comparison)
     {
         //Close tags
 
@@ -576,8 +770,8 @@ internal class TagFinder
 
         return -1;
     }
-    
-    public static Int32 LastClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
+
+    public Int32 LastClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, StringComparison comparison)
     {
         //Close tags
         //Example1: "</ns:Tag>"
@@ -624,7 +818,7 @@ internal class TagFinder
         return -1;
     }
 
-    public static ReadOnlySpan<Char> LastClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Int32 index, StringComparison comparison)
+    public ReadOnlySpan<Char> LastClose(ReadOnlySpan<Char> chars, ReadOnlySpan<Char> name, out Int32 index, StringComparison comparison)
     {
         //Close tags
         //Example1: "</ns:Tag>"

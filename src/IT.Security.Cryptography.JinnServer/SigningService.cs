@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using IT.Text;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +12,7 @@ using Internal;
 
 public class SigningService : IHasher, ISigner
 {
+    private static readonly StringComparison _comparison = StringComparison.OrdinalIgnoreCase;
     private static readonly String[] _hashAlgs = new[] { "1.2.643.7.1.1.2.2", "1.2.643.7.1.1.2.3", "1.2.643.2.2.9" };
     private static readonly String[] _signAlgs = new[] { "1.2.643.7.1.1.1.1", "1.2.643.7.1.1.1.2", "1.2.643.2.2.19" };
     private static readonly String[] _formats = new[] {
@@ -27,24 +29,24 @@ public class SigningService : IHasher, ISigner
     };
 
     private readonly ICryptoInformer _cryptoInformer;
+    private readonly ITagFinder _tagFinder;
     private readonly ILogger? _logger;
     private readonly JinnServerService _service;
     private readonly SigningOptions _options;
 
     public IReadOnlyCollection<String> Formats => _formats;
 
-    public SigningService(
-        Func<SigningOptions> getOptions,
-        ICryptoInformer cryptoInformer,
-        ILogger<SigningService>? logger = null)
+    public SigningService(Func<SigningOptions> getOptions, ICryptoInformer cryptoInformer, ILogger<SigningService>? logger = null)
     {
         if (getOptions is null) throw new ArgumentNullException(nameof(getOptions));
 
         var options = getOptions();
+        var tagFinder = new TagFinder();
 
         _cryptoInformer = cryptoInformer;
         _logger = logger;
-        _service = new JinnServerService(options.SigningUrl, logger);
+        _tagFinder = tagFinder;
+        _service = new JinnServerService(options.SigningUrl, tagFinder, logger);
         _options = options;
     }
 
@@ -188,22 +190,22 @@ public class SigningService : IHasher, ISigner
         }
     }
 
-    private static ReadOnlySpan<Char> ParseDigestResponseType(ReadOnlySpan<Char> response)
+    private ReadOnlySpan<Char> ParseDigestResponseType(ReadOnlySpan<Char> response)
     {
-        var range = TagFinder.Outer(response, "DigestResponseType".AsSpan(), StringComparison.OrdinalIgnoreCase);
+        var range = _tagFinder.Outer(response, "DigestResponseType", _comparison);
 
-        if (range.Equals(default) && JinnServerService.NotFound(response)) throw new InvalidOperationException("'DigestResponseType' not found");
+        if (range.Equals(default) && _service.NotFound(response)) throw new InvalidOperationException("'DigestResponseType' not found");
 
         return response[range];
     }
 
-    private static Byte[] ParseDigest(String response)
+    private Byte[] ParseDigest(String response)
     {
         var span = response.AsSpan();
 
         span = ParseDigestResponseType(span);
 
-        var range = TagFinder.Inner(span, "Digest".AsSpan(), StringComparison.OrdinalIgnoreCase);
+        var range = _tagFinder.Inner(span, "Digest", _comparison);
 
         if (range.Equals(default)) throw new InvalidOperationException("'DigestResponseType.Digest' not found");
 
@@ -212,13 +214,13 @@ public class SigningService : IHasher, ISigner
         return Convert.FromBase64String(digest);
     }
 
-    private static String ParseState(String response)
+    private String ParseState(String response)
     {
         var span = response.AsSpan();
 
         span = ParseDigestResponseType(span);
 
-        var range = TagFinder.Inner(span, "State".AsSpan(), StringComparison.OrdinalIgnoreCase);
+        var range = _tagFinder.Inner(span, "State", _comparison);
 
         if (range.Equals(default)) throw new InvalidOperationException("'DigestResponseType.State' not found");
 
@@ -259,13 +261,13 @@ public class SigningService : IHasher, ISigner
         return ParseSigningResponseType(response);
     }
 
-    private static String ParseSigningResponseType(String response)
+    private String ParseSigningResponseType(String response)
     {
         var span = response.AsSpan();
 
-        var range = TagFinder.Inner(span, "SigningResponseType".AsSpan(), StringComparison.OrdinalIgnoreCase);
+        var range = _tagFinder.Inner(span, "SigningResponseType", _comparison);
 
-        if (range.Equals(default) && JinnServerService.NotFound(span)) throw new InvalidOperationException("'SigningResponseType' not found");
+        if (range.Equals(default) && _service.NotFound(span)) throw new InvalidOperationException("'SigningResponseType' not found");
 
         return response[range].ToString();
     }

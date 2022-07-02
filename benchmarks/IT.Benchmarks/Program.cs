@@ -17,4 +17,12 @@ using IT.Benchmarks;
 //Console.WriteLine("Ok");
 
 
-BenchmarkRunner.Run(typeof(EncodingBenchmark));
+var finder = new TagFinderBenchmark();
+
+var obj = finder.ParseXMLEnvelope();
+
+var obj2 = finder.ParseEnvelope();
+
+var obj3 = finder.NewEtalon();
+
+//BenchmarkRunner.Run(typeof(TagFinderBenchmark));

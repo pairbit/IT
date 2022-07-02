@@ -4,17 +4,17 @@ namespace IT.Security.Cryptography.Models;
 
 public record Signature
 {
-    public Int32 Number { get; set; }
+    //reference
 
-    public String Status { get; set; }
+    public SignatureStatus? Status { get; set; }
 
-    public String StatusComment { get; set; }
+    public SignatureFaultType? FaultType { get; set; }
 
-    public String StatusType { get; set; }
+    public String? FaultComment { get; set; }
 
-    public Certificate Certificate { get; set; }
+    public Certificate? Certificate { get; set; }
 
-    public String Alg { get; set; }
+    public DateTime? ValidationDate { get; set; }
 
-    public String Value { get; set; }
+    public DateTime? FirstTimeStamp { get; set; }
 }

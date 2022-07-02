@@ -9,51 +9,47 @@ using Models;
 
 internal static class xValidationResponseType
 {
-    public static VerifySignatureResult ToVerifySignatureResult(this ValidationResponseType data)
+    public static Signatures ToVerifySignatureResult(this ValidationResponseType data)
     {
-        var model = new VerifySignatureResult();
+        var count = data.SignatureInfos == null ? 0 : data.SignatureInfos.SignatureInfo.Length;
 
-        //model.IsVerify = 
-        model.ResultStatus = data.GlobalStatus.Localize();
-        model.Count = data.SignatureInfos == null ? 0 : data.SignatureInfos.SignatureInfo.Length;
-        var signatures = new List<Signature>();
+        var signatures = new Signatures();
+        signatures.Status = (Models.SignaturesStatus)(Int32)data.GlobalStatus;
 
-        for (var i = 0; i < model.Count; i++)
+        for (var i = 0; i < count; i++)
         {
             var signatureInfo = data.SignatureInfos.SignatureInfo[i];
 
-            var signature = new Signature
+            var signature = new Models.Signature
             {
-                Number = i + 1,
-                Status = signatureInfo.Status.Localize(),
+                Status = (Models.SignatureStatus)(Int32)signatureInfo.Status,
             };
 
             if (signatureInfo.FailInfo != null)
             {
-                signature.StatusComment = signatureInfo.FailInfo.Comment;
-                signature.StatusType = signatureInfo.FailInfo.Type.ToString();
+                signature.FaultComment = signatureInfo.FailInfo.Comment;
+                signature.FaultType = (Models.SignatureFaultType?)(Int32?)signatureInfo.FailInfo.Type;
             }
 
             if (signatureInfo.SignerCertInfo != null)
             {
-                signature.Alg = signatureInfo.SignerCertInfo.Certificate.AlgorithmIdentifier.AlgId;
-                signature.Value = signatureInfo.SignerCertInfo.Certificate.Signature;
+                //signature.Alg = signatureInfo.SignerCertInfo.Certificate.AlgorithmIdentifier.AlgId;
+                //signature.Value = signatureInfo.SignerCertInfo.Certificate.Signature;
                 signature.Certificate = Create(signatureInfo);
 
-                if (string.IsNullOrWhiteSpace(signature.Certificate.Owner.FullName))
-                    signature.Certificate.Owner.FullName = null;
+                if (string.IsNullOrWhiteSpace(signature.Certificate.Subject.FullName))
+                    signature.Certificate.Subject.FullName = null;
 
-                signature.Certificate.Issuer.Location = $"{signature.Certificate.Owner.Country}, {signatureInfo.Reference.StateOrProvinceName}, {signatureInfo.Reference.LocalityName}, {signatureInfo.Reference.StreetAddress}";
+                //signature.Certificate.Issuer.Location = $"{signature.Certificate.Subject.Country}, {signatureInfo.Reference.StateOrProvinceName}, {signatureInfo.Reference.LocalityName}, {signatureInfo.Reference.StreetAddress}";
 
                 if (signatureInfo.SignerCertInfo.AuthorityCertSerial != null)
                 {
-                    signature.Certificate.Issuer.CertificateNumber = BigInteger.Parse(signatureInfo.SignerCertInfo.AuthorityCertSerial).ToString("X");
+                    //signature.Certificate.Issuer.CertificateNumber = BigInteger.Parse(signatureInfo.SignerCertInfo.AuthorityCertSerial).ToString("X");
                 }
             }
             signatures.Add(signature);
         }
-        model.Signatures = signatures.ToArray();
-        return model;
+        return signatures;
     }
 
     private static Models.Certificate Create(SignatureInfo signatureInfo)
@@ -63,9 +59,9 @@ internal static class xValidationResponseType
         {
             SignatureAlg = signatureInfo.SignerCertInfo.Certificate.TBSCertificate.Signature.AlgId,
             SerialNumber = BigInteger.Parse(signatureInfo.SignerCertInfo.Certificate.TBSCertificate.CertificateSerialNumber).ToString("X"),
-            ValidityDateFrom = DateTime.Parse(signatureInfo.SignerCertInfo.Certificate.TBSCertificate.Validity.NotBefore.Item.Replace("UTC", string.Empty), ruFormat),
-            ValidityDateTo = DateTime.Parse(signatureInfo.SignerCertInfo.Certificate.TBSCertificate.Validity.NotAfter.Item.Replace("UTC", string.Empty), ruFormat),
-            Owner = new Owner
+            ValidityFrom = DateTime.Parse(signatureInfo.SignerCertInfo.Certificate.TBSCertificate.Validity.NotBefore.Item.Replace("UTC", string.Empty), ruFormat),
+            ValidityTo = DateTime.Parse(signatureInfo.SignerCertInfo.Certificate.TBSCertificate.Validity.NotAfter.Item.Replace("UTC", string.Empty), ruFormat),
+            Subject = new CertificateSubject
             {
                 FullName = $"{signatureInfo.SignerCertInfo.Surname} {signatureInfo.SignerCertInfo.GivenName}",
                 Organization = signatureInfo.SignerCertInfo.OrganizationName,
@@ -82,9 +78,9 @@ internal static class xValidationResponseType
                 OGRN = signatureInfo.SignerCertInfo.OGRN,
                 OGRNIP = signatureInfo.SignerCertInfo.OGRNIP
             },
-            Issuer = new Issuer
+            Issuer = new CertificateIssuer
             {
-                Name = signatureInfo.Reference.CommonName,
+                CommonName = signatureInfo.Reference.CommonName,
                 Organization = signatureInfo.Reference.OrganizationName,
                 OGRN = signatureInfo.Reference.OGRN,
                 INN = signatureInfo.Reference.INN,
