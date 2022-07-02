@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using System.Buffers.Text;
+using System.Diagnostics;
 using System.Text;
 
 namespace IT.Benchmarks;
@@ -14,33 +15,58 @@ public class EncodingBenchmark
 
     public EncodingBenchmark()
     {
-        _data = File.ReadAllBytes(@"S:\Videos\grip_legend\David_Train.mp4");
+        if (Debugger.IsAttached)
+        {
+            _data = File.ReadAllBytes(@"S:\Videos\grip_legend\schwartz.mp4");
+        }
+        else
+        {
+            _data = File.ReadAllBytes(@"S:\Videos\grip_legend\David_Train.mp4");
+        }
     }
 
-    //[Benchmark(Description = "Base64.EncodeToUtf8InPlace")]
-    //public ReadOnlySpan<byte> EncodeToUtf8InPlace()
-    //{
-    //    var bytes = _data.AsSpan();
+    [Benchmark(Description = "EncodeToUtf8InPlace")]
+    public ReadOnlySpan<byte> EncodeToUtf8InPlace()
+    {
+        var len = _data.Length;
 
-    //    var len = bytes.Length;
+        var utf8len = (len + 2) / 3 * 4;
 
-    //    var utf8len = (len + 2) / 3 * 4;
+        var bytes = CopyData(utf8len);
 
-    //    var utf8 = new byte[utf8len].AsSpan();
+        var status = Base64.EncodeToUtf8InPlace(bytes, len, out var written);
 
-    //    var status = Base64.EncodeToUtf8InPlace(bytes,);
+        if (status != System.Buffers.OperationStatus.Done) throw new InvalidOperationException(status.ToString());
+        
+        if (written != utf8len) throw new InvalidOperationException();
 
-    //    if (status != System.Buffers.OperationStatus.Done) throw new InvalidOperationException(status.ToString());
+        return bytes;
+    }
 
+    [Benchmark(Description = "ASCII.GetChars(EncodeToUtf8InPlace())")]
+    public ReadOnlySpan<char> EncodeToUtf8InPlaceChars()
+    {
+        var bytes = EncodeToUtf8InPlace();
 
-    //    return utf8;
-    //}
+        var len = bytes.Length;
+
+        Span<char> chars = new char[len];
+
+        var count = Encoding.ASCII.GetChars(bytes, chars);
+
+        if (count != len) throw new InvalidOperationException();
+
+        return chars;
+    }
+
+    [Benchmark(Description = "ASCII.GetString(EncodeToUtf8InPlace())")]
+    public string EncodeToUtf8InPlaceString() => Encoding.ASCII.GetString(EncodeToUtf8InPlace());
 
     //https://github.com/dotnet/runtime/blob/main/src/libraries/System.Memory/src/System/Buffers/Text/Base64Encoder.cs
-    [Benchmark(Description = "Base64.EncodeToUtf8")]
+    [Benchmark(Description = "EncodeToUtf8")]
     public ReadOnlySpan<byte> EncodeToUtf8()
     {
-        ReadOnlySpan<byte> bytes = _data;
+        ReadOnlySpan<byte> bytes = CopyData();
 
         var len = bytes.Length;
 
@@ -60,7 +86,7 @@ public class EncodingBenchmark
     }
 
     [Benchmark(Description = "ASCII.GetChars(EncodeToUtf8())")]
-    public ReadOnlySpan<char> ASCIIEncodeToUtf8Chars()
+    public ReadOnlySpan<char> EncodeToUtf8Chars()
     {
         var bytes = EncodeToUtf8();
 
@@ -76,12 +102,12 @@ public class EncodingBenchmark
     }
 
     [Benchmark(Description = "ASCII.GetString(EncodeToUtf8())")]
-    public string ASCIIEncodeToUtf8String() => Encoding.ASCII.GetString(EncodeToUtf8());
+    public string EncodeToUtf8String() => Encoding.ASCII.GetString(EncodeToUtf8());
 
     [Benchmark(Description = "Convert.TryToBase64Chars")]
     public ReadOnlySpan<char> TryToBase64Chars()
     {
-        ReadOnlySpan<byte> bytes = _data;
+        ReadOnlySpan<byte> bytes = CopyData();
 
         var len = (bytes.Length + 2) / 3 * 4;
 
@@ -96,5 +122,18 @@ public class EncodingBenchmark
 
     //https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Convert.cs
     [Benchmark(Description = "Convert.ToBase64String")]
-    public string ConvertToBase64String() => Convert.ToBase64String(_data);
+    public string ConvertToBase64String() => Convert.ToBase64String(CopyData());
+
+    private Span<byte> CopyData(Int32 len = 0)
+    {
+        ReadOnlySpan<byte> data = _data;
+
+        if (len == 0) len = data.Length;
+
+        Span<byte> span = new byte[len];
+
+        data.CopyTo(span);
+
+        return span;
+    }
 }
