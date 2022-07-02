@@ -87,7 +87,34 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
         var range = TagFinder.Inner(span, "advanced".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
-        if (range.Equals(default)) throw new InvalidOperationException("'ValidationResponseType.advanced' not found");
+        if (range.Equals(default))
+        {
+            /*
+             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+	<soapenv:Body>
+		<tccs:ValidationResponseType xmlns:cst="http://www.roskazna.ru/eb/sign/types/cryptoserver" xmlns:tccs="http://www.roskazna.ru/eb/sign/types/sgv">
+			<tccs:gmtDateTime>1.7.2022 18:32:22 UTC</tccs:gmtDateTime>
+			<tccs:globalStatus>invalid</tccs:globalStatus>
+			<tccs:SignatureInfos>
+				<cst:SignatureInfo>
+					<cst:reference>
+						<cst:xmlID/>
+					</cst:reference>
+					<cst:status>invalid</cst:status>
+					<cst:failInfo>
+						<cst:type>invalidDigestValue</cst:type>
+						<cst:comment>неудавшееся преобразование [ref-Yr88jj1lob1CFKFG] :</cst:comment>
+					</cst:failInfo>
+					<cst:validationDate>1.7.2022 18:32:22 UTC</cst:validationDate>
+				</cst:SignatureInfo>
+			</tccs:SignatureInfos>
+		</tccs:ValidationResponseType>
+	</soapenv:Body>
+</soapenv:Envelope>
+
+             */
+            throw new InvalidOperationException("'ValidationResponseType.advanced' not found");
+        }
 
         return span[range].ToString();
     }
