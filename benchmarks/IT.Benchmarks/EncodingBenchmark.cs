@@ -14,7 +14,7 @@ public class EncodingBenchmark
 
     public EncodingBenchmark()
     {
-        _data = File.ReadAllBytes(@"S:\Videos\grip_legend\schwartz.mp4");
+        _data = File.ReadAllBytes(@"S:\Videos\grip_legend\David_Train.mp4");
     }
 
     //[Benchmark(Description = "Base64.EncodeToUtf8InPlace")]
@@ -40,13 +40,13 @@ public class EncodingBenchmark
     [Benchmark(Description = "Base64.EncodeToUtf8")]
     public ReadOnlySpan<byte> EncodeToUtf8()
     {
-        var bytes = _data.AsSpan();
+        ReadOnlySpan<byte> bytes = _data;
 
         var len = bytes.Length;
 
         var utf8len = (len + 2) / 3 * 4;
 
-        var utf8 = new byte[utf8len].AsSpan();
+        Span<byte> utf8 = new byte[utf8len];
 
         var status = Base64.EncodeToUtf8(bytes, utf8, out var consumed, out var written);
 
@@ -59,18 +59,33 @@ public class EncodingBenchmark
         return utf8;
     }
 
-    //https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Convert.cs
-    [Benchmark(Description = "Convert.ToBase64String")]
-    public string ConvertToBase64String() => Convert.ToBase64String(_data);
+    [Benchmark(Description = "ASCII.GetChars(EncodeToUtf8())")]
+    public ReadOnlySpan<char> ASCIIEncodeToUtf8Chars()
+    {
+        var bytes = EncodeToUtf8();
+
+        var len = bytes.Length;
+
+        Span<char> chars = new char[len];
+
+        var count = Encoding.ASCII.GetChars(bytes, chars);
+
+        if (count != len) throw new InvalidOperationException();
+
+        return chars;
+    }
+
+    [Benchmark(Description = "ASCII.GetString(EncodeToUtf8())")]
+    public string ASCIIEncodeToUtf8String() => Encoding.ASCII.GetString(EncodeToUtf8());
 
     [Benchmark(Description = "Convert.TryToBase64Chars")]
     public ReadOnlySpan<char> TryToBase64Chars()
     {
-        var bytes = _data.AsSpan();
+        ReadOnlySpan<byte> bytes = _data;
 
         var len = (bytes.Length + 2) / 3 * 4;
 
-        var chars = new char[len].AsSpan();
+        Span<char> chars = new char[len];
 
         var result = Convert.TryToBase64Chars(bytes, chars, out var written);
 
@@ -79,22 +94,7 @@ public class EncodingBenchmark
         return chars;
     }
 
-    [Benchmark(Description = "UTF8.GetChars(EncodeToUtf8())")]
-    public ReadOnlySpan<char> EncodeToUtf8Chars()
-    {
-        var bytes = EncodeToUtf8();
-
-        var len = bytes.Length;
-
-        var chars = new char[len].AsSpan();
-
-        var count = Encoding.UTF8.GetChars(bytes, chars);
-
-        if (count != len) throw new InvalidOperationException();
-
-        return chars;
-    }
-
-    [Benchmark(Description = "UTF8.GetString(EncodeToUtf8())")]
-    public string EncodeToUtf8String() => Encoding.UTF8.GetString(EncodeToUtf8());
+    //https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Convert.cs
+    [Benchmark(Description = "Convert.ToBase64String")]
+    public string ConvertToBase64String() => Convert.ToBase64String(_data);
 }
