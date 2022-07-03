@@ -69,13 +69,4 @@ internal static class Soap
         public static String Enhance(String signedData, String createAdvanced, String externalData)
             => $@"{Begin}<ValidationRequestType {NS}><signedData>{signedData}</signedData><createAdvanced>{createAdvanced}</createAdvanced><externalData>{externalData}</externalData></ValidationRequestType>{End}";
     }
-
-    public static class Regex
-    {
-        public const String Response = "<soapenv:Envelope(.*)><soapenv:Body>(.*)<\\/soapenv:Body><\\/soapenv:Envelope>";
-        public const String ResponseValidationFault = "<soapenv:Envelope(.*)><soapenv:Body>(.*)<detail>(.*)<\\/detail>(.*)<\\/soapenv:Body><\\/soapenv:Envelope>";
-
-        public const String ResponseSignFault = "<soapenv:Envelope(.*)><soapenv:Body>(.*)<\\/soapenv:Body><\\/soapenv:Envelope>";
-        public const String ResponseSignMatchFault = "<soapenv:Envelope(.*)><soapenv:Body><tccs:ServiceFaultInfo (.*)<\\/tccs:ServiceFaultInfo><\\/soapenv:Body><\\/soapenv:Envelope>";
-    }
 }

@@ -59,8 +59,6 @@ public record CertificateSubject
     /// </summary>
     public String? OrganizationalUnit { get; set; }
 
-    public String? FullName { get; set; }
-
     public String? OGRNIP { get; set; }
 
     public String? SNILS { get; set; }

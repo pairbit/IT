@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,7 +23,6 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         "cades-a", "xades-a", "wssec-a"
     };
     private readonly JinnServerService _service;
-    private readonly ValidationOptions _options;
     private readonly Func<String, DateTime>? _parseDateTime;
     private readonly ITagFinder _tagFinder;
     private readonly ILogger? _logger;
@@ -43,7 +41,6 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
         _logger = logger;
         _service = new JinnServerService(options.ValidationUrl, tagFinder, logger);
-        _options = options;
         _tagFinder = tagFinder;
         _parseDateTime = parseDateTime;
     }
@@ -62,34 +59,6 @@ public class ValidationService : ISignEnhancer, ISignVerifier
     public async Task<Signatures> VerifyAsync(String signature, String? detachedData, CancellationToken cancellationToken)
         => GetSignatures(await _service.GetResponseTextAsync(GetRequestValidation(signature, detachedData), Soap.Actions.Validate).ConfigureAwait(false));
 
-    private Boolean IsVerified(String response)
-    {
-        var span = response.AsSpan();
-
-        span = ParseValidationResponseType(span);
-
-        var range = _tagFinder.Inner(span, "globalStatus", _comparison);
-
-        if (range.Equals(default)) throw new InvalidOperationException("'ValidationResponseType.globalStatus' not found");
-
-        return span[range].Equals("valid", _comparison);
-    }
-
-    internal Signatures GetSignatures(String response)
-    {
-        var chars = response.AsSpan();
-
-        chars = ParseValidationResponseType(chars);
-
-        var signatures = ParseSignatureInfos(chars[_tagFinder.Outer(chars, "SignatureInfos", _comparison)]);
-
-        signatures.Status = ParseGlobalStatus(chars[_tagFinder.Inner(chars, "globalStatus", _comparison)]);
-
-        signatures.DateTime = ParseDateTime(chars[_tagFinder.Inner(chars, "gmtDateTime", _comparison)]);
-
-        return signatures;
-    }
-
     #endregion ISignVerifier
 
     #region ISignEnhancer
@@ -99,6 +68,10 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
     public async Task<String> EnhanceAsync(String signature, String format, String? detachedData, CancellationToken cancellationToken)
         => GetEnhanced(await _service.GetResponseTextAsync(GetRequestEnhance(signature, format, detachedData), Soap.Actions.Validate).ConfigureAwait(false));
+
+    #endregion ISignEnhancer
+
+    #region Private Methods
 
     private String GetEnhanced(String response)
     {
@@ -140,9 +113,33 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         return span[range].ToString();
     }
 
-    #endregion ISignEnhancer
+    private Boolean IsVerified(String response)
+    {
+        var span = response.AsSpan();
 
-    #region Private Methods
+        span = ParseValidationResponseType(span);
+
+        var range = _tagFinder.Inner(span, "globalStatus", _comparison);
+
+        if (range.Equals(default)) throw new InvalidOperationException("'ValidationResponseType.globalStatus' not found");
+
+        return span[range].Equals("valid", _comparison);
+    }
+
+    internal Signatures GetSignatures(String response)
+    {
+        var chars = response.AsSpan();
+
+        chars = ParseValidationResponseType(chars);
+
+        var signatures = ParseSignatureInfos(chars[_tagFinder.Outer(chars, "SignatureInfos", _comparison)]);
+
+        signatures.Status = ParseGlobalStatus(chars[_tagFinder.Inner(chars, "globalStatus", _comparison)]);
+
+        signatures.DateTime = ParseDateTime(chars[_tagFinder.Inner(chars, "gmtDateTime", _comparison)]);
+
+        return signatures;
+    }
 
     private ReadOnlySpan<Char> ParseValidationResponseType(ReadOnlySpan<Char> response)
     {
@@ -152,77 +149,6 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
         return response[range];
     }
-
-    private String GetRequestValidation(String sign, String? detachedData)
-    {
-        return detachedData is null || detachedData.Length == 0
-            ? Soap.Request.Validation(sign.TryToBase64())
-            : Soap.Request.Validation(sign.TryToBase64(), detachedData.TryToBase64());
-    }
-
-    private String GetRequestEnhance(String sign, String format, String? detachedData)
-    {
-        return detachedData is null || detachedData.Length == 0
-            ? Soap.Request.Enhance(sign.TryToBase64(), format)
-            : Soap.Request.Enhance(sign.TryToBase64(), format, detachedData.TryToBase64());
-    }
-
-    private void CheckStatus(Internal.GlobalStatus status, SimpleSignatureInfos signatureInfos)
-    {
-        var infos = signatureInfos?.SignatureInfo;
-
-        Exception? inner = null;
-
-        if (infos is null || infos.Length == 0)
-        {
-            if (status == Internal.GlobalStatus.valid) return;
-        }
-        else
-        {
-            var inners = new List<Exception>();
-
-            foreach (var info in infos!)
-            {
-                if (info.FailInfo is null) continue;
-
-                var innerException = new InvalidOperationException(info.ToString());
-
-                innerException.Data.Add(nameof(info.Status), info.Status);
-
-                inners.Add(innerException);
-            }
-
-            if (inners.Count > 0)
-                inner = inners.Count > 1 ? new AggregateException(inners) : inners.FirstOrDefault();
-        }
-
-        if (inner == null && status == Internal.GlobalStatus.valid) return;
-
-        var exception = new InvalidOperationException(Res.NoEnhanced + " " + status.Localize(), inner);
-
-        exception.Data.Add(nameof(Internal.GlobalStatus), status);
-
-        throw exception;
-    }
-
-    private String GetEnhanced(Body body)
-    {
-        var data = body.ValidationResponseType;
-
-        if (data is null) throw new InvalidOperationException($"{nameof(Body.ValidationResponseType)} is null");
-
-        CheckStatus(data.GlobalStatus, data.SignatureInfos);
-
-        var advanced = data.Advanced;
-
-        if (advanced is null || advanced.Length == 0) throw new InvalidOperationException("Internal Error JinnServer");
-
-        return advanced.ToBase64();
-    }
-
-    #endregion Private Methods
-
-    #region Parse
 
     private Signatures ParseSignatureInfos(ReadOnlySpan<Char> chars)
     {
@@ -257,9 +183,9 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         return info;
     }
 
-    private Models.Certificate ParseCertificate(ReadOnlySpan<Char> chars)
+    private Certificate ParseCertificate(ReadOnlySpan<Char> chars)
     {
-        var cert = new Models.Certificate();
+        var cert = new Certificate();
 
         cert.Signature = Tos(chars[_tagFinder.LastInner(chars, "Signature", _comparison)]);
 
@@ -506,5 +432,19 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         throw new FormatException($"Format bool type '{chars.ToString()}' not correct");
     }
 
-    #endregion
+    private static String GetRequestValidation(String sign, String? detachedData)
+    {
+        return detachedData is null || detachedData.Length == 0
+            ? Soap.Request.Validation(sign.TryToBase64())
+            : Soap.Request.Validation(sign.TryToBase64(), detachedData.TryToBase64());
+    }
+
+    private static String GetRequestEnhance(String sign, String format, String? detachedData)
+    {
+        return detachedData is null || detachedData.Length == 0
+            ? Soap.Request.Enhance(sign.TryToBase64(), format)
+            : Soap.Request.Enhance(sign.TryToBase64(), format, detachedData.TryToBase64());
+    }
+
+    #endregion Private Methods
 }

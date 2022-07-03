@@ -239,7 +239,7 @@ public class SigningService : IHasher, ISigner
     {
         //if (!detached) data = String.Format(Soap.Request.SignMessage, data).ToBase64();
 
-        var request = detached ? Soap.Request.SigningDetached(alg, data.TryToBase64(), format) 
+        var request = detached ? Soap.Request.SigningDetached(alg, data.TryToBase64(), format)
                                : Soap.Request.Signing(alg, data.TryToBase64(), format);
 
         var response = _service.GetResponseText(request, Soap.Actions.Sign);

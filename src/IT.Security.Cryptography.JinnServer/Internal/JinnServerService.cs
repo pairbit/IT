@@ -1,15 +1,10 @@
 ﻿using IT.Text;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
-using System.Xml.Serialization;
 
 namespace IT.Security.Cryptography.JinnServer.Internal;
 
@@ -99,7 +94,7 @@ internal class JinnServerService
         response = response[range];
 
         range = _tagFinder.Outer(response, "Body", StringComparison.OrdinalIgnoreCase);
-        
+
         if (range.Equals(default)) throw new InvalidOperationException("'Body' not found");
 
         response = response[range];
@@ -140,25 +135,6 @@ internal class JinnServerService
         return true;
     }
 
-    public Body ParseResponse(String responseText)
-    {
-        responseText = JsonConvert.SerializeXmlNode(LoadDocument(responseText), Newtonsoft.Json.Formatting.None, true);
-
-        var envelope = JsonConvert.DeserializeObject<Envelope>(responseText);
-
-        var body = envelope?.Body;
-
-        if (body is null) throw new InvalidOperationException($"{nameof(Envelope.Body)} is null");
-
-        if (body.ServiceFaultInfo is not null) throw new InvalidOperationException(body.ServiceFaultInfo.ToString());
-
-        if (body.Fault is not null) throw new InvalidOperationException(body.Fault.ToString());
-
-        //Arg.NotNull(body.Responses.Where(x => x is not null).SingleOrDefault(), "Parse response error!");
-
-        return body;
-    }
-
     #endregion Public Methods
 
     #region Private Methods
@@ -170,69 +146,6 @@ internal class JinnServerService
         request.ContentType = "text/xml;charset=UTF-8";
         request.Headers.Add("SOAPAction:" + soapAction);
         return request;
-    }
-
-    internal ValidationResponseType ParseResponseValidation(String responseText)
-    {
-        var span = responseText.AsSpan();
-
-        span = span[_tagFinder.Outer(span, "Envelope", StringComparison.OrdinalIgnoreCase)];
-
-        responseText = span.ToString();
-
-        var body = ParseResponse(responseText);
-
-        if (body.ValidationResponseType is null) throw new InvalidOperationException($"{nameof(Body.ValidationResponseType)} is null");
-
-        var xml = responseText[_tagFinder.Outer(span, "ValidationResponseType", StringComparison.OrdinalIgnoreCase)];
-
-        //DataMember
-        //var memoryStream = new MemoryStream(Encoding.Unicode.GetBytes(xml));
-        //using var reader = XmlDictionaryReader.CreateTextReader(memoryStream, Encoding.Unicode, new XmlDictionaryReaderQuotas(), null);
-        //var dataContractSerializer = new DataContractSerializer(typeof(ValidationResponseType));
-        //var data = (ValidationResponseType)dataContractSerializer.ReadObject(reader);
-
-        var serializer = new XmlSerializer(typeof(ValidationResponseType));
-        using var reader = new StringReader(xml);
-        return (ValidationResponseType)serializer.Deserialize(reader);
-    }
-
-    private static XmlDocument LoadDocument(String xml)
-    {
-        try
-        {
-            xml = RemoveNamespaces(xml);
-            var doc = new XmlDocument();
-            doc.PreserveWhitespace = true;
-            doc.LoadXml(xml);
-            return doc;
-        }
-        catch (XmlException ex)
-        {
-            throw new InvalidOperationException("Данные не являются XML документом", ex);
-        }
-    }
-
-    private static String RemoveNamespaces(String xml)
-    {
-        var xmlDocumentWithoutNs = RemoveAllNamespaces(XElement.Parse(xml));
-
-        return xmlDocumentWithoutNs.ToString();
-    }
-
-    private static XElement RemoveAllNamespaces(XElement xmlDocument)
-    {
-        if (!xmlDocument.HasElements)
-        {
-            var xElement = new XElement(xmlDocument.Name.LocalName);
-            xElement.Value = xmlDocument.Value;
-
-            foreach (XAttribute attribute in xmlDocument.Attributes().Where(x => !x.IsNamespaceDeclaration))
-                xElement.Add(attribute);
-
-            return xElement;
-        }
-        return new XElement(xmlDocument.Name.LocalName, xmlDocument.Elements().Select(el => RemoveAllNamespaces(el)));
     }
 
     private static WebResponse TryGetResponse(WebRequest request)
