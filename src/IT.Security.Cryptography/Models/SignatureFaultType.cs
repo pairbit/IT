@@ -2,15 +2,15 @@
 
 public enum SignatureFaultType
 {
-    unknownDigestAlgorithm,
-    unknownSignatureAlgorithm,
-    signerCertificateNotFound,
-    signerCertificateIssuerNotFound,
-    signerCertificateSignatureInvalid,
-    signerCertificateCRLNotFound,
-    signerCertificateExpired,
-    signerCertificateRevoked,
-    invalidDigestValue,
-    invalidSignatureValue,
-    invalidSignatureTimeStamp,
+    UnknownDigestAlgorithm,
+    UnknownSignatureAlgorithm,
+    SignerCertificateNotFound,
+    SignerCertificateIssuerNotFound,
+    SignerCertificateSignatureInvalid,
+    SignerCertificateCRLNotFound,
+    SignerCertificateExpired,
+    SignerCertificateRevoked,
+    InvalidDigestValue,
+    InvalidSignatureValue,
+    InvalidSignatureTimeStamp,
 }

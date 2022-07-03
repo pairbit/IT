@@ -4,7 +4,7 @@ namespace IT.Security.Cryptography.Models;
 
 public record Signature
 {
-    //reference
+    public String? Reference { get; set; }
 
     public SignatureStatus? Status { get; set; }
 

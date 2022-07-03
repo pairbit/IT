@@ -81,36 +81,54 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
         var range = _tagFinder.Inner(span, "advanced", _comparison);
 
-        if (range.Equals(default))
-        {
-            /*
-             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-	<soapenv:Body>
-		<tccs:ValidationResponseType xmlns:cst="http://www.roskazna.ru/eb/sign/types/cryptoserver" xmlns:tccs="http://www.roskazna.ru/eb/sign/types/sgv">
-			<tccs:gmtDateTime>1.7.2022 18:32:22 UTC</tccs:gmtDateTime>
-			<tccs:globalStatus>invalid</tccs:globalStatus>
-			<tccs:SignatureInfos>
-				<cst:SignatureInfo>
-					<cst:reference>
-						<cst:xmlID/>
-					</cst:reference>
-					<cst:status>invalid</cst:status>
-					<cst:failInfo>
-						<cst:type>invalidDigestValue</cst:type>
-						<cst:comment>неудавшееся преобразование [ref-Yr88jj1lob1CFKFG] :</cst:comment>
-					</cst:failInfo>
-					<cst:validationDate>1.7.2022 18:32:22 UTC</cst:validationDate>
-				</cst:SignatureInfo>
-			</tccs:SignatureInfos>
-		</tccs:ValidationResponseType>
-	</soapenv:Body>
-</soapenv:Envelope>
-
-             */
-            throw new InvalidOperationException("'ValidationResponseType.advanced' not found");
-        }
+        if (range.Equals(default)) throw ParseExceptions(span) ?? new InvalidOperationException("'ValidationResponseType.advanced' not found");
 
         return span[range].ToString();
+    }
+
+    private Exception? ParseExceptions(ReadOnlySpan<Char> chars)
+    {
+        var list = new List<Exception>();
+
+        do
+        {
+            var range = _tagFinder.LastOuter(chars, "SignatureInfo", _comparison);
+
+            if (range.Equals(default)) break;
+
+            var exception = ParseException(chars[range]);
+
+            if (exception is not null) list.Insert(0, exception);
+
+            chars = chars[..range.Start];
+        } while (true);
+
+        if (list.Count == 0) return null;
+
+        if (list.Count == 1) return list[0];
+
+        return new AggregateException(list);
+    }
+
+    private Exception? ParseException(ReadOnlySpan<Char> chars)
+    {
+        (var type, var comment) = ParseFailInfo(chars);
+
+        if (type is null) return comment is null ? null : new InvalidOperationException(comment);
+
+        return new InvalidOperationException(comment is null ? $"[{type}]" : $"[{type}] {comment}");
+    }
+
+    private (SignatureFaultType?, String?) ParseFailInfo(ReadOnlySpan<Char> chars)
+    {
+        var range = _tagFinder.Inner(chars, "failInfo", _comparison);
+
+        if (range.Equals(default)) return (null, null);
+
+        chars = chars[range];
+
+        return (ParseSignatureFaultType(chars[_tagFinder.Inner(chars, "type", _comparison)]), 
+                Tos(chars[_tagFinder.Inner(chars, "comment", _comparison)]));
     }
 
     private Boolean IsVerified(String response)
@@ -178,7 +196,11 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
         info.Certificate = ParseCertificate(chars[_tagFinder.Outer(chars, "signerCertInfo", _comparison)]);
 
+        (info.FaultType, info.FaultComment) = ParseFailInfo(chars);
+
         info.Status = ParseSignatureStatus(chars[_tagFinder.Inner(chars, "status", _comparison)]);
+
+        info.Reference = Tos(chars[_tagFinder.Inner(chars, "reference", _comparison)]);
 
         return info;
     }
@@ -402,14 +424,14 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
     private static String? Tos(ReadOnlySpan<Char> chars) => chars.Length == 0 ? null : chars.ToString();
 
-    private static Models.SignatureStatus? ParseSignatureStatus(ReadOnlySpan<Char> chars)
+    private static SignatureStatus? ParseSignatureStatus(ReadOnlySpan<Char> chars)
     {
         if (chars.Length == 0) return null;
-        if (chars.Equals("unknown", _comparison)) return Models.SignatureStatus.Unknown;
-        if (chars.Equals("valid", _comparison)) return Models.SignatureStatus.Valid;
-        if (chars.Equals("invalid", _comparison)) return Models.SignatureStatus.Invalid;
+        if (chars.Equals("unknown", _comparison)) return SignatureStatus.Unknown;
+        if (chars.Equals("valid", _comparison)) return SignatureStatus.Valid;
+        if (chars.Equals("invalid", _comparison)) return SignatureStatus.Invalid;
 
-        throw new FormatException("status not correct");
+        throw new FormatException($"status '{chars.ToString()}' not correct");
     }
 
     private static SignaturesStatus? ParseGlobalStatus(ReadOnlySpan<Char> chars)
@@ -420,7 +442,25 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         if (chars.Equals("partiallyValid", _comparison)) return SignaturesStatus.PartiallyValid;
         if (chars.Equals("invalid", _comparison)) return SignaturesStatus.Invalid;
 
-        throw new FormatException("globalStatus not correct");
+        throw new FormatException($"globalStatus '{chars.ToString()}' not correct");
+    }
+
+    private static SignatureFaultType? ParseSignatureFaultType(ReadOnlySpan<Char> chars)
+    {
+        if (chars.Length == 0) return null;
+        if (chars.Equals("unknownDigestAlgorithm", _comparison)) return SignatureFaultType.UnknownDigestAlgorithm;
+        if (chars.Equals("unknownSignatureAlgorithm", _comparison)) return SignatureFaultType.UnknownSignatureAlgorithm;
+        if (chars.Equals("signerCertificateNotFound", _comparison)) return SignatureFaultType.SignerCertificateNotFound;
+        if (chars.Equals("signerCertificateIssuerNotFound", _comparison)) return SignatureFaultType.SignerCertificateIssuerNotFound;
+        if (chars.Equals("signerCertificateSignatureInvalid", _comparison)) return SignatureFaultType.SignerCertificateSignatureInvalid;
+        if (chars.Equals("signerCertificateCRLNotFound", _comparison)) return SignatureFaultType.SignerCertificateCRLNotFound;
+        if (chars.Equals("signerCertificateExpired", _comparison)) return SignatureFaultType.SignerCertificateExpired;
+        if (chars.Equals("signerCertificateRevoked", _comparison)) return SignatureFaultType.SignerCertificateRevoked;
+        if (chars.Equals("invalidDigestValue", _comparison)) return SignatureFaultType.InvalidDigestValue;
+        if (chars.Equals("invalidSignatureValue", _comparison)) return SignatureFaultType.InvalidSignatureValue;
+        if (chars.Equals("invalidSignatureTimeStamp", _comparison)) return SignatureFaultType.InvalidSignatureTimeStamp;
+
+        throw new FormatException($"SignatureFaultType '{chars.ToString()}' not correct");
     }
 
     private static Boolean? ParseBool(ReadOnlySpan<Char> chars)
