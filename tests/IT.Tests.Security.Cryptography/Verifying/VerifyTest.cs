@@ -26,7 +26,7 @@ public abstract class VerifyTest
             var data = datas[i];
             try
             {
-                var isVerified = _verifier.IsVerified(signature, data);
+                var isVerified = _verifier.Verify(signature, data);
 
                 //var info
 
@@ -65,9 +65,9 @@ public abstract class VerifyTest
             var signature = signatures[i];
             try
             {
-                var isVerified = _verifier.IsVerified(signature);
+                var isVerified = _verifier.Verify(signature);
 
-                var info = _verifier.Verify(signature);
+                var info = _verifier.VerifyDetail(signature);
 
                 Console.Write($"{isVerified}");
             }
@@ -81,6 +81,8 @@ public abstract class VerifyTest
                 try
                 {
                     Console.Write($"[{format}]: ");
+                    var detail = _enhancer.EnhanceDetail(signature, format);
+
                     var enhanced = _enhancer.Enhance(signature, format);
                     Console.Write(enhanced);
                 }

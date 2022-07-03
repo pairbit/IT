@@ -6,7 +6,7 @@ using Models;
 
 public interface ISignVerifier : IAsyncSignVerifier
 {
-    Boolean IsVerified(String signature, String? detachedData = null);
+    Boolean Verify(String signature, String? detachedData = null);
 
-    Signatures Verify(String signature, String? detachedData = null);
+    Signatures VerifyDetail(String signature, String? detachedData = null);
 }

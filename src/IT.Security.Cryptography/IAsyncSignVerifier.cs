@@ -8,7 +8,7 @@ using Models;
 
 public interface IAsyncSignVerifier
 {
-    Task<Boolean> IsVerifiedAsync(String signature, String? detachedData = null, CancellationToken cancellationToken = default);
+    Task<Boolean> VerifyAsync(String signature, String? detachedData = null, CancellationToken cancellationToken = default);
 
-    Task<Signatures> VerifyAsync(String signature, String? detachedData = null, CancellationToken cancellationToken = default);
+    Task<Signatures> VerifyDetailAsync(String signature, String? detachedData = null, CancellationToken cancellationToken = default);
 }

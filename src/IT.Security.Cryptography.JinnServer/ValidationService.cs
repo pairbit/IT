@@ -47,16 +47,16 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
     #region ISignVerifier
 
-    public Boolean IsVerified(String signature, String? detachedData)
+    public Boolean Verify(String signature, String? detachedData)
         => IsVerified(_service.GetResponseText(GetRequestValidation(signature, detachedData), Soap.Actions.Validate));
 
-    public Signatures Verify(String signature, String? detachedData)
-        => GetSignatures(_service.GetResponseText(GetRequestValidation(signature, detachedData), Soap.Actions.Validate));
-
-    public async Task<Boolean> IsVerifiedAsync(String signature, String? detachedData, CancellationToken cancellationToken)
+    public async Task<Boolean> VerifyAsync(String signature, String? detachedData, CancellationToken cancellationToken)
         => IsVerified(await _service.GetResponseTextAsync(GetRequestValidation(signature, detachedData), Soap.Actions.Validate).ConfigureAwait(false));
 
-    public async Task<Signatures> VerifyAsync(String signature, String? detachedData, CancellationToken cancellationToken)
+    public Signatures VerifyDetail(String signature, String? detachedData)
+        => GetSignatures(_service.GetResponseText(GetRequestValidation(signature, detachedData), Soap.Actions.Validate));
+
+    public async Task<Signatures> VerifyDetailAsync(String signature, String? detachedData, CancellationToken cancellationToken)
         => GetSignatures(await _service.GetResponseTextAsync(GetRequestValidation(signature, detachedData), Soap.Actions.Validate).ConfigureAwait(false));
 
     #endregion ISignVerifier
@@ -69,9 +69,34 @@ public class ValidationService : ISignEnhancer, ISignVerifier
     public async Task<String> EnhanceAsync(String signature, String format, String? detachedData, CancellationToken cancellationToken)
         => GetEnhanced(await _service.GetResponseTextAsync(GetRequestEnhance(signature, format, detachedData), Soap.Actions.Validate).ConfigureAwait(false));
 
+    public EnhancedSignatures EnhanceDetail(String signature, String format, String? detachedData)
+        => GetEnhancedSignatures(_service.GetResponseText(GetRequestEnhance(signature, format, detachedData), Soap.Actions.Validate));
+
+    public async Task<EnhancedSignatures> EnhanceDetailAsync(String signature, String format, String? detachedData, CancellationToken cancellationToken)
+        => GetEnhancedSignatures(await _service.GetResponseTextAsync(GetRequestEnhance(signature, format, detachedData), Soap.Actions.Validate).ConfigureAwait(false));
+
     #endregion ISignEnhancer
 
     #region Private Methods
+
+    private EnhancedSignatures GetEnhancedSignatures(String response)
+    {
+        var chars = response.AsSpan();
+
+        chars = ParseValidationResponseType(chars);
+
+        var signatures = ParseSignatureInfos(chars);
+
+        signatures.Status = ParseGlobalStatus(chars);
+
+        signatures.DateTime = ParseGmtDateTime(chars);
+
+        return new EnhancedSignatures
+        {
+            Signatures = signatures,
+            Enhanced = Tos(chars[_tagFinder.Inner(chars, "advanced", _comparison)])
+        };
+    }
 
     private String GetEnhanced(String response)
     {
@@ -150,11 +175,11 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
         chars = ParseValidationResponseType(chars);
 
-        var signatures = ParseSignatureInfos(chars[_tagFinder.Outer(chars, "SignatureInfos", _comparison)]);
+        var signatures = ParseSignatureInfos(chars);
 
-        signatures.Status = ParseGlobalStatus(chars[_tagFinder.Inner(chars, "globalStatus", _comparison)]);
+        signatures.Status = ParseGlobalStatus(chars);
 
-        signatures.DateTime = ParseDateTime(chars[_tagFinder.Inner(chars, "gmtDateTime", _comparison)]);
+        signatures.DateTime = ParseGmtDateTime(chars);
 
         return signatures;
     }
@@ -170,6 +195,8 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
     private Signatures ParseSignatureInfos(ReadOnlySpan<Char> chars)
     {
+        chars = chars[_tagFinder.Outer(chars, "SignatureInfos", _comparison)];
+
         var list = new Signatures();
 
         do
@@ -305,6 +332,8 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         return subject;
     }
 
+    private DateTime? ParseGmtDateTime(ReadOnlySpan<Char> chars) => ParseDateTime(chars[_tagFinder.Inner(chars, "gmtDateTime", _comparison)]);
+
     private DateTime? ParseUTCTime(ReadOnlySpan<Char> chars) => ParseDateTime(chars[_tagFinder.Inner(chars, "UTCTime", _comparison)]);
 
     private DateTime? ParseDateTime(ReadOnlySpan<Char> chars)
@@ -422,6 +451,19 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         return chars.Length == 0 ? null : Tos(chars[_tagFinder.Inner(chars, "UTF8String", _comparison)]);
     }
 
+    private SignaturesStatus? ParseGlobalStatus(ReadOnlySpan<Char> chars)
+    {
+        chars = chars[_tagFinder.Inner(chars, "globalStatus", _comparison)];
+
+        if (chars.Length == 0) return null;
+        if (chars.Equals("unknown", _comparison)) return SignaturesStatus.Unknown;
+        if (chars.Equals("valid", _comparison)) return SignaturesStatus.Valid;
+        if (chars.Equals("partiallyValid", _comparison)) return SignaturesStatus.PartiallyValid;
+        if (chars.Equals("invalid", _comparison)) return SignaturesStatus.Invalid;
+
+        throw new FormatException($"globalStatus '{chars.ToString()}' not correct");
+    }
+
     private static String? Tos(ReadOnlySpan<Char> chars) => chars.Length == 0 ? null : chars.ToString();
 
     private static SignatureStatus? ParseSignatureStatus(ReadOnlySpan<Char> chars)
@@ -432,17 +474,6 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         if (chars.Equals("invalid", _comparison)) return SignatureStatus.Invalid;
 
         throw new FormatException($"status '{chars.ToString()}' not correct");
-    }
-
-    private static SignaturesStatus? ParseGlobalStatus(ReadOnlySpan<Char> chars)
-    {
-        if (chars.Length == 0) return null;
-        if (chars.Equals("unknown", _comparison)) return SignaturesStatus.Unknown;
-        if (chars.Equals("valid", _comparison)) return SignaturesStatus.Valid;
-        if (chars.Equals("partiallyValid", _comparison)) return SignaturesStatus.PartiallyValid;
-        if (chars.Equals("invalid", _comparison)) return SignaturesStatus.Invalid;
-
-        throw new FormatException($"globalStatus '{chars.ToString()}' not correct");
     }
 
     private static SignatureFaultType? ParseSignatureFaultType(ReadOnlySpan<Char> chars)
