@@ -13,7 +13,7 @@ public abstract class VerifyTest
         _enhancer = enhancer;
     }
 
-    //[Test]
+    [Test]
     public void VerifyDetached()
     {
         var signs = GetSignaturesDetached().ToArray();
@@ -28,6 +28,7 @@ public abstract class VerifyTest
             {
                 var isVerified = _verifier.Verify(signature, data);
 
+                var info = _verifier.VerifyDetail(signature, data);
                 //var info
 
                 Console.Write($"{isVerified}");
@@ -55,7 +56,7 @@ public abstract class VerifyTest
         }
     }
 
-    [Test]
+    //[Test]
     public void Verify()
     {
         var signatures = GetSignatures().ToArray();
