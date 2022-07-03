@@ -13,7 +13,7 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.0-pre4</Version>
+	<Version>2.0.0-pre5</Version>
 	<PackageReleaseNotes>
 		add prop Algs to Hasher
 	</PackageReleaseNotes>
