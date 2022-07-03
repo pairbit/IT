@@ -194,7 +194,7 @@ public class SigningService : IHasher, ISigner
     {
         var range = _tagFinder.Outer(response, "DigestResponseType", _comparison);
 
-        if (range.Equals(default) && _service.NotFound(response)) throw new InvalidOperationException("'DigestResponseType' not found");
+        if (range.Equals(default) && _service.NotFound(response, _comparison)) throw new InvalidOperationException("'DigestResponseType' not found");
 
         return response[range];
     }
@@ -267,7 +267,7 @@ public class SigningService : IHasher, ISigner
 
         var range = _tagFinder.Inner(span, "SigningResponseType", _comparison);
 
-        if (range.Equals(default) && _service.NotFound(span)) throw new InvalidOperationException("'SigningResponseType' not found");
+        if (range.Equals(default) && _service.NotFound(span, _comparison)) throw new InvalidOperationException("'SigningResponseType' not found");
 
         return response[range].ToString();
     }

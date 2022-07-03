@@ -85,54 +85,74 @@ internal class JinnServerService
         return responseText;
     }
 
-    public Boolean NotFound(ReadOnlySpan<Char> response)
+    public Boolean NotFound(ReadOnlySpan<Char> chars, StringComparison comparison)
     {
-        var range = _tagFinder.Outer(response, Soap.Envelope, StringComparison.OrdinalIgnoreCase);
+        var range = _tagFinder.Outer(chars, Soap.Envelope, comparison);
 
         if (range.Equals(default)) throw new InvalidOperationException("'Envelope' not found");
 
-        response = response[range];
+        chars = chars[range];
 
-        range = _tagFinder.Outer(response, "Body", StringComparison.OrdinalIgnoreCase);
+        range = _tagFinder.Outer(chars, "Body", comparison);
 
         if (range.Equals(default)) throw new InvalidOperationException("'Body' not found");
 
-        response = response[range];
+        chars = chars[range];
 
-        range = _tagFinder.Outer(response, "ServiceFaultInfo", StringComparison.OrdinalIgnoreCase);
+        range = _tagFinder.Inner(chars, "Fault", comparison);
 
         if (!range.Equals(default))
         {
-            response = response[range];
+            chars = chars[range];
 
-            range = _tagFinder.Inner(response, "type", StringComparison.OrdinalIgnoreCase);
+            var faultcode = chars[_tagFinder.Inner(chars, "faultcode", comparison)].Tos();
 
-            var type = range.Equals(default) ? null : response[range].ToString();
+            var faultstring = chars[_tagFinder.Inner(chars, "faultstring", comparison)].Tos();
 
-            range = _tagFinder.Inner(response, "comment", StringComparison.OrdinalIgnoreCase);
+            var message = Message.Build(faultcode, faultstring, "[Fault]");
 
-            var comment = range.Equals(default) ? null : response[range].ToString();
+            range = _tagFinder.Inner(chars, "detail", comparison);
 
-            throw new InvalidOperationException($"[ServiceFaultInfo][{type}] {comment}");
+            if (!range.Equals(default))
+            {
+                chars = chars[range];
+
+                var exm = chars[_tagFinder.Inner(chars, "Exception", comparison)].Tos();
+
+                var ex1 = exm is null ? null : new InvalidOperationException(exm);
+
+                var ex2 = ParseServiceFaultInfo(chars, comparison);
+
+                if (ex1 != null && ex2 != null) throw new InvalidOperationException(message, new AggregateException(ex1, ex2));
+
+                if (ex1 != null) throw new InvalidOperationException(message, ex1);
+
+                if (ex2 != null) throw new InvalidOperationException(message, ex2);
+            }
+
+            throw new InvalidOperationException(message);
         }
 
-        //range = TagFinder.Outer(response, "Fault", StringComparison.OrdinalIgnoreCase);
+        var ex = ParseServiceFaultInfo(chars, comparison);
 
-        //if (!range.Equals(default))
-        //{
-        //    response = response[range];
+        if (ex != null) throw ex;
 
-        //    range = TagFinder.Inner(response, "type", StringComparison.OrdinalIgnoreCase);
-
-        //    var type = range.Equals(default) ? null : response[range];
-
-        //    range = TagFinder.Inner(response, "comment", StringComparison.OrdinalIgnoreCase);
-
-        //    var comment = range.Equals(default) ? null : response[range];
-
-        //    throw new InvalidOperationException($"'ServiceFaultInfo' type '{type}' comment '{comment}'");
-        //}
         return true;
+    }
+
+    private Exception? ParseServiceFaultInfo(ReadOnlySpan<Char> chars, StringComparison comparison)
+    {
+        var range = _tagFinder.Inner(chars, "ServiceFaultInfo", comparison);
+
+        if (range.Equals(default)) return null;
+
+        chars = chars[range];
+
+        var type = chars[_tagFinder.Inner(chars, "type", comparison)].Tos();
+
+        var comment = chars[_tagFinder.Inner(chars, "comment", comparison)].Tos();
+
+        return new InvalidOperationException(Message.Build(type, comment, "[ServiceFaultInfo]"));
     }
 
     #endregion Public Methods

@@ -94,7 +94,7 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         return new EnhancedSignatures
         {
             Signatures = signatures,
-            Enhanced = Tos(chars[_tagFinder.Inner(chars, "advanced", _comparison)])
+            Enhanced = chars[_tagFinder.Inner(chars, "advanced", _comparison)].Tos()
         };
     }
 
@@ -139,9 +139,9 @@ public class ValidationService : ISignEnhancer, ISignVerifier
     {
         (var type, var comment) = ParseFailInfo(chars);
 
-        if (type is null) return comment is null ? null : new InvalidOperationException(comment);
+        if (type is null && comment is null) return null;
 
-        return new InvalidOperationException(comment is null ? $"[{type}]" : $"[{type}] {comment}");
+        return new InvalidOperationException(Message.Build(type?.ToString(), comment, "[failInfo]"));
     }
 
     private (SignatureFaultType?, String?) ParseFailInfo(ReadOnlySpan<Char> chars)
@@ -152,8 +152,8 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
         chars = chars[range];
 
-        return (ParseSignatureFaultType(chars[_tagFinder.Inner(chars, "type", _comparison)]), 
-                Tos(chars[_tagFinder.Inner(chars, "comment", _comparison)]));
+        return (ParseSignatureFaultType(chars[_tagFinder.Inner(chars, "type", _comparison)]),
+                chars[_tagFinder.Inner(chars, "comment", _comparison)].Tos());
     }
 
     private Boolean IsVerified(String response)
@@ -188,7 +188,7 @@ public class ValidationService : ISignEnhancer, ISignVerifier
     {
         var range = _tagFinder.Outer(response, "ValidationResponseType", _comparison);
 
-        if (range.Equals(default) && _service.NotFound(response)) throw new InvalidOperationException("'ValidationResponseType' not found");
+        if (range.Equals(default) && _service.NotFound(response, _comparison)) throw new InvalidOperationException("'ValidationResponseType' not found");
 
         return response[range];
     }
@@ -227,7 +227,7 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
         info.Status = ParseSignatureStatus(chars[_tagFinder.Inner(chars, "status", _comparison)]);
 
-        info.Reference = Tos(chars[_tagFinder.Inner(chars, "reference", _comparison)]);
+        info.Reference = chars[_tagFinder.Inner(chars, "reference", _comparison)].Tos();
 
         return info;
     }
@@ -236,11 +236,11 @@ public class ValidationService : ISignEnhancer, ISignVerifier
     {
         var cert = new Certificate();
 
-        cert.Signature = Tos(chars[_tagFinder.LastInner(chars, "Signature", _comparison)]);
+        cert.Signature = chars[_tagFinder.LastInner(chars, "Signature", _comparison)].Tos();
 
         var temp = chars[_tagFinder.LastInner(chars, "AlgorithmIdentifier", _comparison)];
 
-        cert.AlgorithmIdentifier = Tos(temp[_tagFinder.Inner(temp, "AlgId", _comparison)]);
+        cert.AlgorithmIdentifier = temp[_tagFinder.Inner(temp, "AlgId", _comparison)].Tos();
 
         chars = chars[_tagFinder.Inner(chars, "TBSCertificate", _comparison)];
 
@@ -250,9 +250,9 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
         temp = chars[_tagFinder.Inner(chars, "SubjectPublicKeyInfo", _comparison)];
 
-        cert.SubjectPublicKey = Tos(temp[_tagFinder.Inner(temp, "SubjectPublicKey", _comparison)]);
+        cert.SubjectPublicKey = temp[_tagFinder.Inner(temp, "SubjectPublicKey", _comparison)].Tos();
 
-        cert.SubjectPublicKeyAlgorithm = Tos(temp[_tagFinder.Inner(temp, "PublicKeyAlgorithm", _comparison)]);
+        cert.SubjectPublicKeyAlgorithm = temp[_tagFinder.Inner(temp, "PublicKeyAlgorithm", _comparison)].Tos();
 
         temp = chars[_tagFinder.Inner(chars, "Validity", _comparison)];
         cert.ValidityFrom = ParseUTCTime(temp[_tagFinder.Inner(temp, "NotBefore", _comparison)]);
@@ -261,11 +261,11 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         cert.Issuer = ParseIssuer(chars[_tagFinder.Inner(chars, "Issuer", _comparison)]);
 
         temp = chars[_tagFinder.Inner(chars, "Signature", _comparison)];
-        cert.SignatureAlg = Tos(temp[_tagFinder.Inner(temp, "AlgId", _comparison)]);
+        cert.SignatureAlg = temp[_tagFinder.Inner(temp, "AlgId", _comparison)].Tos();
 
-        cert.SerialNumber = Tos(chars[_tagFinder.Inner(chars, "CertificateSerialNumber", _comparison)]);
+        cert.SerialNumber = chars[_tagFinder.Inner(chars, "CertificateSerialNumber", _comparison)].Tos();
 
-        cert.Version = Tos(chars[_tagFinder.Inner(chars, "Version", _comparison)]);
+        cert.Version = chars[_tagFinder.Inner(chars, "Version", _comparison)].Tos();
 
         return cert;
     }
@@ -292,13 +292,13 @@ public class ValidationService : ISignEnhancer, ISignVerifier
     {
         var ext = new CertificateExtension();
 
-        ext.Oid = Tos(chars[_tagFinder.Inner(chars, "ExtensionType", _comparison)]);
+        ext.Oid = chars[_tagFinder.Inner(chars, "ExtensionType", _comparison)].Tos();
 
         ext.IsCritical = ParseBool(chars[_tagFinder.Inner(chars, "Critical", _comparison)]);
 
         chars = chars[_tagFinder.Inner(chars, "extValue", _comparison)];
 
-        ext.Value = Tos(chars);
+        ext.Value = chars.Tos();
 
         return ext;
     }
@@ -389,66 +389,66 @@ public class ValidationService : ISignEnhancer, ISignVerifier
         return issuer;
     }
 
-    private String? ParseEmail(ReadOnlySpan<Char> chars) => Tos(chars[_tagFinder.Inner(chars, "EmailAddress", _comparison)]);
+    private String? ParseEmail(ReadOnlySpan<Char> chars) => chars[_tagFinder.Inner(chars, "EmailAddress", _comparison)].Tos();
 
     private String? ParseINN(ReadOnlySpan<Char> chars)
     {
         chars = chars[_tagFinder.Inner(chars, "INN", _comparison)];
-        return chars.Length == 0 ? null : Tos(chars[_tagFinder.Inner(chars, "numeric", _comparison)]);
+        return chars.Length == 0 ? null : chars[_tagFinder.Inner(chars, "numeric", _comparison)].Tos();
     }
 
     private String? ParseOGRN(ReadOnlySpan<Char> chars)
     {
         chars = chars[_tagFinder.Inner(chars, "OGRN", _comparison)];
-        return chars.Length == 0 ? null : Tos(chars[_tagFinder.Inner(chars, "numeric", _comparison)]);
+        return chars.Length == 0 ? null : chars[_tagFinder.Inner(chars, "numeric", _comparison)].Tos();
     }
 
     private String? ParseStreet(ReadOnlySpan<Char> chars)
     {
         chars = chars[_tagFinder.Inner(chars, "StreetAddress", _comparison)];
-        return chars.Length == 0 ? null : Tos(chars[_tagFinder.Inner(chars, "UTF8String", _comparison)]);
+        return chars.Length == 0 ? null : chars[_tagFinder.Inner(chars, "UTF8String", _comparison)].Tos();
     }
 
     private String? ParseCountry(ReadOnlySpan<Char> chars)
     {
         chars = chars[_tagFinder.Inner(chars, "CountryName", _comparison)];
-        return chars.Length == 0 ? null : Tos(chars[_tagFinder.Inner(chars, "iso-3166-code", _comparison)]);
+        return chars.Length == 0 ? null : chars[_tagFinder.Inner(chars, "iso-3166-code", _comparison)].Tos();
     }
 
     private String? ParseRegion(ReadOnlySpan<Char> chars)
     {
         chars = chars[_tagFinder.Inner(chars, "StateOrProvinceName", _comparison)];
-        return chars.Length == 0 ? null : Tos(chars[_tagFinder.Inner(chars, "UTF8String", _comparison)]);
+        return chars.Length == 0 ? null : chars[_tagFinder.Inner(chars, "UTF8String", _comparison)].Tos();
     }
 
     private String? ParseCity(ReadOnlySpan<Char> chars)
     {
         chars = chars[_tagFinder.Inner(chars, "LocalityName", _comparison)];
-        return chars.Length == 0 ? null : Tos(chars[_tagFinder.Inner(chars, "UTF8String", _comparison)]);
+        return chars.Length == 0 ? null : chars[_tagFinder.Inner(chars, "UTF8String", _comparison)].Tos();
     }
 
     private String? ParseOrganization(ReadOnlySpan<Char> chars)
     {
         chars = chars[_tagFinder.Inner(chars, "OrganizationName", _comparison)];
-        return chars.Length == 0 ? null : Tos(chars[_tagFinder.Inner(chars, "UTF8String", _comparison)]);
+        return chars.Length == 0 ? null : chars[_tagFinder.Inner(chars, "UTF8String", _comparison)].Tos();
     }
 
     private String? ParseOrganizationalUnit(ReadOnlySpan<Char> chars)
     {
         chars = chars[_tagFinder.Inner(chars, "OrganizationalUnitName", _comparison)];
-        return chars.Length == 0 ? null : Tos(chars[_tagFinder.Inner(chars, "UTF8String", _comparison)]);
+        return chars.Length == 0 ? null : chars[_tagFinder.Inner(chars, "UTF8String", _comparison)].Tos();
     }
 
     private String? ParseUnstructuredName(ReadOnlySpan<Char> chars)
     {
         chars = chars[_tagFinder.Inner(chars, "unstructuredName", _comparison)];
-        return chars.Length == 0 ? null : Tos(chars[_tagFinder.Inner(chars, "UTF8String", _comparison)]);
+        return chars.Length == 0 ? null : chars[_tagFinder.Inner(chars, "UTF8String", _comparison)].Tos();
     }
 
     private String? ParseCommonName(ReadOnlySpan<Char> chars)
     {
         chars = chars[_tagFinder.Inner(chars, "CommonName", _comparison)];
-        return chars.Length == 0 ? null : Tos(chars[_tagFinder.Inner(chars, "UTF8String", _comparison)]);
+        return chars.Length == 0 ? null : chars[_tagFinder.Inner(chars, "UTF8String", _comparison)].Tos();
     }
 
     private SignaturesStatus? ParseGlobalStatus(ReadOnlySpan<Char> chars)
@@ -463,8 +463,6 @@ public class ValidationService : ISignEnhancer, ISignVerifier
 
         throw new FormatException($"globalStatus '{chars.ToString()}' not correct");
     }
-
-    private static String? Tos(ReadOnlySpan<Char> chars) => chars.Length == 0 ? null : chars.ToString();
 
     private static SignatureStatus? ParseSignatureStatus(ReadOnlySpan<Char> chars)
     {

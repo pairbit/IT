@@ -74,6 +74,7 @@ public abstract class VerifyTest
             catch (Exception ex)
             {
                 Console.Write(ex.Message);
+                if (ex.InnerException != null) Console.Write(" : " + ex.InnerException.Message);
             }
             Console.WriteLine();
             foreach (var format in _enhancer.Formats)
@@ -89,6 +90,7 @@ public abstract class VerifyTest
                 catch (Exception ex)
                 {
                     Console.Write(ex.Message);
+                    if (ex.InnerException != null) Console.Write(" : " + ex.InnerException.Message);
                 }
 
                 Console.WriteLine();
