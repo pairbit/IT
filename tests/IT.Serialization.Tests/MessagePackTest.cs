@@ -20,7 +20,11 @@ public class MessagePackTest : SerializerTest
 
         Console.WriteLine(json);
 
-        //var bdump = MessagePackSerializer.ConvertFromJson(json);
+        var bdump = MessagePackSerializer.ConvertFromJson(jsonArray);
+
+        var jsonArray2 = MessagePackSerializer.ConvertToJson(bdump);
+
+        Console.WriteLine(jsonArray2);
 
         //if (!bdump.SequenceEqual(bytes))
         //     throw new InvalidOperationException();

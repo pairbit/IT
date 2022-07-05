@@ -49,13 +49,13 @@ public record Person
     public DateTime Created { get; set; }
 
     [DataMember(Order = 5)]
-    public MyList<Address> Addresses { get; set; }
-
-    [DataMember(Order = 6)]
     public Person Mother { get; set; }
 
-    [DataMember(Order = 7)]
+    [DataMember(Order = 6)]
     public Person Father { get; set; }
+
+    [DataMember(Order = 7)]
+    public MyList<Address> Addresses { get; set; }
 
     [DataMember(Order = 8)]
     public MyList<Person> Childs { get; set; }
