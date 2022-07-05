@@ -17,10 +17,14 @@ public abstract class SerializerTest
         _serializer = serializer;
     }
 
+    protected virtual void Dump<T>(T obj, Byte[] bytes) { }
+
     [Test]
     public void SerializerGeneric()
     {
         var serialized = _serializer.Serialize(_person);
+
+        Dump(_person, serialized);
 
         Assert.NotNull(serialized);
         Assert.Greater(serialized.Length, 0);
@@ -36,6 +40,8 @@ public abstract class SerializerTest
     public void SerializerNonGeneric()
     {
         var serialized = _serializer.Serialize(typeof(Person), _personObject);
+
+        Dump(_personObject, serialized);
 
         Assert.NotNull(serialized);
         Assert.Greater(serialized.Length, 0);
