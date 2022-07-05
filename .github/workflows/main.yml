@@ -28,13 +28,13 @@ jobs:
         run: dotnet build IT.sln --configuration Release --no-restore 
     
       - name: Test System
-        run: dotnet test tests/IT.Tests.System/IT.Tests.System.csproj
+        run: dotnet test tests/IT.Tests/IT.Tests.csproj
             
       - name: Test Generation
-        run: dotnet test tests/IT.Tests.Generation/IT.Tests.Generation.csproj
+        run: dotnet test tests/IT.Generation.Tests/IT.Generation.Tests.csproj
         
       - name: Test Serialization
-        run: dotnet test tests/IT.Tests.Serialization/IT.Tests.Serialization.csproj
+        run: dotnet test tests/IT.Serialization.Tests/T.Serialization.Tests.csproj
         
       - name: Publish IT
         uses: pairbit/publish-nuget@v2.5.7
