@@ -1,7 +1,7 @@
 using IT.Generation;
-using IT.Serialization;
+using IT.Serialization.Tests.Data;
 
-namespace IT.Tests.Serialization;
+namespace IT.Serialization.Tests;
 
 public abstract class SerializerTest
 {
@@ -41,7 +41,7 @@ public abstract class SerializerTest
         Assert.NotNull(serialized);
         Assert.Greater(serialized.Length, 0);
 
-        var person = _serializer.Deserialize(serialized, typeof(Person));
+        var person = _serializer.Deserialize(typeof(Person), serialized);
 
         Assert.NotNull(person);
 
@@ -71,7 +71,7 @@ public abstract class SerializerTest
         Assert.NotNull(serialized);
         Assert.Greater(serialized.Length, 0);
 
-        var person = _textSerializer.Deserialize(serialized, typeof(Person));
+        var person = _textSerializer.Deserialize(typeof(Person), serialized);
 
         Assert.NotNull(person);
 

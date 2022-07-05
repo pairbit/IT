@@ -1,8 +1,8 @@
-﻿namespace IT.Tests;
+﻿namespace IT.Serialization.Tests.Data;
 
 public record Address
 {
-    public Int16 Number { get; set; }
+    public short Number { get; set; }
 
     public string Street { get; set; }
 

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -18,10 +18,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\IT.Generation.KGySoft\IT.Generation.KGySoft.csproj" />
+    <ProjectReference Include="..\..\src\IT.Generation\IT.Generation.csproj" />
     <ProjectReference Include="..\..\src\IT.Serialization.Json\IT.Serialization.Json.csproj" />
     <ProjectReference Include="..\..\src\IT.Serialization.MessagePack\IT.Serialization.MessagePack.csproj" />
     <ProjectReference Include="..\..\src\IT.Serialization.Utf8Json\IT.Serialization.Utf8Json.csproj" />
-    <ProjectReference Include="..\IT.Tests\IT.Tests.csproj" />
   </ItemGroup>
 
 </Project>

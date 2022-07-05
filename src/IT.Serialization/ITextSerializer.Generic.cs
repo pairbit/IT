@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Buffers;
+using System.Threading;
 
 namespace IT.Serialization;
 
-public interface ITextSerializer<T>
+public interface ITextSerializer<T> : ISerializer<T>
 {
-    String Serialize(T value);
+    void Serialize(IBufferWriter<Char> writer, T value, CancellationToken cancellationToken = default);
 
-    T? Deserialize(ReadOnlySpan<Char> value);
+    String SerializeToText(T value, CancellationToken cancellationToken = default);
+
+    T? Deserialize(ReadOnlyMemory<Char> memory, CancellationToken cancellationToken = default);
+
+    T? Deserialize(in ReadOnlySequence<Char> sequence, CancellationToken cancellationToken = default);
 }

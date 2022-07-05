@@ -1,16 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IT.Serialization;
 
 public interface IAsyncSerializer
 {
-    Task SerializeAsync<T>(Stream stream, T value);
+    Task SerializeAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default);
 
-    Task SerializeAsync(Stream stream, Object value);
+    ValueTask<T?> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default);
 
-    Task<Object?> DeserializeAsync(Stream value, Type type);
+    Task SerializeAsync(Type type, Stream stream, Object value, CancellationToken cancellationToken = default);
 
-    Task<T?> DeserializeAsync<T>(Stream value);
+    ValueTask<Object?> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken = default);
 }

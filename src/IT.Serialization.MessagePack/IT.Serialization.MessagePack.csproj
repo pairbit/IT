@@ -27,8 +27,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.3.112" />
+    <PackageReference Include="MessagePack" Version="2.4.35" />
 	<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IT.Serialization\IT.Serialization.csproj" />
   </ItemGroup>
 
 </Project>

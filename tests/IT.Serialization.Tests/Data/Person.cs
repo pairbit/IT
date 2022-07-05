@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace IT.Tests;
+namespace IT.Serialization.Tests.Data;
 
 public class MyList<T> : List<T>, IEquatable<MyList<T>>
 {
@@ -18,7 +18,7 @@ public class MyList<T> : List<T>, IEquatable<MyList<T>>
 
     public override bool Equals(object? obj) => Equals(obj as MyList<T>);
 
-    public bool Equals(MyList<T>? other) => ReferenceEquals(this, other) || (other is not null && this.SequenceEqual(other));
+    public bool Equals(MyList<T>? other) => ReferenceEquals(this, other) || other is not null && this.SequenceEqual(other);
 
     public override int GetHashCode()
     {
