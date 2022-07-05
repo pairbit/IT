@@ -23,33 +23,43 @@ public abstract class TextSerializer<T> : Serializer<T>, ITextSerializer<T>
     {
         var span = memory.Span;
 
-        var charCount = _encoding.GetCharCount(span);
+        var count = _encoding.GetCharCount(span);
 
-        //TODO: ArrayPool<Char>.Shared.Rent(charCount);
-        Memory<Char> memChars = new Char[charCount];
+        var pool = ArrayPool<Char>.Shared;
 
-        _encoding.GetChars(span, memChars.Span);
+        var rented = pool.Rent(count);
 
-        return Deserialize(memChars, cancellationToken);
+        var rentedMemory = rented.AsMemory();
+
+        try
+        {
+            _encoding.GetChars(span, rentedMemory.Span);
+
+            return Deserialize(rentedMemory, cancellationToken);
+        }
+        finally
+        {
+            pool.Return(rented);
+        }
     }
 
     #endregion ISerializer
 
     #region ITextSerializer
 
-    public virtual void Serialize(IBufferWriter<Char> writer, T value, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+    //public virtual void Serialize(IBufferWriter<Char> writer, T value, CancellationToken cancellationToken)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
     public abstract String SerializeToText(T value, CancellationToken cancellationToken);
 
     public abstract T? Deserialize(ReadOnlyMemory<Char> memory, CancellationToken cancellationToken);
 
-    public virtual T? Deserialize(in ReadOnlySequence<Char> sequence, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+    //public virtual T? Deserialize(in ReadOnlySequence<Char> sequence, CancellationToken cancellationToken)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
     #endregion ITextSerializer
 }

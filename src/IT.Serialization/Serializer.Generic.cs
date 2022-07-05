@@ -18,10 +18,21 @@ public abstract class Serializer<T> : ISerializer<T>
 
     public virtual async ValueTask<T?> DeserializeAsync(Stream stream, CancellationToken cancellationToken = default)
     {
-        //TODO: ArrayPool<Byte>.Shared.Rent(stream.Length);
-        var bytes = new Byte[stream.Length];
-        var len = await stream.ReadAsync(bytes, 0, bytes.Length, cancellationToken).ConfigureAwait(false);
-        return Deserialize(bytes, cancellationToken);
+        var len = checked((Int32)stream.Length);
+        var pool = ArrayPool<Byte>.Shared;
+        var bytes = pool.Rent(len);
+        try
+        {
+            var readed = await stream.ReadAsync(bytes, 0, len, cancellationToken).ConfigureAwait(false);
+
+            if ((uint)readed > (uint)len) throw new IOException("IO_StreamTooLong");
+
+            return Deserialize(bytes, cancellationToken);
+        }
+        finally
+        {
+            pool.Return(bytes);
+        }
     }
 
     #endregion IAsyncSerializer
@@ -49,10 +60,23 @@ public abstract class Serializer<T> : ISerializer<T>
 
     public virtual T? Deserialize(Stream stream, CancellationToken cancellationToken = default)
     {
-        //TODO: ArrayPool<Byte>.Shared.Rent(stream.Length);
-        var bytes = new Byte[stream.Length];
-        var len = stream.Read(bytes, 0, bytes.Length);
-        return Deserialize(bytes, cancellationToken);
+        var len = checked((Int32)stream.Length);
+
+        var pool = ArrayPool<Byte>.Shared;
+
+        var bytes = pool.Rent(len);
+        try
+        {
+            var readed = stream.Read(bytes, 0, len);
+
+            if ((uint)readed > (uint)len) throw new IOException("IO_StreamTooLong");
+
+            return Deserialize(bytes, cancellationToken);
+        }
+        finally
+        {
+            pool.Return(bytes);
+        }
     }
 
     #endregion ISerializer

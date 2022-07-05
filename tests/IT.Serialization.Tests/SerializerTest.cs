@@ -1,21 +1,20 @@
 using IT.Generation;
 using IT.Serialization.Tests.Data;
+using MessagePack;
 
 namespace IT.Serialization.Tests;
 
 public abstract class SerializerTest
 {
-    private static readonly IGenerator _generator = new Generation.KGySoft.Generator();
-    private static readonly Person _person = _generator.Generate<Person>();
-    private static readonly Object _personObject = _generator.Generate(typeof(Person));
+    protected static readonly IGenerator _generator = new Generation.KGySoft.Generator();
+    protected static readonly Person _person = _generator.Generate<Person>();
+    protected static readonly Object _personObject = _generator.Generate(typeof(Person));
 
     private readonly ISerializer _serializer;
-    private readonly ITextSerializer _textSerializer;
 
-    public SerializerTest(ISerializer serializer, ITextSerializer textSerializer)
+    public SerializerTest(ISerializer serializer)
     {
         _serializer = serializer;
-        _textSerializer = textSerializer;
     }
 
     [Test]
@@ -36,42 +35,12 @@ public abstract class SerializerTest
     [Test]
     public void SerializerNonGeneric()
     {
-        var serialized = _serializer.Serialize(_personObject);
+        var serialized = _serializer.Serialize(typeof(Person), _personObject);
 
         Assert.NotNull(serialized);
         Assert.Greater(serialized.Length, 0);
 
         var person = _serializer.Deserialize(typeof(Person), serialized);
-
-        Assert.NotNull(person);
-
-        Assert.True(_personObject.Equals(person));
-    }
-
-    [Test]
-    public void TextSerializerGeneric()
-    {
-        var serialized = _textSerializer.Serialize(_person);
-
-        Assert.NotNull(serialized);
-        Assert.Greater(serialized.Length, 0);
-
-        var person = _textSerializer.Deserialize<Person>(serialized);
-
-        Assert.NotNull(person);
-
-        Assert.True(_person.Equals(person));
-    }
-
-    [Test]
-    public void TextSerializerNonGeneric()
-    {
-        var serialized = _textSerializer.Serialize(_personObject);
-
-        Assert.NotNull(serialized);
-        Assert.Greater(serialized.Length, 0);
-
-        var person = _textSerializer.Deserialize(typeof(Person), serialized);
 
         Assert.NotNull(person);
 

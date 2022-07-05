@@ -24,9 +24,13 @@ public static class _Stream
         {
             try
             {
-                int result = await readTask.ConfigureAwait(false);
-                new ReadOnlySpan<byte>(localBuffer, 0, result).CopyTo(localDestination.Span);
-                return result;
+                int readed = await readTask.ConfigureAwait(false);
+
+                if ((uint)readed > (uint)localDestination.Length) throw new IOException("IO_StreamTooLong");
+
+                new ReadOnlySpan<byte>(localBuffer, 0, readed).CopyTo(localDestination.Span);
+
+                return readed;
             }
             finally
             {
@@ -62,7 +66,9 @@ public static class _Stream
         }
 
         byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length);
+
         buffer.Span.CopyTo(sharedBuffer);
+
         return new ValueTask(FinishWriteAsync(stream.WriteAsync(sharedBuffer, 0, buffer.Length, cancellationToken), sharedBuffer));
     }
 

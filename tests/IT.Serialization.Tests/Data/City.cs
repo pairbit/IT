@@ -1,9 +1,14 @@
-﻿namespace IT.Serialization.Tests.Data;
+﻿using System.Runtime.Serialization;
 
+namespace IT.Serialization.Tests.Data;
+
+[DataContract]
 public record City
 {
+    [DataMember(Order = 1)]
     public string Name { get; set; }
 
+    [DataMember(Order = 2)]
     public int Count { get; set; }
 }
 
