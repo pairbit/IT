@@ -23,13 +23,13 @@ public abstract class TextSerializer<T> : Serializer<T>, ITextSerializer<T>
     {
         var span = memory.Span;
 
-        var count = _encoding.GetCharCount(span);
+        var len = _encoding.GetCharCount(span);
 
         var pool = ArrayPool<Char>.Shared;
 
-        var rented = pool.Rent(count);
+        var rented = pool.Rent(len);
 
-        var rentedMemory = rented.AsMemory();
+        var rentedMemory = rented.AsMemory(0, len);
 
         try
         {

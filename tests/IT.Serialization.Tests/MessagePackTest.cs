@@ -26,6 +26,8 @@ public class MessagePackTest : SerializerTest
 
         Console.WriteLine(jsonArray2);
 
+        Console.WriteLine(MessagePackSerializer.SerializeToJson(obj));
+
         //if (!bdump.SequenceEqual(bytes))
         //     throw new InvalidOperationException();
 

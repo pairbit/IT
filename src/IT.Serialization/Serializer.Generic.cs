@@ -20,18 +20,18 @@ public abstract class Serializer<T> : ISerializer<T>
     {
         var len = checked((Int32)stream.Length);
         var pool = ArrayPool<Byte>.Shared;
-        var bytes = pool.Rent(len);
+        var rented = pool.Rent(len);
         try
         {
-            var readed = await stream.ReadAsync(bytes, 0, len, cancellationToken).ConfigureAwait(false);
+            var readed = await stream.ReadAsync(rented, 0, len, cancellationToken).ConfigureAwait(false);
 
             if ((uint)readed > (uint)len) throw new IOException("IO_StreamTooLong");
 
-            return Deserialize(bytes, cancellationToken);
+            return Deserialize(rented.AsMemory(0, len), cancellationToken);
         }
         finally
         {
-            pool.Return(bytes);
+            pool.Return(rented);
         }
     }
 
@@ -64,18 +64,18 @@ public abstract class Serializer<T> : ISerializer<T>
 
         var pool = ArrayPool<Byte>.Shared;
 
-        var bytes = pool.Rent(len);
+        var rented = pool.Rent(len);
         try
         {
-            var readed = stream.Read(bytes, 0, len);
+            var readed = stream.Read(rented, 0, len);
 
             if ((uint)readed > (uint)len) throw new IOException("IO_StreamTooLong");
 
-            return Deserialize(bytes, cancellationToken);
+            return Deserialize(rented.AsMemory(0, len), cancellationToken);
         }
         finally
         {
-            pool.Return(bytes);
+            pool.Return(rented);
         }
     }
 
