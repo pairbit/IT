@@ -25,6 +25,7 @@ public abstract class TextSerializer<T> : Serializer<T>, ITextSerializer<T>
 
         var charCount = _encoding.GetCharCount(span);
 
+        //TODO: ArrayPool<Char>.Shared.Rent(charCount);
         Memory<Char> memChars = new Char[charCount];
 
         _encoding.GetChars(span, memChars.Span);

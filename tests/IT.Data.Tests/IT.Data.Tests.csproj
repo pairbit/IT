@@ -16,4 +16,11 @@
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\IT.Data.Dapper\IT.Data.Dapper.csproj" />
+    <ProjectReference Include="..\..\src\IT.Data.Mongo\IT.Data.Mongo.csproj" />
+    <ProjectReference Include="..\..\src\IT.Data.Redis\IT.Data.Redis.csproj" />
+    <ProjectReference Include="..\..\src\IT.Generation.KGySoft\IT.Generation.KGySoft.csproj" />
+  </ItemGroup>
+
 </Project>

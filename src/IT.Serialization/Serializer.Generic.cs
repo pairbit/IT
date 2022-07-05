@@ -18,6 +18,7 @@ public abstract class Serializer<T> : ISerializer<T>
 
     public virtual async ValueTask<T?> DeserializeAsync(Stream stream, CancellationToken cancellationToken = default)
     {
+        //TODO: ArrayPool<Byte>.Shared.Rent(stream.Length);
         var bytes = new Byte[stream.Length];
         var len = await stream.ReadAsync(bytes, 0, bytes.Length, cancellationToken).ConfigureAwait(false);
         return Deserialize(bytes, cancellationToken);
@@ -48,6 +49,7 @@ public abstract class Serializer<T> : ISerializer<T>
 
     public virtual T? Deserialize(Stream stream, CancellationToken cancellationToken = default)
     {
+        //TODO: ArrayPool<Byte>.Shared.Rent(stream.Length);
         var bytes = new Byte[stream.Length];
         var len = stream.Read(bytes, 0, bytes.Length);
         return Deserialize(bytes, cancellationToken);

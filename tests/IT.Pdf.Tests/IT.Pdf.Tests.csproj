@@ -16,4 +16,9 @@
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\IT.Pdf.DinkToPdf\IT.Pdf.DinkToPdf.csproj" />
+    <ProjectReference Include="..\..\src\IT.Pdf.PDFSharp\IT.Pdf.PDFSharp.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,4 @@
-﻿namespace IT.Serialization.Tests.Data;
+﻿namespace IT.Data.Tests.Data;
 
 public class MyList<T> : List<T>, IEquatable<MyList<T>>
 {

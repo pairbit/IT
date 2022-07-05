@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 
 namespace IT.Serialization;
-
+//https://stebet.net/real-world-example-of-reducing-allocations-using-span-t-and-memory-t/
 public interface ISerializer : IAsyncSerializer
 {
     #region Generic
