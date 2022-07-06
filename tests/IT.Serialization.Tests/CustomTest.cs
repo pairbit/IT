@@ -58,5 +58,20 @@ public class CustomTest
         Assert.NotNull(city);
 
         Assert.True(_city.Equals(city));
+
+        var path = @"C:\var\CustomTest.log";
+
+        File.Delete(path);
+
+        using var file = File.OpenWrite(path);
+        _serializer.Serialize(file, _city);
+        file.Close();
+
+
+        using var reader = File.OpenRead(path);
+        city = _serializer.Deserialize(reader);
+        reader.Close();
+
+        Assert.True(_city.Equals(city));
     }
 }

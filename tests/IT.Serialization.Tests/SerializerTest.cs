@@ -34,6 +34,20 @@ public abstract class SerializerTest
         Assert.NotNull(person);
         
         Assert.True(_person.Equals(person));
+
+        var path = @"C:\var\SerializerTest_Generic.log";
+
+        File.Delete(path);
+
+        using var file = File.OpenWrite(path);
+        _serializer.Serialize(file, _person);
+        file.Close();
+
+        using var reader = File.OpenRead(path);
+        person = _serializer.Deserialize<Person>(reader);
+        reader.Close();
+
+        Assert.True(_person.Equals(person));
     }
 
     [Test]
@@ -51,5 +65,19 @@ public abstract class SerializerTest
         Assert.NotNull(person);
 
         Assert.True(_personObject.Equals(person));
+
+        var path = @"C:\var\SerializerTest_NonGeneric.log";
+
+        File.Delete(path);
+
+        using var file = File.OpenWrite(path);
+        _serializer.Serialize(file, _person);
+        file.Close();
+
+        using var reader = File.OpenRead(path);
+        person = _serializer.Deserialize<Person>(reader);
+        reader.Close();
+
+        Assert.True(_person.Equals(person));
     }
 }
