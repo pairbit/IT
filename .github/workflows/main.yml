@@ -132,6 +132,14 @@ jobs:
             TAG_COMMIT: false
             INCLUDE_SYMBOLS: true
             
+      - name: Publish IT.Serialization.MessagePack
+        uses: pairbit/publish-nuget@v2.5.7
+        with:
+            PROJECT_FILE_PATH: src/IT.Serialization.MessagePack/IT.Serialization.MessagePack.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+            
       - name: Publish IT.Serialization.Utf8Json
         uses: pairbit/publish-nuget@v2.5.7
         with:
