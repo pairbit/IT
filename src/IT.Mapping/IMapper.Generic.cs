@@ -1,6 +1,8 @@
 ﻿namespace IT.Mapping;
 
-internal interface IMapper<T, T2>
+public interface IMapper<TFrom, TTo>
 {
-    T2 Map(T value);
+    void Map(TFrom source, TTo destination);
+
+    TTo Map(TFrom source);
 }

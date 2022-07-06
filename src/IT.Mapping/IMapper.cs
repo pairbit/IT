@@ -1,6 +1,16 @@
-﻿namespace IT.Mapping;
+﻿using System;
 
-internal interface IMapper
+namespace IT.Mapping;
+
+public interface IMapper
 {
-    T Map<T, T2>(T value);
+    TTo Map<TTo>(Object source);
+
+    TTo Map<TFrom, TTo>(TFrom source);
+
+    TTo Map<TFrom, TTo>(TFrom source, TTo destination);
+
+    Object Map(Type sourceType, Object source, Type destinationType);
+
+    Object Map(Type sourceType, Object source, Type destinationType, Object destination);
 }
