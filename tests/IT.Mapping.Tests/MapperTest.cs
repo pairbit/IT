@@ -7,10 +7,12 @@ public abstract class MapperTest
 {
     private readonly IGenerator _generator = new Generation.KGySoft.Generator();
     private readonly IMapper _mapper;
+    private readonly IMapper<Person, Person2> _personMapper;
 
     public MapperTest(IMapper mapper)
     {
         _mapper = mapper;
+        _personMapper = new Mapper<Person, Person2>(mapper);
     }
 
     [SetUp]
@@ -68,6 +70,9 @@ public abstract class MapperTest
 
         PersonEquals(person, person2);
 
+        var person20 = _personMapper.Map(person);
+        Assert.That(person2, Is.EqualTo(person20));
+
         var person21 = _mapper.Map<Person, Person2>(person);
         Assert.That(person2, Is.EqualTo(person21));
 
@@ -79,6 +84,10 @@ public abstract class MapperTest
         Assert.False(ReferenceEquals(person22, person23));
         Assert.That(person2, Is.EqualTo(person23));
 
+        person23 = _personMapper.Map(person, person22);
+        Assert.False(ReferenceEquals(person22, person23));
+        Assert.That(person2, Is.EqualTo(person23));
+
         var person23o = _mapper.Map(typeof(Person), person, typeof(Person2), person22);
         Assert.False(ReferenceEquals(person22, person23o));
         Assert.That(person2, Is.EqualTo(person23o));
@@ -87,6 +96,10 @@ public abstract class MapperTest
         person23 = _mapper.Map(person, person22);
         Assert.True(ReferenceEquals(person22, person23));
         person2.NotMapped2 = "NotMapped2";
+        Assert.That(person2, Is.EqualTo(person23));
+
+        person23 = _personMapper.Map(person, person22);
+        Assert.True(ReferenceEquals(person22, person23));
         Assert.That(person2, Is.EqualTo(person23));
 
         person22 = new Person2 { NotMapped2 = "NotMapped2o" };
