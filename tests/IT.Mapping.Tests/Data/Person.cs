@@ -47,6 +47,8 @@ public record Person
     public Person Father { get; set; }
 
     public MyList<Person> Childs { get; set; }
+
+    public String? NotMapped { get; set; }
 }
 
 public record Person2
@@ -68,4 +70,6 @@ public record Person2
     public Person2 Father { get; set; }
 
     public MyList<Person2> Childs { get; set; }
+
+    public String? NotMapped2 { get; set; }
 }

@@ -68,6 +68,33 @@ public abstract class MapperTest
 
         PersonEquals(person, person2);
 
+        var person21 = _mapper.Map<Person, Person2>(person);
+        Assert.That(person2, Is.EqualTo(person21));
+
+        var person21o = _mapper.Map(typeof(Person), person, typeof(Person2));
+        Assert.That(person2, Is.EqualTo(person21o));
+
+        Person2? person22 = null;
+        var person23 = _mapper.Map(person, person22);
+        Assert.False(ReferenceEquals(person22, person23));
+        Assert.That(person2, Is.EqualTo(person23));
+
+        var person23o = _mapper.Map(typeof(Person), person, typeof(Person2), person22);
+        Assert.False(ReferenceEquals(person22, person23o));
+        Assert.That(person2, Is.EqualTo(person23o));
+
+        person22 = new Person2 { NotMapped2 = "NotMapped2" };
+        person23 = _mapper.Map(person, person22);
+        Assert.True(ReferenceEquals(person22, person23));
+        person2.NotMapped2 = "NotMapped2";
+        Assert.That(person2, Is.EqualTo(person23));
+
+        person22 = new Person2 { NotMapped2 = "NotMapped2o" };
+        var person22o = _mapper.Map(typeof(Person), person, typeof(Person2), person22);
+        Assert.True(ReferenceEquals(person22, person22o));
+        person2.NotMapped2 = "NotMapped2o";
+        Assert.That(person2, Is.EqualTo(person22o));
+
         person2 = _generator.Generate<Person2>();
         person = _mapper.Map<Person>(person2);
 
