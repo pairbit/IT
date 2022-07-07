@@ -30,4 +30,8 @@
     <PackageReference Include="Mapster" Version="7.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IT.Mapping\IT.Mapping.csproj" />
+  </ItemGroup>
+
 </Project>

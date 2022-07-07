@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace IT.Mapping.Mapster;
+namespace IT.Mapping.AutoMapper;
 
 public class Mapper : IMapper
 {
-    private readonly MapsterMapper.IMapper _mapper;
+    private readonly global::AutoMapper.IMapperBase _mapper;
 
-    public Mapper(MapsterMapper.IMapper mapper)
+    public Mapper(global::AutoMapper.IMapperBase mapper)
     {
         _mapper = mapper;
     }

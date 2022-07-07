@@ -30,4 +30,8 @@
     <PackageReference Include="AutoMapper" Version="11.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IT.Mapping\IT.Mapping.csproj" />
+  </ItemGroup>
+
 </Project>

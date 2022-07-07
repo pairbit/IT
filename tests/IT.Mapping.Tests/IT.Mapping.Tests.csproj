@@ -17,7 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\IT.Generation.KGySoft\IT.Generation.KGySoft.csproj" />
     <ProjectReference Include="..\..\src\IT.Mapping.AutoMapper\IT.Mapping.AutoMapper.csproj" />
+    <ProjectReference Include="..\..\src\IT.Mapping.Mapster\IT.Mapping.Mapster.csproj" />
   </ItemGroup>
 
 </Project>
