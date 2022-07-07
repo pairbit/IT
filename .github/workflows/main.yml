@@ -36,7 +36,7 @@ jobs:
       - name: Test Serialization
         run: dotnet test tests/IT.Serialization.Tests/IT.Serialization.Tests.csproj
         
-      - name: Test Serialization
+      - name: Test Mapping
         run: dotnet test tests/IT.Mapping.Tests/IT.Mapping.Tests.csproj
         
       - name: Publish IT
