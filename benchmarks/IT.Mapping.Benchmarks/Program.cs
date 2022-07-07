@@ -1,2 +1,1 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Mapping.Benchmarks.MapperBenchmark));

@@ -14,7 +14,7 @@ namespace IT.Benchmarks;
 public class TagFinderBenchmark
 {
     private readonly String _data;
-    private readonly JinnServerService _jinnServerService = new JinnServerService(null, new TagFinder(), null);
+    private readonly JinnServerService _jinnServerService = new(null, new TagFinder(), null);
     private readonly ValidationService _validationService = new(() => new ValidationOptions());
 
     public TagFinderBenchmark()
