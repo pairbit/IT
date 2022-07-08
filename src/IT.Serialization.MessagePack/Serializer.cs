@@ -25,7 +25,7 @@ public class Serializer : ISerializer
         => await MessagePackSerializer.DeserializeAsync<T>(stream, _options, cancellationToken).ConfigureAwait(false);
 
     public Task SerializeAsync(Type type, Stream stream, Object value, CancellationToken cancellationToken)
-    => MessagePackSerializer.SerializeAsync(type, stream, value, _options, cancellationToken);
+        => MessagePackSerializer.SerializeAsync(type, stream, value, _options, cancellationToken);
 
     public ValueTask<Object?> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken)
         => MessagePackSerializer.DeserializeAsync(type, stream, _options, cancellationToken);
