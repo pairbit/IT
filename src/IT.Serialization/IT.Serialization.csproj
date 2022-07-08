@@ -15,7 +15,7 @@
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
 	<Version>2.0.0-pre4</Version>
 	<PackageReleaseNotes>
-		change Interfaces
+		add SerializerProxy and TextSerializerProxy
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
