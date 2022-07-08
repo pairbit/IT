@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace IT.Locking.Redis;
 
-class _Lock : ILock
+internal class Lock : ILock
 {
     internal static readonly String StringDeleteIfEqual;
 
-    static _Lock()
+    static Lock()
     {
         var assembly = Assembly.GetExecutingAssembly();
 
@@ -25,7 +25,7 @@ class _Lock : ILock
     private readonly RedisValue _value;
     private Boolean _disposed;
 
-    public _Lock(IDatabase db, RedisKey key, RedisValue value)
+    public Lock(IDatabase db, RedisKey key, RedisValue value)
     {
         _db = db;
         _key = key;
