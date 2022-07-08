@@ -1,10 +1,10 @@
-//using IT.Serialization.Utf8Json;
+using IT.Serialization.Utf8Json;
 
-//namespace IT.Serialization.Tests;
+namespace IT.Serialization.Tests;
 
-//public class Utf8JsonTest : SerializerTest
-//{
-//    private static TextSerializer _serializer = new();
+public class Utf8JsonTest : TextSerializerTest
+{
+    private static TextSerializer _serializer = new();
 
-//    public Utf8JsonTest() : base(_serializer, _serializer) { }
-//}
+    public Utf8JsonTest() : base(_serializer) { }
+}
