@@ -96,10 +96,10 @@ public class TextSerializer : ITextSerializer
 
     #region Generic
 
-    public void Serialize<T>(IBufferWriter<Char> writer, T value, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+    //public void Serialize<T>(IBufferWriter<Char> writer, T value, CancellationToken cancellationToken)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
     public String SerializeToText<T>(T value, CancellationToken cancellationToken)
         => JsonSerializer.Serialize(value, _getOptions?.Invoke());
@@ -107,19 +107,19 @@ public class TextSerializer : ITextSerializer
     public T? Deserialize<T>(ReadOnlyMemory<Char> memory, CancellationToken cancellationToken)
         => JsonSerializer.Deserialize<T>(memory.Span, _getOptions?.Invoke());
 
-    public T? Deserialize<T>(in ReadOnlySequence<Char> sequence, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+    //public T? Deserialize<T>(in ReadOnlySequence<Char> sequence, CancellationToken cancellationToken)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
     #endregion Generic
 
     #region NonGeneric
 
-    public void Serialize(Type type, IBufferWriter<Char> writer, Object value, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+    //public void Serialize(Type type, IBufferWriter<Char> writer, Object value, CancellationToken cancellationToken)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
     public String SerializeToText(Type type, Object value, CancellationToken cancellationToken)
         => JsonSerializer.Serialize(value, type, _getOptions?.Invoke());
@@ -127,10 +127,10 @@ public class TextSerializer : ITextSerializer
     public Object? Deserialize(Type type, ReadOnlyMemory<Char> memory, CancellationToken cancellationToken)
         => JsonSerializer.Deserialize(memory.Span, type, _getOptions?.Invoke());
 
-    public Object? Deserialize(Type type, ReadOnlySequence<Char> sequence, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+    //public Object? Deserialize(Type type, ReadOnlySequence<Char> sequence, CancellationToken cancellationToken)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
     #endregion NonGeneric
 
