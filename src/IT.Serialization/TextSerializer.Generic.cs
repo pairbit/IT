@@ -16,7 +16,7 @@ public abstract class TextSerializer<T> : Serializer<T>, ITextSerializer<T>
 
     #region ISerializer
 
-    public override byte[] Serialize(T value, CancellationToken cancellationToken)
+    public override Byte[] Serialize(T value, CancellationToken cancellationToken)
         => _encoding.GetBytes(SerializeToText(value, cancellationToken));
 
     public override T? Deserialize(ReadOnlyMemory<Byte> memory, CancellationToken cancellationToken)

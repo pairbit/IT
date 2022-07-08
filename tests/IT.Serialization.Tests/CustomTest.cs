@@ -8,7 +8,6 @@ public class CustomTest
     protected static readonly IGenerator _generator = new Generation.KGySoft.Generator();
     protected static readonly City _city = _generator.Generate<City>();
 
-    //private static JsonSerializerOptions _options = new ();
     private static ITextSerializer<City> _serializer = new CitySerializer();
 
     class CitySerializer : TextSerializer<City>
