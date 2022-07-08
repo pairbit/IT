@@ -36,6 +36,9 @@ jobs:
       - name: Test Serialization
         run: dotnet test tests/IT.Serialization.Tests/IT.Serialization.Tests.csproj
         
+      - name: Test Mapping
+        run: dotnet test tests/IT.Mapping.Tests/IT.Mapping.Tests.csproj
+        
       - name: Publish IT
         uses: pairbit/publish-nuget@v2.5.7
         with:
@@ -248,6 +251,30 @@ jobs:
         uses: pairbit/publish-nuget@v2.5.7
         with:
             PROJECT_FILE_PATH: src/IT.Working.Redis/IT.Working.Redis.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Mapping
+        uses: pairbit/publish-nuget@v2.5.7
+        with:
+            PROJECT_FILE_PATH: src/IT.Mapping/IT.Mapping.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Mapping.AutoMapper
+        uses: pairbit/publish-nuget@v2.5.7
+        with:
+            PROJECT_FILE_PATH: src/IT.Mapping.AutoMapper/IT.Mapping.AutoMapper.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+            
+      - name: Publish IT.Mapping.Mapster
+        uses: pairbit/publish-nuget@v2.5.7
+        with:
+            PROJECT_FILE_PATH: src/IT.Mapping.Mapster/IT.Mapping.Mapster.csproj
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             INCLUDE_SYMBOLS: true
