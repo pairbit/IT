@@ -10,9 +10,9 @@ public class Locker : ILocker
     private static readonly TimeSpan ExpiryDebug = TimeSpan.FromMinutes(3);
     protected readonly IDatabase _db;
     protected readonly String? _prefix;
-    protected readonly Func<Byte[]> _newId;
+    protected readonly Func<ReadOnlyMemory<Byte>> _newId;
 
-    public Locker(IDatabase db, Func<Options>? getOptions = null, Func<Byte[]>? newId = null)
+    public Locker(IDatabase db, Func<Options>? getOptions = null, Func<ReadOnlyMemory<Byte>>? newId = null)
     {
         _db = db;
         _prefix = getOptions?.Invoke()?.Prefix;

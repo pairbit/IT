@@ -1,13 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
-	<LangVersion>latest</LangVersion>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
 	<Nullable>enable</Nullable>
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<Company />
-	<Description>Implementation of locking via RedLock.net</Description>
+	<Description>Implementation of locking via DistributedLock</Description>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/pairbit/IT</RepositoryUrl>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -25,10 +25,10 @@
 	<DebugType>full</DebugType>
 	<NoWarn>$(NoWarn);1591;IDE1006;IDE0049</NoWarn>
   </PropertyGroup>
-
+	
   <ItemGroup>
-    <PackageReference Include="RedLock.net" Version="2.3.2" />
-	<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="DistributedLock.Core" Version="1.0.4" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
-
+	
 </Project>

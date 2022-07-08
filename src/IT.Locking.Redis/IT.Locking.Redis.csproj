@@ -13,9 +13,9 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.5</Version>
+	<Version>2.0.6-pre1</Version>
 	<PackageReleaseNotes>
-		update StackExchange.Redis 2.6.48
+		change Func newId from Byte[] to ReadOnlyMemory 
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
