@@ -23,9 +23,9 @@ public class TextSerializer : ITextSerializer
 
     public ValueTask<T?> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken)
         => JsonSerializer.DeserializeAsync<T>(stream, _getOptions?.Invoke(), cancellationToken);
-
+    //whatesspace
     public Task SerializeAsync(Type type, Stream stream, Object value, CancellationToken cancellationToken)
-    => JsonSerializer.SerializeAsync(stream, value, type, _getOptions?.Invoke(), cancellationToken);
+        => JsonSerializer.SerializeAsync(stream, value, type, _getOptions?.Invoke(), cancellationToken);
 
     public ValueTask<Object?> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken)
         => JsonSerializer.DeserializeAsync(stream, type, _getOptions?.Invoke(), cancellationToken);

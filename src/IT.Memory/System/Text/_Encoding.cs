@@ -16,7 +16,6 @@ public static class _Encoding
         fixed (Char* charsPtr = chars)
         fixed (Byte* bytesPtr = bytes)
             return encoding.GetBytes(charsPtr, chars.Length, bytesPtr, bytes.Length);
-
     }
 
     public static unsafe Int32 GetCharCount(this Encoding encoding, ReadOnlySpan<Byte> bytes)
