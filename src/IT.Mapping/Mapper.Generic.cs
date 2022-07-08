@@ -11,5 +11,5 @@ public class Mapper<TFrom, TTo> : IMapper<TFrom, TTo>
 
     public TTo Map(TFrom from) => _mapper.Map<TFrom, TTo>(from);
 
-    public TTo Map(TFrom from, TTo to) => _mapper.Map(from, to);
+    public TTo Map(TFrom from, TTo? to) => _mapper.Map(from, to);
 }
