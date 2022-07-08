@@ -1,6 +1,7 @@
 ﻿using StackExchange.Redis;
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IT.Locking.Redis;
@@ -21,7 +22,7 @@ public class Locker : Locking.Locker
 
     #region IAsyncLocker
 
-    public override async Task<ILock?> LockAsync(String resource, TimeSpan expiry)
+    public override async Task<ILock?> LockAsync(String resource, TimeSpan expiry, CancellationToken cancellationToken)
     {
         if (resource is null) throw new ArgumentNullException(nameof(resource));
         if (resource.Length == 0) throw new ArgumentException("is empty", nameof(resource));
@@ -37,7 +38,7 @@ public class Locker : Locking.Locker
 
     #region ILocker
 
-    public override ILock? Lock(String resource, TimeSpan expiry)
+    public override ILock? Lock(String resource, TimeSpan expiry, CancellationToken cancellationToken)
     {
         if (resource is null) throw new ArgumentNullException(nameof(resource));
         if (resource.Length == 0) throw new ArgumentException("is empty", nameof(resource));

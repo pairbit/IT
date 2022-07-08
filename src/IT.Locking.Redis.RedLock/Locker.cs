@@ -16,7 +16,7 @@ public class Locker : Locking.Locker
 
     #region IAsyncLocker
 
-    public override async Task<ILock?> LockAsync(String resource, TimeSpan expiry)
+    public override async Task<ILock?> LockAsync(String resource, TimeSpan expiry, CancellationToken cancellationToken)
     {
         var @lock = await _factory.CreateLockAsync(resource, expiry).ConfigureAwait(false);
         return @lock.IsAcquired ? new RedLock(@lock) : null;
@@ -32,7 +32,7 @@ public class Locker : Locking.Locker
 
     #region ILocker
 
-    public override ILock? Lock(String resource, TimeSpan expiry)
+    public override ILock? Lock(String resource, TimeSpan expiry, CancellationToken cancellationToken)
     {
         var @lock = _factory.CreateLock(resource, expiry);
         return @lock.IsAcquired ? new RedLock(@lock) : null;

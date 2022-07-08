@@ -10,7 +10,7 @@ public abstract class Locker : ILocker
 {
     #region IAsyncLocker
 
-    public abstract Task<ILock?> LockAsync(String resource, TimeSpan expiry);
+    public abstract Task<ILock?> LockAsync(String resource, TimeSpan expiry, CancellationToken cancellationToken = default);
 
     public virtual async Task<ILock?> LockAsync(String resource, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
     {
@@ -67,7 +67,7 @@ public abstract class Locker : ILocker
 
     #region ILocker
 
-    public abstract ILock? Lock(String resource, TimeSpan expiry);
+    public abstract ILock? Lock(String resource, TimeSpan expiry, CancellationToken cancellationToken = default);
 
     public virtual ILock? Lock(String resource, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
     {
