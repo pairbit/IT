@@ -10,14 +10,14 @@ public abstract class Locker : ILocker
 {
     #region IAsyncLocker
 
-    public abstract Task<ILock?> LockAsync(String resource, TimeSpan expiry, CancellationToken cancellationToken = default);
+    public abstract Task<ILock?> LockAsync(String name, TimeSpan expiry, CancellationToken cancellationToken = default);
 
-    public virtual async Task<ILock?> LockAsync(String resource, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+    public virtual async Task<ILock?> LockAsync(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
         while (stopwatch.Elapsed <= wait)
         {
-            var @lock = await LockAsync(resource, expiry).ConfigureAwait(false);
+            var @lock = await LockAsync(name, expiry).ConfigureAwait(false);
 
             if (@lock is not null) return @lock;
 
@@ -26,7 +26,7 @@ public abstract class Locker : ILocker
         return null;
     }
 
-    public virtual async Task<T?> LockWithDoubleCheckAsync<T>(String resource,
+    public virtual async Task<T?> LockWithDoubleCheckAsync<T>(String name,
         Func<CancellationToken, Task<T?>> checkAsync, Func<CancellationToken, Task<T>> getResultAsync,
         TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
     {
@@ -43,7 +43,7 @@ public abstract class Locker : ILocker
 
             if (!comparer.Equals(result, default)) return result!;
 
-            await using var @lock = await LockAsync(resource, expiry).ConfigureAwait(false);
+            await using var @lock = await LockAsync(name, expiry).ConfigureAwait(false);
 
             if (@lock != null)
             {
@@ -67,14 +67,14 @@ public abstract class Locker : ILocker
 
     #region ILocker
 
-    public abstract ILock? Lock(String resource, TimeSpan expiry, CancellationToken cancellationToken = default);
+    public abstract ILock? Lock(String name, TimeSpan expiry, CancellationToken cancellationToken = default);
 
-    public virtual ILock? Lock(String resource, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+    public virtual ILock? Lock(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
         while (stopwatch.Elapsed <= wait)
         {
-            var @lock = Lock(resource, expiry);
+            var @lock = Lock(name, expiry);
 
             if (@lock is not null) return @lock;
 
@@ -83,7 +83,7 @@ public abstract class Locker : ILocker
         return null;
     }
 
-    public virtual T? LockWithDoubleCheck<T>(String resource,
+    public virtual T? LockWithDoubleCheck<T>(String name,
         Func<CancellationToken, T?> check, Func<CancellationToken, T> getResult,
         TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
     {
@@ -100,7 +100,7 @@ public abstract class Locker : ILocker
 
             if (!comparer.Equals(result, default)) return result!;
 
-            using var @lock = Lock(resource, expiry);
+            using var @lock = Lock(name, expiry);
 
             if (@lock != null)
             {

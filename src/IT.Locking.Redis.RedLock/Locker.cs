@@ -16,15 +16,15 @@ public class Locker : Locking.Locker
 
     #region IAsyncLocker
 
-    public override async Task<ILock?> LockAsync(String resource, TimeSpan expiry, CancellationToken cancellationToken)
+    public override async Task<ILock?> LockAsync(String name, TimeSpan expiry, CancellationToken cancellationToken)
     {
-        var @lock = await _factory.CreateLockAsync(resource, expiry).ConfigureAwait(false);
+        var @lock = await _factory.CreateLockAsync(name, expiry).ConfigureAwait(false);
         return @lock.IsAcquired ? new RedLock(@lock) : null;
     }
 
-    public override async Task<ILock?> LockAsync(String resource, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+    public override async Task<ILock?> LockAsync(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
     {
-        var @lock = await _factory.CreateLockAsync(resource, expiry, wait, retry, cancellationToken).ConfigureAwait(false);
+        var @lock = await _factory.CreateLockAsync(name, expiry, wait, retry, cancellationToken).ConfigureAwait(false);
         return @lock.IsAcquired ? new RedLock(@lock) : null;
     }
 
@@ -32,15 +32,15 @@ public class Locker : Locking.Locker
 
     #region ILocker
 
-    public override ILock? Lock(String resource, TimeSpan expiry, CancellationToken cancellationToken)
+    public override ILock? Lock(String name, TimeSpan expiry, CancellationToken cancellationToken)
     {
-        var @lock = _factory.CreateLock(resource, expiry);
+        var @lock = _factory.CreateLock(name, expiry);
         return @lock.IsAcquired ? new RedLock(@lock) : null;
     }
 
-    public override ILock? Lock(String resource, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+    public override ILock? Lock(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
     {
-        var @lock = _factory.CreateLock(resource, expiry, wait, retry, cancellationToken);
+        var @lock = _factory.CreateLock(name, expiry, wait, retry, cancellationToken);
         return @lock.IsAcquired ? new RedLock(@lock) : null;
     }
 

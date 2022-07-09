@@ -22,12 +22,12 @@ public class Locker : Locking.Locker
 
     #region IAsyncLocker
 
-    public override async Task<ILock?> LockAsync(String resource, TimeSpan expiry, CancellationToken cancellationToken)
+    public override async Task<ILock?> LockAsync(String name, TimeSpan expiry, CancellationToken cancellationToken)
     {
-        if (resource is null) throw new ArgumentNullException(nameof(resource));
-        if (resource.Length == 0) throw new ArgumentException("is empty", nameof(resource));
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
 
-        RedisKey key = _prefix is null ? resource : $"{_prefix}:{resource}";
+        RedisKey key = _prefix is null ? name : $"{_prefix}:{name}";
         RedisValue value = _newId();
         if (Debugger.IsAttached) expiry = ExpiryDebug;
 
@@ -38,12 +38,12 @@ public class Locker : Locking.Locker
 
     #region ILocker
 
-    public override ILock? Lock(String resource, TimeSpan expiry, CancellationToken cancellationToken)
+    public override ILock? Lock(String name, TimeSpan expiry, CancellationToken cancellationToken)
     {
-        if (resource is null) throw new ArgumentNullException(nameof(resource));
-        if (resource.Length == 0) throw new ArgumentException("is empty", nameof(resource));
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
 
-        RedisKey key = _prefix is null ? resource : $"{_prefix}:{resource}";
+        RedisKey key = _prefix is null ? name : $"{_prefix}:{name}";
         RedisValue value = _newId();
         if (Debugger.IsAttached) expiry = ExpiryDebug;
 
