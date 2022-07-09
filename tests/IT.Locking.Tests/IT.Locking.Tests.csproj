@@ -16,4 +16,10 @@
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\IT.Locking.Medallion\IT.Locking.Medallion.csproj" />
+    <ProjectReference Include="..\..\src\IT.Locking.Redis.RedLock\IT.Locking.Redis.RedLock.csproj" />
+    <ProjectReference Include="..\..\src\IT.Locking.Redis\IT.Locking.Redis.csproj" />
+  </ItemGroup>
+
 </Project>
