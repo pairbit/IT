@@ -5,10 +5,13 @@ namespace IT.Locking;
 
 public interface ILocker : IAsyncLocker
 {
-    ILock? Lock(String name, TimeSpan expiry, CancellationToken cancellationToken = default);
+    ILock? TryLock(String name, TimeSpan expiry, CancellationToken cancellationToken = default);
 
-    ILock? Lock(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken = default);
+    ILock? TryLock(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken = default);
 
-    T? LockWithDoubleCheck<T>(String name, Func<CancellationToken, T?> check, Func<CancellationToken, T> getResult, 
+    T? TryLockWithDoubleCheck<T>(String name, Func<CancellationToken, T?> check, Func<CancellationToken, T> getResult,
+        TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken = default);
+
+    Boolean TryLockWithDoubleCheck(String name, Func<CancellationToken, Boolean> check, Action<CancellationToken> action,
         TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken = default);
 }

@@ -16,13 +16,13 @@ public class Locker : Locking.Locker
 
     #region IAsyncLocker
 
-    public override async Task<ILock?> LockAsync(String name, TimeSpan expiry, CancellationToken cancellationToken)
+    public override async Task<ILock?> TryLockAsync(String name, TimeSpan expiry, CancellationToken cancellationToken)
     {
         var @lock = await _factory.CreateLockAsync(name, expiry).ConfigureAwait(false);
         return @lock.IsAcquired ? new RedLock(@lock) : null;
     }
 
-    public override async Task<ILock?> LockAsync(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+    public override async Task<ILock?> TryLockAsync(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
     {
         var @lock = await _factory.CreateLockAsync(name, expiry, wait, retry, cancellationToken).ConfigureAwait(false);
         return @lock.IsAcquired ? new RedLock(@lock) : null;
@@ -32,13 +32,13 @@ public class Locker : Locking.Locker
 
     #region ILocker
 
-    public override ILock? Lock(String name, TimeSpan expiry, CancellationToken cancellationToken)
+    public override ILock? TryLock(String name, TimeSpan expiry, CancellationToken cancellationToken)
     {
         var @lock = _factory.CreateLock(name, expiry);
         return @lock.IsAcquired ? new RedLock(@lock) : null;
     }
 
-    public override ILock? Lock(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+    public override ILock? TryLock(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
     {
         var @lock = _factory.CreateLock(name, expiry, wait, retry, cancellationToken);
         return @lock.IsAcquired ? new RedLock(@lock) : null;

@@ -22,7 +22,7 @@ public class Locker : Locking.Locker
 
     #region IAsyncLocker
 
-    public override async Task<ILock?> LockAsync(String name, TimeSpan expiry, CancellationToken cancellationToken)
+    public override async Task<ILock?> TryLockAsync(String name, TimeSpan expiry, CancellationToken cancellationToken)
     {
         if (name is null) throw new ArgumentNullException(nameof(name));
         if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
@@ -38,7 +38,7 @@ public class Locker : Locking.Locker
 
     #region ILocker
 
-    public override ILock? Lock(String name, TimeSpan expiry, CancellationToken cancellationToken)
+    public override ILock? TryLock(String name, TimeSpan expiry, CancellationToken cancellationToken)
     {
         if (name is null) throw new ArgumentNullException(nameof(name));
         if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));

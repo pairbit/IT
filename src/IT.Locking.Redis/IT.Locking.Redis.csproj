@@ -13,9 +13,9 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.6-pre2</Version>
+	<Version>2.0.6-pre3</Version>
 	<PackageReleaseNotes>
-		change Func newId from Byte[] to ReadOnlyMemory 
+		change Lock to TryLock
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>

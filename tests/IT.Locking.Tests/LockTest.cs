@@ -11,7 +11,7 @@ public abstract class LockTest : NoLockTest
 
     protected override void InsertData(IDictionary<Guid, byte> data, byte value)
     {
-        using var @lock = _locker.Lock($"InsertData-{value}", TimeSpan.FromSeconds(1));
+        using var @lock = _locker.TryLock($"InsertData-{value}", TimeSpan.FromSeconds(1));
         if (@lock != null)
         {
             if (!data.Values.Contains(value))
