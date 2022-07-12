@@ -27,7 +27,7 @@
   </PropertyGroup>
 	
   <ItemGroup>
-    <PackageReference Include="DistributedLock.Core" Version="1.0.4" />
+    <PackageReference Include="DistributedLock.Core" Version="1.0.5" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 	
