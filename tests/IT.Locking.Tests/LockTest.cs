@@ -1,4 +1,6 @@
-﻿namespace IT.Locking.Tests;
+﻿using System.Diagnostics;
+
+namespace IT.Locking.Tests;
 
 public abstract class LockTest : NoLockTest
 {
@@ -11,7 +13,10 @@ public abstract class LockTest : NoLockTest
 
     protected override void InsertData(IDictionary<Guid, byte> data, byte value)
     {
-        using var @lock = _locker.TryLock($"InsertData-{value}", TimeSpan.FromSeconds(1));
+        var expiry = Debugger.IsAttached ? TimeSpan.FromMinutes(10) : TimeSpan.FromSeconds(1);
+
+        using var @lock = _locker.TryLock($"InsertData-{value}", expiry);
+
         if (@lock != null)
         {
             if (!data.Values.Contains(value))
