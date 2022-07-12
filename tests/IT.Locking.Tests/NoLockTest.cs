@@ -5,6 +5,7 @@ namespace IT.Locking.Tests;
 public class NoLockTest
 {
     private readonly Random _random = new();
+    private const Int32 Count = 500;
 
     [Test]
     public Task Test() => Parallel(InsertData);
@@ -12,13 +13,13 @@ public class NoLockTest
     protected async Task Parallel(Action<IDictionary<Guid, Byte>> action)
     {
         var data = new ConcurrentDictionary<Guid, Byte>();
-        var tasks = new Task[10];
+        var tasks = new Task[Environment.ProcessorCount];
 
         for (int i = 0; i < tasks.Length; i++)
         {
             tasks[i] = Task.Run(() =>
             {
-                for (int i = 0; i < 500; i++)
+                for (int i = 0; i < Count; i++)
                 {
                     action(data);
                 }
@@ -27,7 +28,7 @@ public class NoLockTest
 
         await Task.WhenAll(tasks);
 
-        Console.WriteLine($"{data.Count} from 5000 (255 unique)");
+        Console.WriteLine($"{data.Count} from {Count * tasks.Length} (256 unique)");
 
         foreach (var item in data.OrderBy(x => x.Value))
         {
