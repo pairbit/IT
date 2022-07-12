@@ -13,16 +13,28 @@ public abstract class LockTest : NoLockTest
 
     protected override void InsertData(IDictionary<Guid, byte> data, byte value)
     {
-        var expiry = Debugger.IsAttached ? TimeSpan.FromMinutes(10) : TimeSpan.FromSeconds(1);
+        var expiry = Debugger.IsAttached ? TimeSpan.FromMinutes(1) : TimeSpan.FromSeconds(1);
 
-        using var @lock = _locker.TryLock($"InsertData-{value}", expiry);
+        //simple
+        //using var @lock = _locker.TryLock($"InsertData-{value}", expiry);
 
-        if (@lock != null)
-        {
-            if (!data.Values.Contains(value))
-            {
-                base.InsertData(data, value);
-            }
-        }
+        //if (@lock != null)
+        //{
+        //    if (!data.Values.Contains(value))
+        //    {
+        //        base.InsertData(data, value);
+        //    }
+        //}
+
+        var wait = Debugger.IsAttached ? TimeSpan.FromMinutes(5) : TimeSpan.FromSeconds(2);
+        var retry = Debugger.IsAttached ? TimeSpan.FromSeconds(1) : TimeSpan.FromMilliseconds(100);
+
+        //good
+        var status = _locker.TryLockWithDoubleCheck($"InsertData-{value}",
+            _ => data.Values.Contains(value),
+            _ => base.InsertData(data, value),
+            expiry, wait, retry);
+
+        if (!status) throw new InvalidOperationException();
     }
 }

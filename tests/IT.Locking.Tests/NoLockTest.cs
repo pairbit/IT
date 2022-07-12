@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace IT.Locking.Tests;
 
@@ -13,7 +14,7 @@ public class NoLockTest
     protected async Task Parallel(Action<IDictionary<Guid, Byte>> action)
     {
         var data = new ConcurrentDictionary<Guid, Byte>();
-        var tasks = new Task[Environment.ProcessorCount];
+        var tasks = new Task[Debugger.IsAttached ? 1 : Environment.ProcessorCount];
 
         for (int i = 0; i < tasks.Length; i++)
         {
