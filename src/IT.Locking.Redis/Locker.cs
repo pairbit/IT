@@ -68,7 +68,7 @@ public class Locker : Locking.Locker
 
                 left = (Int32)(wait.TotalMilliseconds - elapsed.TotalMilliseconds);
 
-                Console.WriteLine($"{left} = {wait.TotalMilliseconds} - {elapsed.TotalMilliseconds}");
+                //Console.WriteLine($"{left} = {wait.TotalMilliseconds} - {elapsed.TotalMilliseconds}");
             } while (true);
         }
 
@@ -116,7 +116,7 @@ public class Locker : Locking.Locker
 
                 left = (Int32)(wait.TotalMilliseconds - elapsed.TotalMilliseconds);
 
-                Console.WriteLine($"{left} = {wait.TotalMilliseconds} - {elapsed.TotalMilliseconds}");
+                //Console.WriteLine($"{left} = {wait.TotalMilliseconds} - {elapsed.TotalMilliseconds}");
             } while (true);
         }
 
