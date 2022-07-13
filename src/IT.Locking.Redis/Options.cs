@@ -8,5 +8,7 @@ public record Options
 
     public Int32? ExpiryMilliseconds { get; set; }
 
-    public Int32? RetryMilliseconds { get; set; }
+    public Int32? RetryMinMs { get; set; }
+
+    //public Int32? RetryMaxMs { get; set; }//0.8sec
 }

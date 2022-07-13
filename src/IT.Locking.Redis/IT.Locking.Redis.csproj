@@ -15,7 +15,7 @@
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
 	<Version>2.0.6-pre3</Version>
 	<PackageReleaseNotes>
-		change Lock to TryLock
+		change interfaces
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
@@ -34,7 +34,12 @@
     <EmbeddedResource Include="StringDeleteIfEqual.lua" />
   </ItemGroup>
 
+  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0' or $(TargetFramework) == 'netstandard2.1'">
+    <ProjectReference Include="..\IT\IT.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
   </ItemGroup>
 

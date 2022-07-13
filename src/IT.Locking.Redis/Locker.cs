@@ -1,4 +1,5 @@
-﻿using StackExchange.Redis;
+﻿using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -8,19 +9,24 @@ namespace IT.Locking.Redis;
 
 public class Locker : Locking.Locker
 {
-    private const Int32 RetryMillisecondsDefault = 100;
+    private const Int32 RetryMinMsDefault = 10;
     private static readonly TimeSpan ExpiryDefault = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan ExpiryDebug = TimeSpan.FromMinutes(3);
 
     protected readonly IDatabase _db;
     protected readonly Func<Options?>? _getOptions;
     protected readonly Func<ReadOnlyMemory<Byte>> _newId;
+    protected readonly ILogger? _logger;
 
-    public Locker(IDatabase db, Func<Options?>? getOptions = null, Func<ReadOnlyMemory<Byte>>? newId = null)
+    public Locker(IDatabase db,
+        Func<Options?>? getOptions = null,
+        Func<ReadOnlyMemory<Byte>>? newId = null,
+        ILogger<Locker>? logger = null)
     {
         _db = db;
         _getOptions = getOptions;
         _newId = newId ?? (() => Guid.NewGuid().ToByteArray());
+        _logger = logger;
     }
 
     #region IAsyncLocker
@@ -48,10 +54,16 @@ public class Locker : Locking.Locker
 
         if (wait > TimeSpan.Zero)
         {
-            var retry = options?.RetryMilliseconds ?? RetryMillisecondsDefault;
+            var min = options?.RetryMinMs ?? RetryMinMsDefault;
+            var max = (Int32)wait.TotalMilliseconds;
             var stopwatch = Stopwatch.StartNew();
             do
             {
+                var retry = max <= min ? max : GetRandom().Next(min, max);
+
+                if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug($"Delay {retry}ms");
+
                 await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
 
                 if (await _db.StringSetAsync(key, value, expiry, when: When.NotExists).ConfigureAwait(false))
@@ -89,10 +101,16 @@ public class Locker : Locking.Locker
 
         if (wait > TimeSpan.Zero)
         {
-            var retry = options?.RetryMilliseconds ?? RetryMillisecondsDefault;
+            var min = options?.RetryMinMs ?? RetryMinMsDefault;
+            var max = (Int32)wait.TotalMilliseconds;
             var stopwatch = Stopwatch.StartNew();
             do
             {
+                var retry = max <= min ? max : GetRandom().Next(min, max);
+
+                if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug($"Delay {retry}ms");
+
                 Task.Delay(retry, cancellationToken).Wait(cancellationToken);
 
                 if (_db.StringSet(key, value, expiry, when: When.NotExists))
@@ -104,4 +122,13 @@ public class Locker : Locking.Locker
     }
 
     #endregion ILocker
+
+    private Random GetRandom()
+    {
+#if NET6_0
+        return Random.Shared;
+#else
+        return _Random.Shared;
+#endif
+    }
 }

@@ -1,4 +1,5 @@
-﻿using RedLockNet;
+﻿using Microsoft.Extensions.Logging;
+using RedLockNet;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -14,11 +15,13 @@ public class Locker : Locking.Locker
 
     private readonly IDistributedLockFactory _factory;
     protected readonly Func<Options?>? _getOptions;
+    protected readonly ILogger? _logger;
 
-    public Locker(IDistributedLockFactory factory, Func<Options?>? getOptions = null)
+    public Locker(IDistributedLockFactory factory, Func<Options?>? getOptions = null, ILogger<Locker>? logger = null)
     {
         _factory = factory;
         _getOptions = getOptions;
+        _logger = logger;
     }
 
     #region IAsyncLocker
