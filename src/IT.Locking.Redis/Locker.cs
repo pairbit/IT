@@ -16,6 +16,8 @@ public class Locker : Locking.Locker
 
     protected override Int32? RetryMin => _getOptions?.Invoke()?.RetryMin;
 
+    protected override Int32? RetryMax => _getOptions?.Invoke()?.RetryMax;
+
     public Locker(IDatabase db,
         Func<Options?>? getOptions = null,
         Func<ReadOnlyMemory<Byte>>? newId = null,
@@ -46,20 +48,28 @@ public class Locker : Locking.Locker
 
         if (wait > TimeSpan.Zero)
         {
+            var left = (Int32)wait.TotalMilliseconds;
             var min = options?.RetryMin ?? RetryMinDefault;
-            var max = (Int32)wait.TotalMilliseconds;
+            var max = options?.RetryMax ?? RetryMaxDefault;
             var stopwatch = Stopwatch.StartNew();
             do
             {
-                var retry = max <= min ? max : GetRandom().Next(min, max);
-
-                LogDelay(name, retry);
+                if (left < max) max = left;
+                var retry = NextDelay(name, min, max);
 
                 await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
 
                 if (await _db.StringSetAsync(key, value, expiry, when: When.NotExists).ConfigureAwait(false))
                     return new Locked(_db, key, value);
-            } while (stopwatch.Elapsed <= wait);
+
+                var elapsed = stopwatch.Elapsed;
+
+                if (elapsed > wait) return null;
+
+                left = (Int32)(wait.TotalMilliseconds - elapsed.TotalMilliseconds);
+
+                Console.WriteLine($"{left} = {wait.TotalMilliseconds} - {elapsed.TotalMilliseconds}");
+            } while (true);
         }
 
         return null;
@@ -86,20 +96,28 @@ public class Locker : Locking.Locker
 
         if (wait > TimeSpan.Zero)
         {
+            var left = (Int32)wait.TotalMilliseconds;
             var min = options?.RetryMin ?? RetryMinDefault;
-            var max = (Int32)wait.TotalMilliseconds;
+            var max = options?.RetryMax ?? RetryMaxDefault;
             var stopwatch = Stopwatch.StartNew();
             do
             {
-                var retry = max <= min ? max : GetRandom().Next(min, max);
-
-                LogDelay(name, retry);
+                if (left < max) max = left;
+                var retry = NextDelay(name, min, max);
 
                 Task.Delay(retry, cancellationToken).Wait(cancellationToken);
 
                 if (_db.StringSet(key, value, expiry, when: When.NotExists))
                     return new Locked(_db, key, value);
-            } while (stopwatch.Elapsed <= wait);
+
+                var elapsed = stopwatch.Elapsed;
+
+                if (elapsed > wait) return null;
+
+                left = (Int32)(wait.TotalMilliseconds - elapsed.TotalMilliseconds);
+
+                Console.WriteLine($"{left} = {wait.TotalMilliseconds} - {elapsed.TotalMilliseconds}");
+            } while (true);
         }
 
         return null;
@@ -107,13 +125,29 @@ public class Locker : Locking.Locker
 
     #endregion ILocker
 
-    protected override void LogDelay(String name, Int32 retry)
+    protected override Int32 NextDelay(String name, Int32 min, Int32 max)
     {
+        if (max <= min)
+        {
+#if DEBUG
+            if (_logger == null)
+                Debug.WriteLine($"Lock '{name}' thread '{Thread.CurrentThread.ManagedThreadId}' delay {max}ms");
+#endif
+            if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug($"Lock '{name}' thread '{Thread.CurrentThread.ManagedThreadId}' delay {max}ms");
+
+            return max;
+        }
+
+        var delay = GetRandom().Next(min, max);
+
 #if DEBUG
         if (_logger == null)
-            Debug.WriteLine($"Lock '{name}' delay {retry}ms");
+            Debug.WriteLine($"Lock '{name}' thread '{Thread.CurrentThread.ManagedThreadId}' random delay {delay}ms (from {min} to {max})");
 #endif
         if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
-            _logger.LogDebug($"Lock '{name}' delay {retry}ms");
+            _logger.LogDebug($"Lock '{name}' thread '{Thread.CurrentThread.ManagedThreadId}' random delay {delay}ms (from {min} to {max})");
+
+        return delay;
     }
 }

@@ -9,10 +9,13 @@ namespace IT.Locking;
 public abstract class Locker : ILocker
 {
     protected const Int32 RetryMinDefault = 10;
+    protected const Int32 RetryMaxDefault = 400;
     protected static readonly TimeSpan ExpiryDefault = TimeSpan.FromSeconds(30);
     protected static readonly TimeSpan ExpiryDebug = TimeSpan.FromMinutes(3);
 
     protected virtual Int32? RetryMin => null;
+
+    protected virtual Int32? RetryMax => null;
 
     #region IAsyncLocker
 
@@ -71,9 +74,7 @@ public abstract class Locker : ILocker
 
             do
             {
-                var retry = max <= min ? max : GetRandom().Next(min, max);
-
-                LogDelay(name, retry);
+                var retry = NextDelay(name, min, max);
 
                 await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
 
@@ -128,9 +129,7 @@ public abstract class Locker : ILocker
 
             do
             {
-                var retry = max <= min ? max : GetRandom().Next(min, max);
-
-                LogDelay(name, retry);
+                var retry = NextDelay(name, min, max);
 
                 await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
 
@@ -210,9 +209,7 @@ public abstract class Locker : ILocker
 
             do
             {
-                var retry = max <= min ? max : GetRandom().Next(min, max);
-
-                LogDelay(name, retry);
+                var retry = NextDelay(name, min, max);
 
                 Task.Delay(retry, cancellationToken).Wait(cancellationToken);
 
@@ -267,9 +264,7 @@ public abstract class Locker : ILocker
 
             do
             {
-                var retry = max <= min ? max : GetRandom().Next(min, max);
-
-                LogDelay(name, retry);
+                var retry = NextDelay(name, min, max);
 
                 Task.Delay(retry, cancellationToken).Wait(cancellationToken);
 
@@ -292,9 +287,9 @@ public abstract class Locker : ILocker
 
     #endregion ILocker
 
-    protected virtual void LogDelay(String name, Int32 retry)
+    protected virtual Int32 NextDelay(String name, Int32 min, Int32 max)
     {
-
+        return max <= min ? max : GetRandom().Next(min, max);
     }
 
     protected static Random GetRandom()

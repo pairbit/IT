@@ -13,20 +13,20 @@ public abstract class LockTest : NoLockTest
 
     protected override void InsertData(IDictionary<Guid, byte> data, byte value)
     {
-        var wait = Debugger.IsAttached ? TimeSpan.FromSeconds(1) : TimeSpan.FromMilliseconds(200);
+        var wait = Debugger.IsAttached ? TimeSpan.FromSeconds(1) : TimeSpan.FromMilliseconds(300);
 
         var name = $"InsertData-{value}";
 
         var @lock = _locker.NewLock(name);
 
         //simple
-        using var locked = @lock.TryAcquire();
+        using var locked = @lock.TryAcquire(wait);
 
         if (locked != null)
         {
             if (!data.Values.Contains(value))
             {
-                Task.Delay(150).Wait();
+                Task.Delay(250).Wait();
                 base.InsertData(data, value);
             }
         }

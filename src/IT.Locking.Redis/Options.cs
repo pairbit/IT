@@ -10,5 +10,5 @@ public record Options
 
     public Int32? RetryMin { get; set; }
 
-    //public Int32? RetryMaxMs { get; set; }//0.8sec
+    public Int32? RetryMax { get; set; }
 }
