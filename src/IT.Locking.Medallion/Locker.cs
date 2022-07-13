@@ -8,10 +8,14 @@ namespace IT.Locking.Medallion;
 public class Locker : Locking.Locker
 {
     private readonly IDistributedLockProvider _provider;
+    private readonly Int32? _retryMin;
 
-    public Locker(IDistributedLockProvider provider)
+    protected override Int32? RetryMin => _retryMin;
+
+    public Locker(IDistributedLockProvider provider, Int32? retryMin = null)
     {
         _provider = provider;
+        _retryMin = retryMin;
     }
 
     public override ILocked? TryAcquire(String name, TimeSpan wait, CancellationToken cancellationToken)

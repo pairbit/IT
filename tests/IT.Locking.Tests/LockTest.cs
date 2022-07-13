@@ -20,7 +20,7 @@ public abstract class LockTest : NoLockTest
         var @lock = _locker.NewLock(name);
 
         //simple
-        using var locked = @lock.TryAcquire(wait);
+        using var locked = @lock.TryAcquire();
 
         if (locked != null)
         {

@@ -8,6 +8,12 @@ namespace IT.Locking;
 
 public abstract class Locker : ILocker
 {
+    protected const Int32 RetryMinDefault = 10;
+    protected static readonly TimeSpan ExpiryDefault = TimeSpan.FromSeconds(30);
+    protected static readonly TimeSpan ExpiryDebug = TimeSpan.FromMinutes(3);
+
+    protected virtual Int32? RetryMin => null;
+
     #region IAsyncLocker
 
     public virtual IAsyncLock NewAsyncLock(String name)
@@ -18,27 +24,34 @@ public abstract class Locker : ILocker
         return new Lock(name, this);
     }
 
-    public abstract Task<IAsyncLocked?> TryAcquireAsync(String name, TimeSpan wait, CancellationToken cancellationToken = default);
-
-    public virtual async Task<T?> TryLockWithDoubleCheckAsync<T>(String name,
-        Func<CancellationToken, Task<T?>> checkAsync, Func<CancellationToken, Task<T>> getResultAsync,
-        TimeSpan wait, TimeSpan expiry, TimeSpan retry, CancellationToken cancellationToken)
+    Task<IAsyncLocked?> IAsyncLocker.TryAcquireAsync(String name, TimeSpan wait, CancellationToken cancellationToken)
     {
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
+        if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
+        return TryAcquireAsync(name, wait, cancellationToken);
+    }
+
+    public abstract Task<IAsyncLocked?> TryAcquireAsync(String name, TimeSpan wait, CancellationToken cancellationToken);
+
+    public virtual async Task<T?> TryAcquireWithCheckAsync<T>(String name,
+        Func<CancellationToken, Task<T?>> checkAsync, Func<CancellationToken, Task<T>> getResultAsync,
+        TimeSpan wait, CancellationToken cancellationToken)
+    {
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
+        if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
         if (checkAsync is null) throw new ArgumentNullException(nameof(checkAsync));
         if (getResultAsync is null) throw new ArgumentNullException(nameof(getResultAsync));
 
         var comparer = EqualityComparer<T?>.Default;
 
-        var stopwatch = Stopwatch.StartNew();
+        var result = await checkAsync(cancellationToken).ConfigureAwait(false);
 
-        while (stopwatch.Elapsed <= wait)
+        if (!comparer.Equals(result, default)) return result!;
+
+        await using (var locked = await TryAcquireAsync(name, default, cancellationToken).ConfigureAwait(false))
         {
-            var result = await checkAsync(cancellationToken).ConfigureAwait(false);
-
-            if (!comparer.Equals(result, default)) return result!;
-
-            await using var locked = await TryAcquireAsync(name, expiry, cancellationToken).ConfigureAwait(false);
-
             if (locked != null)
             {
                 result = await checkAsync(cancellationToken).ConfigureAwait(false);
@@ -48,28 +61,56 @@ public abstract class Locker : ILocker
 
                 return result!;
             }
+        }
 
-            await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
+        if (wait > TimeSpan.Zero)
+        {
+            var min = RetryMin ?? RetryMinDefault;
+            var max = (Int32)wait.TotalMilliseconds;
+            var stopwatch = Stopwatch.StartNew();
+
+            do
+            {
+                var retry = max <= min ? max : GetRandom().Next(min, max);
+
+                LogDelay(name, retry);
+
+                await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
+
+                result = await checkAsync(cancellationToken).ConfigureAwait(false);
+
+                if (!comparer.Equals(result, default)) return result!;
+
+                await using var locked = await TryAcquireAsync(name, default, cancellationToken).ConfigureAwait(false);
+                if (locked != null)
+                {
+                    result = await checkAsync(cancellationToken).ConfigureAwait(false);
+
+                    if (comparer.Equals(result, default))
+                        result = await getResultAsync(cancellationToken).ConfigureAwait(false);
+
+                    return result!;
+                }
+            } while (stopwatch.Elapsed <= wait);
         }
 
         return default;
     }
 
-    public virtual async Task<Boolean> TryLockWithDoubleCheckAsync(String name,
+    public virtual async Task<Boolean> TryAcquireWithCheckAsync(String name,
         Func<CancellationToken, Task<Boolean>> checkAsync, Func<CancellationToken, Task> doAsync,
-        TimeSpan wait, TimeSpan expiry, TimeSpan retry, CancellationToken cancellationToken)
+        TimeSpan wait, CancellationToken cancellationToken)
     {
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
+        if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
         if (checkAsync is null) throw new ArgumentNullException(nameof(checkAsync));
         if (doAsync is null) throw new ArgumentNullException(nameof(doAsync));
 
-        var stopwatch = Stopwatch.StartNew();
+        if (await checkAsync(cancellationToken).ConfigureAwait(false)) return true;
 
-        while (stopwatch.Elapsed <= wait)
+        await using (var locked = await TryAcquireAsync(name, default, cancellationToken).ConfigureAwait(false))
         {
-            if (await checkAsync(cancellationToken).ConfigureAwait(false)) return true;
-
-            await using var locked = await TryAcquireAsync(name, expiry, cancellationToken).ConfigureAwait(false);
-
             if (locked != null)
             {
                 if (!await checkAsync(cancellationToken).ConfigureAwait(false))
@@ -77,8 +118,34 @@ public abstract class Locker : ILocker
 
                 return true;
             }
+        }
 
-            await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
+        if (wait > TimeSpan.Zero)
+        {
+            var min = RetryMin ?? RetryMinDefault;
+            var max = (Int32)wait.TotalMilliseconds;
+            var stopwatch = Stopwatch.StartNew();
+
+            do
+            {
+                var retry = max <= min ? max : GetRandom().Next(min, max);
+
+                LogDelay(name, retry);
+
+                await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
+
+                if (await checkAsync(cancellationToken).ConfigureAwait(false)) return true;
+
+                await using var locked = await TryAcquireAsync(name, default, cancellationToken).ConfigureAwait(false);
+
+                if (locked != null)
+                {
+                    if (!await checkAsync(cancellationToken).ConfigureAwait(false))
+                        await doAsync(cancellationToken).ConfigureAwait(false);
+
+                    return true;
+                }
+            } while (stopwatch.Elapsed <= wait);
         }
 
         return false;
@@ -96,27 +163,34 @@ public abstract class Locker : ILocker
         return new Lock(name, this);
     }
 
-    public abstract ILocked? TryAcquire(String name, TimeSpan wait, CancellationToken cancellationToken = default);
-
-    public virtual T? TryLockWithDoubleCheck<T>(String name,
-        Func<CancellationToken, T?> check, Func<CancellationToken, T> getResult,
-        TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+    ILocked? ILocker.TryAcquire(String name, TimeSpan wait, CancellationToken cancellationToken)
     {
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
+        if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
+        return TryAcquire(name, wait, cancellationToken);
+    }
+
+    public abstract ILocked? TryAcquire(String name, TimeSpan wait, CancellationToken cancellationToken);
+
+    public virtual T? TryAcquireWithCheck<T>(String name,
+        Func<CancellationToken, T?> check, Func<CancellationToken, T> getResult,
+        TimeSpan wait, CancellationToken cancellationToken)
+    {
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
+        if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
         if (check is null) throw new ArgumentNullException(nameof(check));
         if (getResult is null) throw new ArgumentNullException(nameof(getResult));
 
         var comparer = EqualityComparer<T?>.Default;
 
-        var stopwatch = Stopwatch.StartNew();
+        var result = check(cancellationToken);
 
-        while (stopwatch.Elapsed <= wait)
+        if (!comparer.Equals(result, default)) return result!;
+
+        using (var locked = TryAcquire(name, default, cancellationToken))
         {
-            var result = check(cancellationToken);
-
-            if (!comparer.Equals(result, default)) return result!;
-
-            using var locked = TryAcquire(name, default, cancellationToken);
-
             if (locked != null)
             {
                 result = check(cancellationToken);
@@ -126,28 +200,56 @@ public abstract class Locker : ILocker
 
                 return result!;
             }
+        }
 
-            Task.Delay(retry, cancellationToken).Wait(cancellationToken);
+        if (wait > TimeSpan.Zero)
+        {
+            var min = RetryMin ?? RetryMinDefault;
+            var max = (Int32)wait.TotalMilliseconds;
+            var stopwatch = Stopwatch.StartNew();
+
+            do
+            {
+                var retry = max <= min ? max : GetRandom().Next(min, max);
+
+                LogDelay(name, retry);
+
+                Task.Delay(retry, cancellationToken).Wait(cancellationToken);
+
+                result = check(cancellationToken);
+
+                if (!comparer.Equals(result, default)) return result!;
+
+                using var locked = TryAcquire(name, default, cancellationToken);
+                if (locked != null)
+                {
+                    result = check(cancellationToken);
+
+                    if (comparer.Equals(result, default))
+                        result = getResult(cancellationToken);
+
+                    return result!;
+                }
+            } while (stopwatch.Elapsed <= wait);
         }
 
         return default;
     }
 
-    public virtual Boolean TryLockWithDoubleCheck(String name,
+    public virtual Boolean TryAcquireWithCheck(String name,
         Func<CancellationToken, Boolean> check, Action<CancellationToken> action,
-        TimeSpan wait, TimeSpan expiry, TimeSpan retry, CancellationToken cancellationToken)
+        TimeSpan wait, CancellationToken cancellationToken)
     {
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
+        if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
         if (check is null) throw new ArgumentNullException(nameof(check));
         if (action is null) throw new ArgumentNullException(nameof(action));
 
-        var stopwatch = Stopwatch.StartNew();
+        if (check(cancellationToken)) return true;
 
-        while (stopwatch.Elapsed <= wait)
+        using (var locked = TryAcquire(name, default, cancellationToken))
         {
-            if (check(cancellationToken)) return true;
-
-            using var locked = TryAcquire(name, expiry, cancellationToken);
-
             if (locked != null)
             {
                 if (!check(cancellationToken))
@@ -155,12 +257,52 @@ public abstract class Locker : ILocker
 
                 return true;
             }
+        }
 
-            Task.Delay(retry, cancellationToken).Wait(cancellationToken);
+        if (wait > TimeSpan.Zero)
+        {
+            var min = RetryMin ?? RetryMinDefault;
+            var max = (Int32)wait.TotalMilliseconds;
+            var stopwatch = Stopwatch.StartNew();
+
+            do
+            {
+                var retry = max <= min ? max : GetRandom().Next(min, max);
+
+                LogDelay(name, retry);
+
+                Task.Delay(retry, cancellationToken).Wait(cancellationToken);
+
+                if (check(cancellationToken)) return true;
+
+                using var locked = TryAcquire(name, default, cancellationToken);
+
+                if (locked != null)
+                {
+                    if (!check(cancellationToken))
+                        action(cancellationToken);
+
+                    return true;
+                }
+            } while (stopwatch.Elapsed <= wait);
         }
 
         return false;
     }
 
     #endregion ILocker
+
+    protected virtual void LogDelay(String name, Int32 retry)
+    {
+
+    }
+
+    protected static Random GetRandom()
+    {
+#if NET6_0
+        return Random.Shared;
+#else
+        return _Random.Shared;
+#endif
+    }
 }

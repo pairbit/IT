@@ -9,13 +9,11 @@ namespace IT.Locking.Redis.RedLock;
 
 public class Locker : Locking.Locker
 {
-    private const Int32 RetryMinDefault = 10;
-    private static readonly TimeSpan ExpiryDefault = TimeSpan.FromSeconds(30);
-    private static readonly TimeSpan ExpiryDebug = TimeSpan.FromMinutes(3);
-
     private readonly IDistributedLockFactory _factory;
     protected readonly Func<Options?>? _getOptions;
     protected readonly ILogger? _logger;
+
+    protected override Int32? RetryMin => _getOptions?.Invoke()?.RetryMin;
 
     public Locker(IDistributedLockFactory factory, Func<Options?>? getOptions = null, ILogger<Locker>? logger = null)
     {
@@ -28,10 +26,6 @@ public class Locker : Locking.Locker
 
     public override async Task<IAsyncLocked?> TryAcquireAsync(String name, TimeSpan wait, CancellationToken cancellationToken)
     {
-        if (name is null) throw new ArgumentNullException(nameof(name));
-        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
-        if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
-
         var options = _getOptions?.Invoke();
         var expiryMilliseconds = options?.Expiry;
         var expiry = expiryMilliseconds.HasValue ? TimeSpan.FromMilliseconds(expiryMilliseconds.Value) : ExpiryDefault;
@@ -51,12 +45,8 @@ public class Locker : Locking.Locker
             do
             {
                 var retry = max <= min ? max : GetRandom().Next(min, max);
-#if DEBUG
-                if (_logger == null)
-                    Debug.WriteLine($"Lock '{name}' delay {retry}ms");
-#endif
-                if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
-                    _logger.LogDebug($"Lock '{name}' delay {retry}ms");
+
+                LogDelay(name, retry);
 
                 await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
 
@@ -75,10 +65,6 @@ public class Locker : Locking.Locker
 
     public override ILocked? TryAcquire(String name, TimeSpan wait, CancellationToken cancellationToken)
     {
-        if (name is null) throw new ArgumentNullException(nameof(name));
-        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
-        if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
-
         var options = _getOptions?.Invoke();
         var expiryMilliseconds = options?.Expiry;
         var expiry = expiryMilliseconds.HasValue ? TimeSpan.FromMilliseconds(expiryMilliseconds.Value) : ExpiryDefault;
@@ -98,12 +84,8 @@ public class Locker : Locking.Locker
             do
             {
                 var retry = max <= min ? max : GetRandom().Next(min, max);
-#if DEBUG
-                if (_logger == null)
-                    Debug.WriteLine($"Lock '{name}' delay {retry}ms");
-#endif
-                if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
-                    _logger.LogDebug($"Lock '{name}' delay {retry}ms");
+
+                LogDelay(name, retry);
 
                 Task.Delay(retry, cancellationToken).Wait(cancellationToken);
 
@@ -118,12 +100,13 @@ public class Locker : Locking.Locker
 
     #endregion ILocker
 
-    private Random GetRandom()
+    protected override void LogDelay(String name, Int32 retry)
     {
-#if NET6_0
-        return Random.Shared;
-#else
-        return _Random.Shared;
+#if DEBUG
+        if (_logger == null)
+            Debug.WriteLine($"Lock '{name}' delay {retry}ms");
 #endif
+        if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug($"Lock '{name}' delay {retry}ms");
     }
 }
