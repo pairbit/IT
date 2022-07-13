@@ -1,4 +1,5 @@
-﻿using RedLockNet.SERedis;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
 using StackExchange.Redis;
 
@@ -29,6 +30,8 @@ public class RedisRedLockTest : LockTest
         redLockMultiplexers.Add(Create(2));
 
         var factory = RedLockFactory.Create(redLockMultiplexers, new RedLockRetryConfiguration(1), null);
+
+        var logger = NullLogger<Redis.RedLock.Locker>.Instance;
 
         return new Redis.RedLock.Locker(factory);
     }

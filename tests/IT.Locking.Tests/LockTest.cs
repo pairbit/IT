@@ -13,7 +13,7 @@ public abstract class LockTest : NoLockTest
 
     protected override void InsertData(IDictionary<Guid, byte> data, byte value)
     {
-        var wait = Debugger.IsAttached ? TimeSpan.FromSeconds(1) : TimeSpan.FromMilliseconds(5);
+        var wait = Debugger.IsAttached ? TimeSpan.FromSeconds(1) : TimeSpan.FromMilliseconds(200);
 
         var name = $"InsertData-{value}";
 
@@ -24,13 +24,9 @@ public abstract class LockTest : NoLockTest
 
         if (locked != null)
         {
-            //using var lock2 = _locker.TryLock(name, expiry);
-
-            //if (lock2 != null) throw new InvalidOperationException();
-
             if (!data.Values.Contains(value))
             {
-                //Task.Delay(150).Wait();
+                Task.Delay(150).Wait();
                 base.InsertData(data, value);
             }
         }
