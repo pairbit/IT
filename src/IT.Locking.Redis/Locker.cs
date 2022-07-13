@@ -44,11 +44,9 @@ public class Locker : Locking.Locker
         RedisKey key = prefix is null ? name : $"{prefix}:{name}";
         RedisValue value = _newId();
         var expiry = expiryMilliseconds.HasValue ? TimeSpan.FromMilliseconds(expiryMilliseconds.Value) : ExpiryDefault;
-
 #if DEBUG
         if (Debugger.IsAttached) expiry = ExpiryDebug;
 #endif
-
         if (await _db.StringSetAsync(key, value, expiry, when: When.NotExists).ConfigureAwait(false))
             return new Locked(_db, key, value);
 
@@ -60,7 +58,9 @@ public class Locker : Locking.Locker
             do
             {
                 var retry = max <= min ? max : GetRandom().Next(min, max);
-
+#if DEBUG
+                Debug.WriteLine($"Delay {retry}ms");
+#endif
                 if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
                     _logger.LogDebug($"Delay {retry}ms");
 
@@ -91,11 +91,9 @@ public class Locker : Locking.Locker
         RedisKey key = prefix is null ? name : $"{prefix}:{name}";
         RedisValue value = _newId();
         var expiry = expiryMilliseconds.HasValue ? TimeSpan.FromMilliseconds(expiryMilliseconds.Value) : ExpiryDefault;
-
 #if DEBUG
         if (Debugger.IsAttached) expiry = ExpiryDebug;
 #endif
-
         if (_db.StringSet(key, value, expiry, when: When.NotExists))
             return new Locked(_db, key, value);
 
@@ -107,7 +105,9 @@ public class Locker : Locking.Locker
             do
             {
                 var retry = max <= min ? max : GetRandom().Next(min, max);
-
+#if DEBUG
+                Debug.WriteLine($"Delay {retry}ms");
+#endif
                 if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
                     _logger.LogDebug($"Delay {retry}ms");
 
