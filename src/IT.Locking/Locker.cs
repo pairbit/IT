@@ -68,12 +68,14 @@ public abstract class Locker : ILocker
 
         if (wait > TimeSpan.Zero)
         {
+            var left = (Int32)wait.TotalMilliseconds;
             var min = RetryMin ?? RetryMinDefault;
-            var max = (Int32)wait.TotalMilliseconds;
+            var max = RetryMax ?? RetryMaxDefault;
             var stopwatch = Stopwatch.StartNew();
 
             do
             {
+                if (left < max) max = left;
                 var retry = NextDelay(name, min, max);
 
                 await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
@@ -92,7 +94,15 @@ public abstract class Locker : ILocker
 
                     return result!;
                 }
-            } while (stopwatch.Elapsed <= wait);
+
+                var elapsed = stopwatch.Elapsed;
+
+                if (elapsed > wait) return default;
+
+                left = (Int32)(wait.TotalMilliseconds - elapsed.TotalMilliseconds);
+
+                //Console.WriteLine($"{left} = {wait.TotalMilliseconds} - {elapsed.TotalMilliseconds}");
+            } while (true);
         }
 
         return default;
@@ -123,12 +133,14 @@ public abstract class Locker : ILocker
 
         if (wait > TimeSpan.Zero)
         {
+            var left = (Int32)wait.TotalMilliseconds;
             var min = RetryMin ?? RetryMinDefault;
-            var max = (Int32)wait.TotalMilliseconds;
+            var max = RetryMax ?? RetryMaxDefault;
             var stopwatch = Stopwatch.StartNew();
 
             do
             {
+                if (left < max) max = left;
                 var retry = NextDelay(name, min, max);
 
                 await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
@@ -144,7 +156,15 @@ public abstract class Locker : ILocker
 
                     return true;
                 }
-            } while (stopwatch.Elapsed <= wait);
+
+                var elapsed = stopwatch.Elapsed;
+
+                if (elapsed > wait) return false;
+
+                left = (Int32)(wait.TotalMilliseconds - elapsed.TotalMilliseconds);
+
+                //Console.WriteLine($"{left} = {wait.TotalMilliseconds} - {elapsed.TotalMilliseconds}");
+            } while (true);
         }
 
         return false;
@@ -203,12 +223,14 @@ public abstract class Locker : ILocker
 
         if (wait > TimeSpan.Zero)
         {
+            var left = (Int32)wait.TotalMilliseconds;
             var min = RetryMin ?? RetryMinDefault;
-            var max = (Int32)wait.TotalMilliseconds;
+            var max = RetryMax ?? RetryMaxDefault;
             var stopwatch = Stopwatch.StartNew();
 
             do
             {
+                if (left < max) max = left;
                 var retry = NextDelay(name, min, max);
 
                 Task.Delay(retry, cancellationToken).Wait(cancellationToken);
@@ -227,7 +249,15 @@ public abstract class Locker : ILocker
 
                     return result!;
                 }
-            } while (stopwatch.Elapsed <= wait);
+
+                var elapsed = stopwatch.Elapsed;
+
+                if (elapsed > wait) return default;
+
+                left = (Int32)(wait.TotalMilliseconds - elapsed.TotalMilliseconds);
+
+                //Console.WriteLine($"{left} = {wait.TotalMilliseconds} - {elapsed.TotalMilliseconds}");
+            } while (true);
         }
 
         return default;
@@ -258,12 +288,14 @@ public abstract class Locker : ILocker
 
         if (wait > TimeSpan.Zero)
         {
+            var left = (Int32)wait.TotalMilliseconds;
             var min = RetryMin ?? RetryMinDefault;
-            var max = (Int32)wait.TotalMilliseconds;
+            var max = RetryMax ?? RetryMaxDefault;
             var stopwatch = Stopwatch.StartNew();
 
             do
             {
+                if (left < max) max = left;
                 var retry = NextDelay(name, min, max);
 
                 Task.Delay(retry, cancellationToken).Wait(cancellationToken);
@@ -279,7 +311,15 @@ public abstract class Locker : ILocker
 
                     return true;
                 }
-            } while (stopwatch.Elapsed <= wait);
+
+                var elapsed = stopwatch.Elapsed;
+
+                if (elapsed > wait) return false;
+
+                left = (Int32)(wait.TotalMilliseconds - elapsed.TotalMilliseconds);
+
+                //Console.WriteLine($"{left} = {wait.TotalMilliseconds} - {elapsed.TotalMilliseconds}");
+            } while (true);
         }
 
         return false;
