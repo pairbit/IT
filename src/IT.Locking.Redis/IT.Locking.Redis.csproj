@@ -7,13 +7,13 @@
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<Company />
-	<Description>Implementation of simple locking via StackExchange.Redis</Description>
+	<Description>Implementation of locking via StackExchange.Redis (simple)</Description>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/pairbit/IT</RepositoryUrl>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.6-pre4</Version>
+	<Version>2.0.6</Version>
 	<PackageReleaseNotes>
 		change interfaces
 	</PackageReleaseNotes>
