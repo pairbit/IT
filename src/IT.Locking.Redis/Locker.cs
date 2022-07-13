@@ -9,7 +9,7 @@ namespace IT.Locking.Redis;
 
 public class Locker : Locking.Locker
 {
-    private const Int32 RetryMinMsDefault = 10;
+    private const Int32 RetryMinDefault = 10;
     private static readonly TimeSpan ExpiryDefault = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan ExpiryDebug = TimeSpan.FromMinutes(3);
 
@@ -39,7 +39,7 @@ public class Locker : Locking.Locker
 
         var options = _getOptions?.Invoke();
         var prefix = options?.Prefix;
-        var expiryMilliseconds = options?.ExpiryMilliseconds;
+        var expiryMilliseconds = options?.Expiry;
 
         RedisKey key = prefix is null ? name : $"{prefix}:{name}";
         RedisValue value = _newId();
@@ -52,17 +52,18 @@ public class Locker : Locking.Locker
 
         if (wait > TimeSpan.Zero)
         {
-            var min = options?.RetryMinMs ?? RetryMinMsDefault;
+            var min = options?.RetryMin ?? RetryMinDefault;
             var max = (Int32)wait.TotalMilliseconds;
             var stopwatch = Stopwatch.StartNew();
             do
             {
                 var retry = max <= min ? max : GetRandom().Next(min, max);
 #if DEBUG
-                Debug.WriteLine($"Delay {retry}ms");
+                if (_logger == null)
+                    Debug.WriteLine($"Lock '{name}' delay {retry}ms");
 #endif
                 if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
-                    _logger.LogDebug($"Delay {retry}ms");
+                    _logger.LogDebug($"Lock '{name}' delay {retry}ms");
 
                 await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
 
@@ -86,7 +87,7 @@ public class Locker : Locking.Locker
 
         var options = _getOptions?.Invoke();
         var prefix = options?.Prefix;
-        var expiryMilliseconds = options?.ExpiryMilliseconds;
+        var expiryMilliseconds = options?.Expiry;
 
         RedisKey key = prefix is null ? name : $"{prefix}:{name}";
         RedisValue value = _newId();
@@ -99,17 +100,18 @@ public class Locker : Locking.Locker
 
         if (wait > TimeSpan.Zero)
         {
-            var min = options?.RetryMinMs ?? RetryMinMsDefault;
+            var min = options?.RetryMin ?? RetryMinDefault;
             var max = (Int32)wait.TotalMilliseconds;
             var stopwatch = Stopwatch.StartNew();
             do
             {
                 var retry = max <= min ? max : GetRandom().Next(min, max);
 #if DEBUG
-                Debug.WriteLine($"Delay {retry}ms");
+                if (_logger == null) 
+                    Debug.WriteLine($"Lock '{name}' delay {retry}ms");
 #endif
                 if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
-                    _logger.LogDebug($"Delay {retry}ms");
+                    _logger.LogDebug($"Lock '{name}' delay {retry}ms");
 
                 Task.Delay(retry, cancellationToken).Wait(cancellationToken);
 

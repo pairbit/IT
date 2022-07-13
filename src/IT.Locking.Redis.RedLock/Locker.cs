@@ -9,7 +9,7 @@ namespace IT.Locking.Redis.RedLock;
 
 public class Locker : Locking.Locker
 {
-    private const Int32 RetryMillisecondsDefault = 100;
+    private const Int32 RetryMinDefault = 10;
     private static readonly TimeSpan ExpiryDefault = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan ExpiryDebug = TimeSpan.FromMinutes(3);
 
@@ -33,7 +33,7 @@ public class Locker : Locking.Locker
         if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
 
         var options = _getOptions?.Invoke();
-        var expiryMilliseconds = options?.ExpiryMilliseconds;
+        var expiryMilliseconds = options?.Expiry;
         var expiry = expiryMilliseconds.HasValue ? TimeSpan.FromMilliseconds(expiryMilliseconds.Value) : ExpiryDefault;
 
 #if DEBUG
@@ -45,10 +45,19 @@ public class Locker : Locking.Locker
 
         if (wait > TimeSpan.Zero)
         {
-            var retry = options?.RetryMilliseconds ?? RetryMillisecondsDefault;
+            var min = options?.RetryMin ?? RetryMinDefault;
+            var max = (Int32)wait.TotalMilliseconds;
             var stopwatch = Stopwatch.StartNew();
             do
             {
+                var retry = max <= min ? max : GetRandom().Next(min, max);
+#if DEBUG
+                if (_logger == null)
+                    Debug.WriteLine($"Lock '{name}' delay {retry}ms");
+#endif
+                if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug($"Lock '{name}' delay {retry}ms");
+
                 await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
 
                 redlock = await _factory.CreateLockAsync(name, expiry).ConfigureAwait(false);
@@ -71,7 +80,7 @@ public class Locker : Locking.Locker
         if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
 
         var options = _getOptions?.Invoke();
-        var expiryMilliseconds = options?.ExpiryMilliseconds;
+        var expiryMilliseconds = options?.Expiry;
         var expiry = expiryMilliseconds.HasValue ? TimeSpan.FromMilliseconds(expiryMilliseconds.Value) : ExpiryDefault;
 
 #if DEBUG
@@ -83,10 +92,19 @@ public class Locker : Locking.Locker
 
         if (wait > TimeSpan.Zero)
         {
-            var retry = options?.RetryMilliseconds ?? RetryMillisecondsDefault;
+            var min = options?.RetryMin ?? RetryMinDefault;
+            var max = (Int32)wait.TotalMilliseconds;
             var stopwatch = Stopwatch.StartNew();
             do
             {
+                var retry = max <= min ? max : GetRandom().Next(min, max);
+#if DEBUG
+                if (_logger == null)
+                    Debug.WriteLine($"Lock '{name}' delay {retry}ms");
+#endif
+                if (_logger != null && _logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug($"Lock '{name}' delay {retry}ms");
+
                 Task.Delay(retry, cancellationToken).Wait(cancellationToken);
 
                 redlock = _factory.CreateLock(name, expiry);
@@ -99,4 +117,13 @@ public class Locker : Locking.Locker
     }
 
     #endregion ILocker
+
+    private Random GetRandom()
+    {
+#if NET6_0
+        return Random.Shared;
+#else
+        return _Random.Shared;
+#endif
+    }
 }

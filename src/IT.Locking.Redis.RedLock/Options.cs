@@ -4,7 +4,7 @@ namespace IT.Locking.Redis.RedLock;
 
 public record Options
 {
-    public Int32? ExpiryMilliseconds { get; set; }
+    public Int32? Expiry { get; set; }
 
-    public Int32? RetryMilliseconds { get; set; }
+    public Int32? RetryMin { get; set; }
 }
