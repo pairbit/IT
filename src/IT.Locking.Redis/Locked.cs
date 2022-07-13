@@ -15,6 +15,9 @@ internal class Locked : ILocked
         var assembly = Assembly.GetExecutingAssembly();
 
         using var stream = assembly.GetManifestResourceStream("IT.Locking.Redis.StringDeleteIfEqual.lua");
+
+        if (stream is null) throw new InvalidOperationException("Script 'StringDeleteIfEqual.lua' not found");
+
         using var reader = new StreamReader(stream);
 
         StringDeleteIfEqual = reader.ReadToEnd();
