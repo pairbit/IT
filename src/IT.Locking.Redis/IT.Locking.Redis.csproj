@@ -13,9 +13,9 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.6</Version>
+	<Version>2.0.7</Version>
 	<PackageReleaseNotes>
-		change interfaces
+		up Microsoft.Extensions.Logging.Abstractions to 6.0.1
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
@@ -35,7 +35,7 @@
   </ItemGroup>
 	
   <ItemGroup>
-	<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
     <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
   </ItemGroup>
 
