@@ -14,15 +14,15 @@ public class Locker : Locking.Locker
         _provider = provider;
     }
 
-    public override ILock? TryLock(String name, TimeSpan expiry, CancellationToken cancellationToken)
+    public override ILocked? TryAcquire(String name, TimeSpan wait, CancellationToken cancellationToken)
     {
-        var handle = _provider.TryAcquireLock(name, expiry, cancellationToken);
-        return handle is not null ? new Lock(handle) : null;
+        var handle = _provider.CreateLock(name).TryAcquire(wait, cancellationToken);
+        return handle is not null ? new Locked(handle) : null;
     }
 
-    public override async Task<ILock?> TryLockAsync(String name, TimeSpan expiry, CancellationToken cancellationToken)
+    public override async Task<IAsyncLocked?> TryAcquireAsync(String name, TimeSpan wait, CancellationToken cancellationToken)
     {
-        var handle = await _provider.TryAcquireLockAsync(name, expiry, cancellationToken).ConfigureAwait(false);
-        return handle is not null ? new Lock(handle) : null;
+        var handle = await _provider.CreateLock(name).TryAcquireAsync(wait, cancellationToken).ConfigureAwait(false);
+        return handle is not null ? new Locked(handle) : null;
     }
 }

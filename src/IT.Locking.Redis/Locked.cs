@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace IT.Locking.Redis;
 
-internal class Lock : ILock
+internal class Locked : ILocked
 {
     internal static readonly String StringDeleteIfEqual;
 
-    static Lock()
+    static Locked()
     {
         var assembly = Assembly.GetExecutingAssembly();
 
@@ -25,7 +25,7 @@ internal class Lock : ILock
     private readonly RedisValue _value;
     private Boolean _disposed;
 
-    public Lock(IDatabase db, RedisKey key, RedisValue value)
+    public Locked(IDatabase db, RedisKey key, RedisValue value)
     {
         _db = db;
         _key = key;
@@ -38,7 +38,7 @@ internal class Lock : ILock
         {
             _disposed = true;
             var deleted = (Boolean)_db.ScriptEvaluate(StringDeleteIfEqual, new RedisKey[] { _key }, new RedisValue[] { _value });
-            if (!deleted) throw new ArgumentException();
+            //if (!deleted) throw new ArgumentException();
         }
     }
 
@@ -48,11 +48,7 @@ internal class Lock : ILock
         {
             _disposed = true;
             var deleted = (Boolean)await _db.ScriptEvaluateAsync(StringDeleteIfEqual, new RedisKey[] { _key }, new RedisValue[] { _value }).ConfigureAwait(false);
-            if (!deleted) throw new ArgumentException();
+            //if (!deleted) throw new ArgumentException();
         }
     }
-
-    public void Unlock() => Dispose();
-
-    public ValueTask UnlockAsync() => DisposeAsync();
 }

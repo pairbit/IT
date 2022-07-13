@@ -4,17 +4,17 @@ using System.Threading.Tasks;
 
 namespace IT.Locking;
 
-public interface IAsyncLocker
+public interface IAsyncLock
 {
-    IAsyncLock NewAsyncLock(String name);
+    String Name { get; }
 
-    Task<IAsyncLocked?> TryAcquireAsync(String name, TimeSpan wait = default, CancellationToken cancellationToken = default);
+    Task<IAsyncLocked?> TryAcquireAsync(TimeSpan wait = default, CancellationToken cancellationToken = default);
 
-    //Task<T?> TryLockWithDoubleCheckAsync<T>(String name,
+    //Task<T?> TryLockWithDoubleCheckAsync<T>(
     //    Func<CancellationToken, Task<T?>> checkAsync, Func<CancellationToken, Task<T>> getResultAsync,
     //    TimeSpan wait, TimeSpan expiry, TimeSpan retry, CancellationToken cancellationToken = default);
 
-    //Task<Boolean> TryLockWithDoubleCheckAsync(String name,
+    //Task<Boolean> TryLockWithDoubleCheckAsync(
     //    Func<CancellationToken, Task<Boolean>> checkAsync, Func<CancellationToken, Task> doAsync,
     //    TimeSpan wait, TimeSpan expiry, TimeSpan retry, CancellationToken cancellationToken = default);
 }

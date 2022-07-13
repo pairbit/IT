@@ -28,7 +28,7 @@ public class RedisRedLockTest : LockTest
 
         redLockMultiplexers.Add(Create(2));
 
-        var factory = RedLockFactory.Create(redLockMultiplexers, null);
+        var factory = RedLockFactory.Create(redLockMultiplexers, new RedLockRetryConfiguration(1), null);
 
         return new Redis.RedLock.Locker(factory);
     }

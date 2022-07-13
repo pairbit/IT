@@ -1,5 +1,6 @@
 ﻿using RedLockNet;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,41 +8,91 @@ namespace IT.Locking.Redis.RedLock;
 
 public class Locker : Locking.Locker
 {
-    private readonly IDistributedLockFactory _factory;
+    private const Int32 RetryMillisecondsDefault = 100;
+    private static readonly TimeSpan ExpiryDefault = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan ExpiryDebug = TimeSpan.FromMinutes(3);
 
-    public Locker(IDistributedLockFactory factory)
+    private readonly IDistributedLockFactory _factory;
+    protected readonly Func<Options?>? _getOptions;
+
+    public Locker(IDistributedLockFactory factory, Func<Options?>? getOptions = null)
     {
         _factory = factory;
+        _getOptions = getOptions;
     }
 
     #region IAsyncLocker
 
-    public override async Task<ILock?> TryLockAsync(String name, TimeSpan expiry, CancellationToken cancellationToken)
+    public override async Task<IAsyncLocked?> TryAcquireAsync(String name, TimeSpan wait, CancellationToken cancellationToken)
     {
-        var @lock = await _factory.CreateLockAsync(name, expiry).ConfigureAwait(false);
-        return @lock.IsAcquired ? new RedLock(@lock) : null;
-    }
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
+        if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
 
-    public override async Task<ILock?> TryLockAsync(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
-    {
-        var @lock = await _factory.CreateLockAsync(name, expiry, wait, retry, cancellationToken).ConfigureAwait(false);
-        return @lock.IsAcquired ? new RedLock(@lock) : null;
+        var options = _getOptions?.Invoke();
+        var expiryMilliseconds = options?.ExpiryMilliseconds;
+        var expiry = expiryMilliseconds.HasValue ? TimeSpan.FromMilliseconds(expiryMilliseconds.Value) : ExpiryDefault;
+
+#if DEBUG
+        if (Debugger.IsAttached) expiry = ExpiryDebug;
+#endif
+
+        var redlock = await _factory.CreateLockAsync(name, expiry).ConfigureAwait(false);
+        if (redlock.IsAcquired) return new Locked(redlock);
+
+        if (wait > TimeSpan.Zero)
+        {
+            var retry = options?.RetryMilliseconds ?? RetryMillisecondsDefault;
+            var stopwatch = Stopwatch.StartNew();
+            do
+            {
+                await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
+
+                redlock = await _factory.CreateLockAsync(name, expiry).ConfigureAwait(false);
+                if (redlock.IsAcquired) return new Locked(redlock);
+
+            } while (stopwatch.Elapsed <= wait);
+        }
+
+        return null;
     }
 
     #endregion IAsyncLocker
 
     #region ILocker
 
-    public override ILock? TryLock(String name, TimeSpan expiry, CancellationToken cancellationToken)
+    public override ILocked? TryAcquire(String name, TimeSpan wait, CancellationToken cancellationToken)
     {
-        var @lock = _factory.CreateLock(name, expiry);
-        return @lock.IsAcquired ? new RedLock(@lock) : null;
-    }
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
+        if (wait < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(wait));
 
-    public override ILock? TryLock(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
-    {
-        var @lock = _factory.CreateLock(name, expiry, wait, retry, cancellationToken);
-        return @lock.IsAcquired ? new RedLock(@lock) : null;
+        var options = _getOptions?.Invoke();
+        var expiryMilliseconds = options?.ExpiryMilliseconds;
+        var expiry = expiryMilliseconds.HasValue ? TimeSpan.FromMilliseconds(expiryMilliseconds.Value) : ExpiryDefault;
+
+#if DEBUG
+        if (Debugger.IsAttached) expiry = ExpiryDebug;
+#endif
+
+        var redlock = _factory.CreateLock(name, expiry);
+        if (redlock.IsAcquired) return new Locked(redlock);
+
+        if (wait > TimeSpan.Zero)
+        {
+            var retry = options?.RetryMilliseconds ?? RetryMillisecondsDefault;
+            var stopwatch = Stopwatch.StartNew();
+            do
+            {
+                Task.Delay(retry, cancellationToken).Wait(cancellationToken);
+
+                redlock = _factory.CreateLock(name, expiry);
+                if (redlock.IsAcquired) return new Locked(redlock);
+
+            } while (stopwatch.Elapsed <= wait);
+        }
+
+        return null;
     }
 
     #endregion ILocker

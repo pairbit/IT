@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 
 namespace IT.Locking.Medallion;
 
-internal class Lock : ILock
+internal class Locked : ILocked
 {
     private readonly IDistributedSynchronizationHandle _handle;
 
-    public Lock(IDistributedSynchronizationHandle handle)
+    public Locked(IDistributedSynchronizationHandle handle)
     {
         _handle = handle;
     }
@@ -15,8 +15,4 @@ internal class Lock : ILock
     public void Dispose() => _handle.Dispose();
 
     public ValueTask DisposeAsync() => _handle.DisposeAsync();
-
-    public void Unlock() => _handle.Dispose();
-
-    public ValueTask UnlockAsync() => _handle.DisposeAsync();
 }

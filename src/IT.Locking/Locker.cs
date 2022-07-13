@@ -10,25 +10,19 @@ public abstract class Locker : ILocker
 {
     #region IAsyncLocker
 
-    public abstract Task<ILock?> TryLockAsync(String name, TimeSpan expiry, CancellationToken cancellationToken = default);
-
-    public virtual async Task<ILock?> TryLockAsync(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+    public virtual IAsyncLock NewAsyncLock(String name)
     {
-        var stopwatch = Stopwatch.StartNew();
-        while (stopwatch.Elapsed <= wait)
-        {
-            var @lock = await TryLockAsync(name, expiry).ConfigureAwait(false);
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
 
-            if (@lock is not null) return @lock;
-
-            await Task.Delay(retry, cancellationToken).ConfigureAwait(false);
-        }
-        return null;
+        return new Lock(name, this);
     }
+
+    public abstract Task<IAsyncLocked?> TryAcquireAsync(String name, TimeSpan wait, CancellationToken cancellationToken = default);
 
     public virtual async Task<T?> TryLockWithDoubleCheckAsync<T>(String name,
         Func<CancellationToken, Task<T?>> checkAsync, Func<CancellationToken, Task<T>> getResultAsync,
-        TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+        TimeSpan wait, TimeSpan expiry, TimeSpan retry, CancellationToken cancellationToken)
     {
         if (checkAsync is null) throw new ArgumentNullException(nameof(checkAsync));
         if (getResultAsync is null) throw new ArgumentNullException(nameof(getResultAsync));
@@ -43,16 +37,14 @@ public abstract class Locker : ILocker
 
             if (!comparer.Equals(result, default)) return result!;
 
-            await using var @lock = await TryLockAsync(name, expiry).ConfigureAwait(false);
+            await using var locked = await TryAcquireAsync(name, expiry, cancellationToken).ConfigureAwait(false);
 
-            if (@lock != null)
+            if (locked != null)
             {
                 result = await checkAsync(cancellationToken).ConfigureAwait(false);
 
                 if (comparer.Equals(result, default))
                     result = await getResultAsync(cancellationToken).ConfigureAwait(false);
-
-                await @lock.UnlockAsync().ConfigureAwait(false);
 
                 return result!;
             }
@@ -65,7 +57,7 @@ public abstract class Locker : ILocker
 
     public virtual async Task<Boolean> TryLockWithDoubleCheckAsync(String name,
         Func<CancellationToken, Task<Boolean>> checkAsync, Func<CancellationToken, Task> doAsync,
-        TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+        TimeSpan wait, TimeSpan expiry, TimeSpan retry, CancellationToken cancellationToken)
     {
         if (checkAsync is null) throw new ArgumentNullException(nameof(checkAsync));
         if (doAsync is null) throw new ArgumentNullException(nameof(doAsync));
@@ -76,14 +68,12 @@ public abstract class Locker : ILocker
         {
             if (await checkAsync(cancellationToken).ConfigureAwait(false)) return true;
 
-            await using var @lock = await TryLockAsync(name, expiry).ConfigureAwait(false);
+            await using var locked = await TryAcquireAsync(name, expiry, cancellationToken).ConfigureAwait(false);
 
-            if (@lock != null)
+            if (locked != null)
             {
                 if (!await checkAsync(cancellationToken).ConfigureAwait(false))
                     await doAsync(cancellationToken).ConfigureAwait(false);
-
-                await @lock.UnlockAsync().ConfigureAwait(false);
 
                 return true;
             }
@@ -98,25 +88,19 @@ public abstract class Locker : ILocker
 
     #region ILocker
 
-    public abstract ILock? TryLock(String name, TimeSpan expiry, CancellationToken cancellationToken = default);
-
-    public virtual ILock? TryLock(String name, TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+    public virtual ILock NewLock(String name)
     {
-        var stopwatch = Stopwatch.StartNew();
-        while (stopwatch.Elapsed <= wait)
-        {
-            var @lock = TryLock(name, expiry);
+        if (name is null) throw new ArgumentNullException(nameof(name));
+        if (name.Length == 0) throw new ArgumentException("is empty", nameof(name));
 
-            if (@lock is not null) return @lock;
-
-            Task.Delay(retry, cancellationToken).Wait(cancellationToken);
-        }
-        return null;
+        return new Lock(name, this);
     }
+
+    public abstract ILocked? TryAcquire(String name, TimeSpan wait, CancellationToken cancellationToken = default);
 
     public virtual T? TryLockWithDoubleCheck<T>(String name,
         Func<CancellationToken, T?> check, Func<CancellationToken, T> getResult,
-        TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+        TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
     {
         if (check is null) throw new ArgumentNullException(nameof(check));
         if (getResult is null) throw new ArgumentNullException(nameof(getResult));
@@ -131,16 +115,14 @@ public abstract class Locker : ILocker
 
             if (!comparer.Equals(result, default)) return result!;
 
-            using var @lock = TryLock(name, expiry);
+            using var locked = TryAcquire(name, default, cancellationToken);
 
-            if (@lock != null)
+            if (locked != null)
             {
                 result = check(cancellationToken);
 
                 if (comparer.Equals(result, default))
                     result = getResult(cancellationToken);
-
-                @lock.UnlockAsync();
 
                 return result!;
             }
@@ -153,7 +135,7 @@ public abstract class Locker : ILocker
 
     public virtual Boolean TryLockWithDoubleCheck(String name,
         Func<CancellationToken, Boolean> check, Action<CancellationToken> action,
-        TimeSpan expiry, TimeSpan wait, TimeSpan retry, CancellationToken cancellationToken)
+        TimeSpan wait, TimeSpan expiry, TimeSpan retry, CancellationToken cancellationToken)
     {
         if (check is null) throw new ArgumentNullException(nameof(check));
         if (action is null) throw new ArgumentNullException(nameof(action));
@@ -164,14 +146,12 @@ public abstract class Locker : ILocker
         {
             if (check(cancellationToken)) return true;
 
-            using var @lock = TryLock(name, expiry);
+            using var locked = TryAcquire(name, expiry, cancellationToken);
 
-            if (@lock != null)
+            if (locked != null)
             {
                 if (!check(cancellationToken))
                     action(cancellationToken);
-
-                @lock.Unlock();
 
                 return true;
             }

@@ -5,6 +5,7 @@ namespace IT.Locking.Tests;
 
 public class NoLockTest
 {
+    protected Int32 _noLock = 0;
     private readonly Random _random = new();
     private const Int32 Count = 500;
 
@@ -28,6 +29,8 @@ public class NoLockTest
         }
 
         await Task.WhenAll(tasks);
+
+        Console.WriteLine($"noLock : {_noLock}");
 
         Console.WriteLine($"{data.Count} from {Count * tasks.Length} (256 unique)");
 
