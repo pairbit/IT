@@ -87,6 +87,22 @@ jobs:
             TAG_COMMIT: false
             INCLUDE_SYMBOLS: true
 
+      - name: Publish IT.Locking.Redis.RedLock
+        uses: pairbit/publish-nuget@v2.5.7
+        with:
+            PROJECT_FILE_PATH: src/IT.Locking.Redis.RedLock/IT.Locking.Redis.RedLock.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+
+      - name: Publish IT.Locking.Medallion
+        uses: pairbit/publish-nuget@v2.5.7
+        with:
+            PROJECT_FILE_PATH: src/IT.Locking.Medallion/IT.Locking.Medallion.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: false
+            INCLUDE_SYMBOLS: true
+
       - name: Publish IT.PubSub
         uses: pairbit/publish-nuget@v2.5.7
         with:
