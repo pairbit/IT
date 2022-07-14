@@ -1,0 +1,13 @@
+[![NuGet version (IT)](https://img.shields.io/nuget/v/IT.svg)](https://www.nuget.org/packages/IT)
+
+Extensions of System to support latest language version
+
+## Random
+
+```csharp
+#if NET6_0
+        return Random.Shared;
+#else
+        return _Random.Shared;
+#endif
+```
