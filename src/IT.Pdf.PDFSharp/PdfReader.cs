@@ -34,9 +34,13 @@ public class PdfReader : IPdfReader
 
         newDoc.Version = doc.Version;
 
-        newDoc.Info.Title = $"Page {number + 1} of {count} from {doc.Info.Title}";
+        var info = doc.Info;
 
-        newDoc.Info.Creator = doc.Info.Creator;
+        var title = info.Title;
+
+        newDoc.Info.Title = String.IsNullOrWhiteSpace(title) ? $"Page {number + 1} of {count}" : $"Page {number + 1} of {count} from {title}";
+
+        newDoc.Info.Creator = info.Creator;
 
         newDoc.AddPage(doc.Pages[number]);
 

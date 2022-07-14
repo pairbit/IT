@@ -26,7 +26,7 @@ public abstract class PdfReaderTest
 
             var path = Path.Combine(dir, Path.GetFileNameWithoutExtension(file));
 
-            for (int page = 0; page < countPages; page++)
+            for (int page = 0; page < 1; page++)
             {
                 using var pageWrite = File.OpenWrite(path + $".{page}.stream.pdf");
 

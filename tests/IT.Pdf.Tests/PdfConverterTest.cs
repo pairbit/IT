@@ -12,9 +12,9 @@ public abstract class PdfConverterTest : IDisposable
     [Test]
     public void ConvertTest()
     {
-        var html = $"Простые данные для отображения в PDF ({Guid.NewGuid()})";
+        //var html = $"Простые данные для отображения в PDF ({Guid.NewGuid()})";
 
-        //var html = File.ReadAllText(@"C:\var\pdf\View2.txt");
+        var html = File.ReadAllText(@"C:\var\pdf\EMP-View.html");
 
         var bytes = _pdfConverter.Convert(html);
 
