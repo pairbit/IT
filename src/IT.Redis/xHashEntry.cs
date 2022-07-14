@@ -10,6 +10,4 @@ public static class xHashEntry
 
     public static HashEntry[] ToHashEntries(this IDictionary<String, Byte[]> dictionary)
         => dictionary.ToArray(x => new HashEntry(x.Key, x.Value ?? RedisValue.EmptyString));
-
-    
 }
