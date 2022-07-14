@@ -13,7 +13,10 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.0</Version>
+	<Version>2.0.1</Version>
+	<PackageTags>Serialization Serializer</PackageTags>
+	<PackageReadmeFile>Readme.md</PackageReadmeFile>
+	<PackageIcon>Icon.png</PackageIcon>
 	<PackageReleaseNotes>
 		add SerializerProxy and TextSerializerProxy
 	</PackageReleaseNotes>
@@ -26,6 +29,11 @@
 	<NoWarn>$(NoWarn);1591;IDE1006;IDE0049</NoWarn>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="Readme.md" Pack="true" PackagePath="\" />
+    <None Include="Icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+	
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <ProjectReference Include="..\IT.Memory\IT.Memory.csproj" />
   </ItemGroup>

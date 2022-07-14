@@ -9,4 +9,6 @@ public interface IGenerator
     //void Populate<T>(T value, String? rule = null);
 
     Object Generate(Type type, String? rule = null);
+
+    //void Populate(Type type, Object value, String? rule = null);
 }
