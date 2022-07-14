@@ -13,7 +13,10 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.0</Version>
+	<Version>2.0.1</Version>
+	<PackageTags>Locking Lock DistributedLock Medallion</PackageTags>
+	<PackageReadmeFile>Readme.md</PackageReadmeFile>
+	<PackageIcon>Icon.png</PackageIcon>
 	<PackageReleaseNotes>
 		
 	</PackageReleaseNotes>
@@ -25,6 +28,11 @@
 	<DebugType>full</DebugType>
 	<NoWarn>$(NoWarn);1591;IDE1006;IDE0049</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Readme.md" Pack="true" PackagePath="\" />
+    <None Include="Icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 	
   <ItemGroup>
     <PackageReference Include="DistributedLock.Core" Version="1.0.5" />
