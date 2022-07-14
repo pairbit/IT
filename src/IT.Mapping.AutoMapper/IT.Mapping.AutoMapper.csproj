@@ -13,7 +13,10 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.0</Version>
+	<Version>2.0.1</Version>
+	<PackageTags>Mapping Mapper AutoMapper</PackageTags>
+	<PackageReadmeFile>Readme.md</PackageReadmeFile>
+	<PackageIcon>Icon.png</PackageIcon>
 	<PackageReleaseNotes>
 		add Microsoft.SourceLink.GitHub
 	</PackageReleaseNotes>
@@ -25,6 +28,11 @@
 	<DebugType>full</DebugType>
 	<NoWarn>$(NoWarn);1591;IDE1006;IDE0049</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Readme.md" Pack="true" PackagePath="\" />
+    <None Include="Icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="11.0.1" />
