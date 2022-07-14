@@ -7,5 +7,7 @@ public interface IPdfReader
 {
     Int32 GetCountPages(Stream pdf);
 
-    Byte[] ReadPage(Stream pdf, Int32 page);
+    void ReadPage(Stream pdf, Int32 number, Stream page);
+
+    Byte[] ReadPage(Stream pdf, Int32 number);
 }

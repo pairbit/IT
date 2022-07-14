@@ -16,33 +16,33 @@ public class PdfReader : IPdfReader
         _logger = logger;
     }
 
-    public virtual Int32 GetCountPages(Stream file)
+    public virtual Int32 GetCountPages(Stream pdf)
     {
-        using var pdf = PdfSharp.Pdf.IO.PdfReader.Open(file, PdfDocumentOpenMode.Import);
-        return pdf.PageCount;
+        using var doc = PdfSharp.Pdf.IO.PdfReader.Open(pdf, PdfDocumentOpenMode.Import);
+        return doc.PageCount;
     }
 
-    public virtual Byte[] ReadPage(Stream file, Int32 page)
+    public virtual void ReadPage(Stream pdf, Int32 number, Stream page)
     {
-        using var pdf = PdfSharp.Pdf.IO.PdfReader.Open(file, PdfDocumentOpenMode.Import);
+        using var doc = PdfSharp.Pdf.IO.PdfReader.Open(pdf, PdfDocumentOpenMode.Import);
 
-        if (page < 0 || page > pdf.PageCount - 1) throw new ArgumentOutOfRangeException();
+        var count = doc.PageCount;
+
+        if (number < 0 || number > count - 1) throw new ArgumentOutOfRangeException(nameof(number), $"{count - 1} >= {number} >= 0");
 
         var newDoc = new PdfDocument();
 
-        newDoc.Version = pdf.Version;
+        newDoc.Version = doc.Version;
 
-        newDoc.Info.Title = $"Page {page + 1} of {pdf.PageCount} from {pdf.Info.Title}";
+        newDoc.Info.Title = $"Page {number + 1} of {count} from {doc.Info.Title}";
 
-        newDoc.Info.Creator = pdf.Info.Creator;
+        newDoc.Info.Creator = doc.Info.Creator;
 
-        newDoc.AddPage(pdf.Pages[page]);
-
-        using var outStream = new MemoryStream();
+        newDoc.AddPage(doc.Pages[number]);
 
         try
         {
-            newDoc.Save(outStream);
+            newDoc.Save(page);
         }
         catch (NotSupportedException ex)
         {
@@ -54,9 +54,16 @@ public class PdfReader : IPdfReader
             if (_logger is not null && _logger.IsEnabled(LogLevel.Information))
                 _logger.LogInformation("Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)");
 
-            newDoc.Save(outStream);
+            newDoc.Save(page);
         }
+    }
 
-        return outStream.ToArray();
+    public virtual Byte[] ReadPage(Stream pdf, Int32 number)
+    {
+        using var page = new MemoryStream();
+
+        ReadPage(pdf, number, page);
+
+        return page.ToArray();
     }
 }

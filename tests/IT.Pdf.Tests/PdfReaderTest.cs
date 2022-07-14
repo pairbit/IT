@@ -24,17 +24,24 @@ public abstract class PdfReaderTest
 
             Assert.True(countPages > 0);
 
+            var path = Path.Combine(dir, Path.GetFileNameWithoutExtension(file));
+
             for (int page = 0; page < countPages; page++)
             {
+                using var pageWrite = File.OpenWrite(path + $".{page}.stream.pdf");
+
+                _pdfReader.ReadPage(pdf, page, pageWrite);
+
+                pageWrite.Close();
+
+                //ToBytes
                 var pageBytes = _pdfReader.ReadPage(pdf, page);
 
                 Assert.True(pageBytes is not null);
 
                 Assert.True(pageBytes!.Length > 0);
 
-                var path = Path.Combine(dir, Path.GetFileNameWithoutExtension(file));
-                path += $".{page}.pdf";
-                //File.WriteAllBytes(path, pageBytes);
+                File.WriteAllBytes(path + $".{page}.bytes.pdf", pageBytes);
             }
         }
     }

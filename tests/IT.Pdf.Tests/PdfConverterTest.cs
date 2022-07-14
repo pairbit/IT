@@ -14,7 +14,7 @@ public abstract class PdfConverterTest : IDisposable
     {
         var html = $"Простые данные для отображения в PDF ({Guid.NewGuid()})";
 
-        //var html = File.ReadAllText(@"D:\var\pdf\View2.txt");
+        //var html = File.ReadAllText(@"C:\var\pdf\View2.txt");
 
         var bytes = _pdfConverter.Convert(html);
 
@@ -22,7 +22,7 @@ public abstract class PdfConverterTest : IDisposable
 
         Assert.True(bytes!.Length > 0);
 
-        //File.WriteAllBytes($@"D:\var\pdf\{DateTime.Now.Ticks}.pdf", bytes);
+        File.WriteAllBytes($@"C:\var\pdf\{DateTime.Now.Ticks}.pdf", bytes);
     }
 
     public void Dispose()
