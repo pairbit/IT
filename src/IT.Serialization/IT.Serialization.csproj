@@ -13,12 +13,12 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.1</Version>
+	<Version>2.0.2</Version>
 	<PackageTags>Serialization Serializer</PackageTags>
 	<PackageReadmeFile>Readme.md</PackageReadmeFile>
 	<PackageIcon>Icon.png</PackageIcon>
 	<PackageReleaseNotes>
-		add SerializerProxy and TextSerializerProxy
+		move IT.Memory to IT
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
@@ -35,7 +35,7 @@
   </ItemGroup>
 	
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
-    <ProjectReference Include="..\IT.Memory\IT.Memory.csproj" />
+    <ProjectReference Include="..\IT\IT.csproj" />
   </ItemGroup>
 
   <ItemGroup>

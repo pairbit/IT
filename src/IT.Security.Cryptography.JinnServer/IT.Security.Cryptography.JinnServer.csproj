@@ -13,9 +13,9 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.1-pre5</Version>
+	<Version>2.0.1-pre6</Version>
 	<PackageReleaseNotes>
-		hide internal classes
+		remove IT.Memory
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
@@ -33,7 +33,6 @@
 
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0' or $(TargetFramework) == 'netstandard2.1'">
     <ProjectReference Include="..\IT\IT.csproj" />
-    <ProjectReference Include="..\IT.Memory\IT.Memory.csproj" />
   </ItemGroup>
 
   <ItemGroup>
