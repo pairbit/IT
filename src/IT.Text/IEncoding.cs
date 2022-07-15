@@ -4,11 +4,13 @@ namespace IT.Text;
 
 public interface IEncoding
 {
-    int GetChars(ReadOnlySpan<byte> bytes, Span<char> chars);
+    Int32 GetByteCount(ReadOnlySpan<Char> chars);
 
-    string GetString(ReadOnlySpan<byte> bytes);
+    Int32 GetBytes(ReadOnlySpan<Char> chars, Span<Byte> bytes);
 
-    int GetBytes(ReadOnlySpan<char> chars, Span<byte> bytes);
+    Int32 GetCharCount(ReadOnlySpan<Byte> bytes);
 
-    byte[] GetBytes(ReadOnlySpan<char> chars);
+    Int32 GetChars(ReadOnlySpan<Byte> bytes, Span<Char> chars);
+
+    String GetString(ReadOnlySpan<Byte> bytes);
 }

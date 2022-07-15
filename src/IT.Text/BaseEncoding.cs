@@ -5,24 +5,25 @@ namespace IT.Text;
 
 public class BaseEncoding : IEncoding
 {
-    public int GetBytes(ReadOnlySpan<char> chars, Span<byte> bytes)
+    private Encoding _encoding;
+
+    public BaseEncoding(Encoding encoding)
     {
-        throw new NotImplementedException();
+        _encoding = encoding;
     }
 
-    public byte[] GetBytes(ReadOnlySpan<char> chars)
-    {
-        throw new NotImplementedException();
-    }
+    public Int32 GetByteCount(ReadOnlySpan<Char> chars)
+        => _encoding.GetByteCount(chars);
 
-    public int GetChars(ReadOnlySpan<byte> bytes, Span<char> chars)
-    {
-        throw new NotImplementedException();
-    }
+    public Int32 GetBytes(ReadOnlySpan<Char> chars, Span<Byte> bytes)
+         => _encoding.GetBytes(chars, bytes);
 
-    public string GetString(ReadOnlySpan<byte> bytes)
-    {
-        //Encoding.Default.GetChars()
-        throw new NotImplementedException();
-    }
+    public Int32 GetCharCount(ReadOnlySpan<Byte> bytes)
+        => _encoding.GetCharCount(bytes);
+
+    public Int32 GetChars(ReadOnlySpan<Byte> bytes, Span<Char> chars)
+        => _encoding.GetChars(bytes, chars);
+
+    public String GetString(ReadOnlySpan<Byte> bytes)
+        => _encoding.GetString(bytes);
 }

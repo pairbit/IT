@@ -15,7 +15,7 @@ public class HexEncoding : IEncoding
     private static uint[] CreateLookup32Unsafe(string format)
     {
         var result = new uint[256];
-        for (int i = 0; i < 256; i++)
+        for (int i = 0; i < result.Length; i++)
         {
             string s = i.ToString(format);
             if (BitConverter.IsLittleEndian)
@@ -26,22 +26,39 @@ public class HexEncoding : IEncoding
         return result;
     }
 
-    public int GetBytes(ReadOnlySpan<char> chars, Span<byte> bytes)
+    public Int32 GetByteCount(ReadOnlySpan<Char> chars)
+        => chars.Length / 2;
+
+    public Int32 GetBytes(ReadOnlySpan<Char> chars, Span<Byte> bytes)
     {
         throw new NotImplementedException();
     }
 
-    public byte[] GetBytes(ReadOnlySpan<char> chars)
+    public Int32 GetCharCount(ReadOnlySpan<Byte> bytes)
+        => bytes.Length * 2;
+
+    public virtual Int32 GetChars(ReadOnlySpan<Byte> bytes, Span<Char> chars)
     {
-        throw new NotImplementedException();
+        var len = bytes.Length * 2;
+        if (chars.Length < len) throw new ArgumentException($"(chars.Length == {chars.Length}) < (bytes.Length == {len})", nameof(chars));
+
+        unsafe
+        {
+            var lookupP = _lowerLookup32UnsafeP;
+            fixed (byte* bytesP = bytes)
+            fixed (char* resultP = chars)
+            {
+                uint* resultP2 = (uint*)resultP;
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    resultP2[i] = lookupP[bytesP[i]];
+                }
+            }
+        }
+        return len;
     }
 
-    public int GetChars(ReadOnlySpan<byte> bytes, Span<char> chars)
-    {
-        throw new NotImplementedException();
-    }
-
-    public string GetString(ReadOnlySpan<byte> bytes)
+    public virtual String GetString(ReadOnlySpan<Byte> bytes)
     {
         var result = new string((char)0, bytes.Length * 2);
         unsafe

@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
+using System.Buffers;
 using System.Buffers.Text;
 using System.Diagnostics;
 using System.Text;
@@ -22,6 +23,8 @@ public class EncodingBenchmark
         else
         {
             _data = File.ReadAllBytes(@"S:\Videos\grip_legend\David_Train.mp4");
+            //_data = new byte[60];
+            //Random.Shared.NextBytes(_data);
         }
     }
 
@@ -37,7 +40,7 @@ public class EncodingBenchmark
         var status = Base64.EncodeToUtf8InPlace(bytes, len, out var written);
 
         if (status != System.Buffers.OperationStatus.Done) throw new InvalidOperationException(status.ToString());
-        
+
         if (written != utf8len) throw new InvalidOperationException();
 
         return bytes;
@@ -88,21 +91,74 @@ public class EncodingBenchmark
     [Benchmark(Description = "ASCII.GetChars(EncodeToUtf8())")]
     public ReadOnlySpan<char> EncodeToUtf8Chars()
     {
-        var bytes = EncodeToUtf8();
+        ReadOnlySpan<byte> bytes = CopyData();
 
         var len = bytes.Length;
 
-        Span<char> chars = new char[len];
+        var utf8len = (len + 2) / 3 * 4;
 
-        var count = Encoding.ASCII.GetChars(bytes, chars);
+        var pool = ArrayPool<byte>.Shared;
 
-        if (count != len) throw new InvalidOperationException();
+        var rented = pool.Rent(utf8len);
 
-        return chars;
+        Span<byte> utf8 = rented;
+
+        try
+        {
+            var status = Base64.EncodeToUtf8(bytes, utf8, out var consumed, out var written);
+
+            if (status != OperationStatus.Done) throw new InvalidOperationException(status.ToString());
+
+            if (consumed != len) throw new InvalidOperationException();
+
+            if (written != utf8len) throw new InvalidOperationException();
+
+            Span<char> chars = new char[utf8len];
+
+            var count = Encoding.ASCII.GetChars(utf8[..utf8len], chars);
+
+            if (count != utf8len) throw new InvalidOperationException();
+
+            return chars;
+        }
+        finally
+        {
+            pool.Return(rented);
+        }
     }
 
     [Benchmark(Description = "ASCII.GetString(EncodeToUtf8())")]
-    public string EncodeToUtf8String() => Encoding.ASCII.GetString(EncodeToUtf8());
+    public string EncodeToUtf8String()
+    {
+        ReadOnlySpan<byte> bytes = CopyData();
+
+        var len = bytes.Length;
+
+        var utf8len = (len + 2) / 3 * 4;
+
+        var pool = ArrayPool<byte>.Shared;
+
+        var rented = pool.Rent(utf8len);
+
+        Span<byte> utf8 = rented;
+
+        try
+        {
+            var status = Base64.EncodeToUtf8(bytes, utf8, out var consumed, out var written);
+
+            if (status != OperationStatus.Done) throw new InvalidOperationException(status.ToString());
+
+            if (consumed != len) throw new InvalidOperationException();
+
+            if (written != utf8len) throw new InvalidOperationException();
+
+            return Encoding.ASCII.GetString(utf8[..utf8len]);
+        }
+        finally
+        {
+            pool.Return(rented);
+        }
+    }
 
     [Benchmark(Description = "Convert.TryToBase64Chars")]
     public ReadOnlySpan<char> TryToBase64Chars()
@@ -123,6 +179,9 @@ public class EncodingBenchmark
     //https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Convert.cs
     [Benchmark(Description = "Convert.ToBase64String")]
     public string ConvertToBase64String() => Convert.ToBase64String(CopyData());
+
+    [Benchmark(Description = "CopyDataEtalon")]
+    public Span<byte> CopyDataEtalon() => CopyData();
 
     private Span<byte> CopyData(Int32 len = 0)
     {
