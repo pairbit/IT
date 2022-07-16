@@ -151,6 +151,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Samples", "samples\IT.Sa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Samples.NET6", "samples\IT.Samples.NET6\IT.Samples.NET6.csproj", "{B22A75F9-F535-46A1-8CAE-8DDC1AAE7462}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Text.Benchmarks", "benchmarks\IT.Text.Benchmarks\IT.Text.Benchmarks.csproj", "{90368EAB-D081-431C-8D92-6FC9A1EE6753}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -397,6 +399,10 @@ Global
 		{B22A75F9-F535-46A1-8CAE-8DDC1AAE7462}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B22A75F9-F535-46A1-8CAE-8DDC1AAE7462}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B22A75F9-F535-46A1-8CAE-8DDC1AAE7462}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90368EAB-D081-431C-8D92-6FC9A1EE6753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90368EAB-D081-431C-8D92-6FC9A1EE6753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90368EAB-D081-431C-8D92-6FC9A1EE6753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90368EAB-D081-431C-8D92-6FC9A1EE6753}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -462,6 +468,7 @@ Global
 		{9648395C-1573-41CB-B23F-B28EE7ADA990} = {E081CF0B-E3B5-469B-8CA2-FF1CAA9FB58D}
 		{F3E08D50-036F-4F46-B201-C917867B0199} = {2D3BA35B-06B1-4ACB-8C44-DCA0B92AAB82}
 		{B22A75F9-F535-46A1-8CAE-8DDC1AAE7462} = {2D3BA35B-06B1-4ACB-8C44-DCA0B92AAB82}
+		{90368EAB-D081-431C-8D92-6FC9A1EE6753} = {D3FFCD4A-8A92-42ED-9A66-EA03689767DA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E61A39C8-7FE8-4292-A237-B5DBE7E0E57C}
