@@ -3,51 +3,14 @@ using System.Buffers;
 using System.Buffers.Text;
 using System.Text;
 
-namespace IT.Text;
+namespace IT.Text.Encoders;
 
-public class Base64Encoding : IEncoding
+public class Base64Encoder : IEncoder
 {
-    public Int32 GetByteCount(ReadOnlySpan<Char> chars)
-        => Base64.GetMaxDecodedFromUtf8Length(chars.Length);
-
-    public Int32 GetBytes(ReadOnlySpan<Char> chars, Span<Byte> bytes)
-    {
-        var utf8len = chars.Length;
-
-        var len = Base64.GetMaxDecodedFromUtf8Length(utf8len);
-
-        var pool = ArrayPool<byte>.Shared;
-
-        var rented = pool.Rent(len);
-
-        Span<byte> utf8Span = rented;
-
-        try
-        {
-            var count = Encoding.ASCII.GetBytes(chars, utf8Span);
-
-            if (count != utf8len) throw new InvalidOperationException();
-
-            var status = Base64.DecodeFromUtf8(utf8Span, bytes, out var consumed, out var written);
-
-            if (status != OperationStatus.Done) throw new InvalidOperationException(status.ToString());
-
-            if (consumed != len) throw new InvalidOperationException();
-
-            if (written != utf8len) throw new InvalidOperationException();
-
-            return count;
-        }
-        finally
-        {
-            pool.Return(rented);
-        }
-    }
-
-    public Int32 GetCharCount(ReadOnlySpan<Byte> bytes)
+    public int GetMaxEncodedLength(ReadOnlySpan<byte> bytes)
         => Base64.GetMaxEncodedToUtf8Length(bytes.Length);
 
-    public Int32 GetChars(ReadOnlySpan<Byte> bytes, Span<Char> chars)
+    public int Encode(ReadOnlySpan<byte> bytes, Span<char> chars)
     {
         var len = bytes.Length;
 
@@ -81,7 +44,7 @@ public class Base64Encoding : IEncoding
         }
     }
 
-    public String GetString(ReadOnlySpan<Byte> bytes)
+    public string Encode(ReadOnlySpan<byte> bytes)
     {
         var len = bytes.Length;
 
@@ -109,5 +72,49 @@ public class Base64Encoding : IEncoding
         {
             pool.Return(rented);
         }
+    }
+
+    public int GetMaxDecodedLength(ReadOnlySpan<char> chars)
+        => Base64.GetMaxDecodedFromUtf8Length(chars.Length);
+
+    public int Decode(ReadOnlySpan<char> chars, Span<byte> bytes)
+    {
+        var utf8len = chars.Length;
+
+        var len = Base64.GetMaxDecodedFromUtf8Length(utf8len);
+
+        var pool = ArrayPool<byte>.Shared;
+
+        var rented = pool.Rent(len);
+
+        Span<byte> utf8Span = rented;
+
+        try
+        {
+            var count = Encoding.ASCII.GetBytes(chars, utf8Span);
+
+            if (count != utf8len) throw new InvalidOperationException();
+
+            var status = Base64.DecodeFromUtf8(utf8Span, bytes, out var consumed, out var written);
+
+            if (status != OperationStatus.Done) throw new InvalidOperationException(status.ToString());
+
+            if (consumed != len) throw new InvalidOperationException();
+
+            if (written != utf8len) throw new InvalidOperationException();
+
+            return count;
+        }
+        finally
+        {
+            pool.Return(rented);
+        }
+    }
+
+    public byte[] Decode(ReadOnlySpan<char> chars)
+    {
+        var bytes = new byte[Base64.GetMaxDecodedFromUtf8Length(chars.Length)];
+        Decode(chars, bytes);
+        return bytes;
     }
 }

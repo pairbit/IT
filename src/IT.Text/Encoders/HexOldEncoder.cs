@@ -1,16 +1,24 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace IT.Text;
+namespace IT.Text.Encoders;
 
-public class HexEncoding : IEncoding
+public class HexOldEncoder : IEncoder
 {
     //https://stackoverflow.com/questions/311165/how-do-you-convert-a-byte-array-to-a-hexadecimal-string-and-vice-versa/24343727#24343727
+    //https://ndportmann.com/breaking-records-with-core-3-0/
     private static readonly uint[] _lowerLookup32Unsafe = CreateLookup32Unsafe("x2");
     private static readonly uint[] _upperLookup32Unsafe = CreateLookup32Unsafe("X2");
 
     internal static readonly unsafe uint* _lowerLookup32UnsafeP = (uint*)GCHandle.Alloc(_lowerLookup32Unsafe, GCHandleType.Pinned).AddrOfPinnedObject();
     internal static readonly unsafe uint* _upperLookup32UnsafeP = (uint*)GCHandle.Alloc(_upperLookup32Unsafe, GCHandleType.Pinned).AddrOfPinnedObject();
+
+    private readonly Boolean _isUpper;
+
+    public HexOldEncoder(Boolean isUpper = true)
+    {
+        _isUpper = isUpper;
+    }
 
     private static uint[] CreateLookup32Unsafe(string format)
     {
@@ -26,25 +34,17 @@ public class HexEncoding : IEncoding
         return result;
     }
 
-    public Int32 GetByteCount(ReadOnlySpan<Char> chars)
-        => chars.Length / 2;
-
-    public Int32 GetBytes(ReadOnlySpan<Char> chars, Span<Byte> bytes)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Int32 GetCharCount(ReadOnlySpan<Byte> bytes)
+    public int GetMaxEncodedLength(ReadOnlySpan<byte> bytes)
         => bytes.Length * 2;
 
-    public virtual Int32 GetChars(ReadOnlySpan<Byte> bytes, Span<Char> chars)
+    public int Encode(ReadOnlySpan<byte> bytes, Span<char> chars)
     {
         var len = bytes.Length * 2;
         if (chars.Length < len) throw new ArgumentException($"(chars.Length == {chars.Length}) < (bytes.Length == {len})", nameof(chars));
 
         unsafe
         {
-            var lookupP = _lowerLookup32UnsafeP;
+            var lookupP = _isUpper ? _upperLookup32UnsafeP : _lowerLookup32UnsafeP;
             fixed (byte* bytesP = bytes)
             fixed (char* resultP = chars)
             {
@@ -58,12 +58,12 @@ public class HexEncoding : IEncoding
         return len;
     }
 
-    public virtual String GetString(ReadOnlySpan<Byte> bytes)
+    public string Encode(ReadOnlySpan<byte> bytes)
     {
         var result = new string((char)0, bytes.Length * 2);
         unsafe
         {
-            var lookupP = _lowerLookup32UnsafeP;
+            var lookupP = _isUpper ? _upperLookup32UnsafeP : _lowerLookup32UnsafeP;
             fixed (byte* bytesP = bytes)
             fixed (char* resultP = result)
             {
@@ -75,5 +75,18 @@ public class HexEncoding : IEncoding
             }
         }
         return result;
+    }
+
+    public int GetMaxDecodedLength(ReadOnlySpan<char> chars)
+        => chars.Length / 2;
+
+    public int Decode(ReadOnlySpan<char> chars, Span<byte> bytes)
+    {
+        throw new NotImplementedException();
+    }
+
+    public byte[] Decode(ReadOnlySpan<char> chars)
+    {
+        throw new NotImplementedException();
     }
 }

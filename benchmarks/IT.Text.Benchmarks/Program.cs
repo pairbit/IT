@@ -1,19 +1,62 @@
 ﻿using IT.Text.Benchmarks;
 
-var bench = new BaseCoderBenchmark();
+Base16Test();
 
-var u1 = bench.Base16_Upper_Encode_IT();
-var u2 = bench.Base16_Upper_Encode_SimpleBase();
-var u3 = bench.Base16_Upper_Encode_K4os();
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Encode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Decode_Benchmark));
 
-if (!u1.Equals(u2)) throw new InvalidOperationException();
-if (!u1.Equals(u3)) throw new InvalidOperationException();
+static void Base16Test()
+{
+    var encoder = new Base16_Encode_Benchmark();
 
-var l1 = bench.Base16_Lower_Encode_IT();
-var l2 = bench.Base16_Lower_Encode_SimpleBase();
-var l3 = bench.Base16_Lower_Encode_K4os();
+    encoder.Length = 16;
+    encoder.Setup();
 
-if (!l1.Equals(l2)) throw new InvalidOperationException();
-if (!l1.Equals(l3)) throw new InvalidOperationException();
+    var u1 = encoder.Upper_IT_old();
+    var u2 = encoder.Upper_SimpleBase();
+    var u3 = encoder.Upper_K4os();
+    var u4 = encoder.Upper_DR();
+    var u5 = encoder.Upper_Convert();
+    var u6 = encoder.Upper_HexMate();
+    var u7 = encoder.Upper_IT_HexMate();
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(BaseCoderBenchmark));
+    if (!u1.Equals(u2)) throw new InvalidOperationException();
+    if (!u1.Equals(u3)) throw new InvalidOperationException();
+    if (!u1.Equals(u4)) throw new InvalidOperationException();
+    if (!u1.Equals(u5)) throw new InvalidOperationException();
+    if (!u1.Equals(u6)) throw new InvalidOperationException();
+    if (!u1.Equals(u7)) throw new InvalidOperationException();
+
+    var l1 = encoder.Lower_IT_old();
+    var l2 = encoder.Lower_SimpleBase();
+    var l3 = encoder.Lower_K4os();
+    var l4 = encoder.Lower_HexMate();
+    var l5 = encoder.Lower_IT_HexMate();
+
+    if (!l1.Equals(l2)) throw new InvalidOperationException();
+    if (!l1.Equals(l3)) throw new InvalidOperationException();
+    if (!l1.Equals(l4)) throw new InvalidOperationException();
+    if (!l1.Equals(l5)) throw new InvalidOperationException();
+
+    var decoder = new Base16_Decode_Benchmark();
+    decoder._data = l1;
+
+    var b = encoder._data.AsSpan();
+    var b1 = decoder.Lower_K4os();
+    var b2 = decoder.Lower_DR();
+    var b3 = decoder.Lower_SimpleBase();
+    var b4 = decoder.Upper_K4os();
+    var b5 = decoder.Upper_SimpleBase();
+    var b6 = decoder.Upper_Convert();
+    var b7 = decoder.HexMate_Convert();
+    var b8 = decoder.IT_HexMate();
+
+    if (!b.SequenceEqual(b1)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b2)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b3)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b4)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b5)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b6)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b7)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b8)) throw new InvalidOperationException();
+}

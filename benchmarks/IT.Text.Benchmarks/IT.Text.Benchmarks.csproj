@@ -5,11 +5,13 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
     <PackageReference Include="ByteEncodings" Version="1.2.1" />
+    <PackageReference Include="HexMate" Version="0.0.3" />
     <PackageReference Include="K4os.Text.BaseX" Version="0.0.4" />
     <PackageReference Include="Multiformats.Base" Version="2.0.2" />
     <PackageReference Include="SimpleBase" Version="3.1.0" />

@@ -1,9 +1,32 @@
 ﻿#if NETSTANDARD2_0
 
+using System.Buffers;
+
 namespace System;
 
 public static class _String
 {
+    public static String Create<TState>(int length, TState state, SpanAction<char, TState> action)
+    {
+        if (length == 0) return String.Empty;
+
+        if (length < 0) throw new ArgumentOutOfRangeException(nameof(length));
+        if (action is null) throw new ArgumentNullException(nameof(action));
+
+        var pool = ArrayPool<Char>.Shared;
+        var rented = pool.Rent(length);
+
+        try
+        {
+            action(rented, state);
+            return new String(rented, 0, length);
+        }
+        finally
+        {
+            pool.Return(rented);
+        }
+    }
+
     public static String[] Split(this String value, String separator, StringSplitOptions options = StringSplitOptions.None)
         => value.Split(new[] { separator }, options);
 
