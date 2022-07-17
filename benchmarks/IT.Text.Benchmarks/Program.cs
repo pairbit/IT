@@ -1,4 +1,5 @@
 ﻿using IT.Text.Benchmarks;
+using System.Text;
 
 Base16Test();
 
@@ -59,4 +60,17 @@ static void Base16Test()
     if (!b.SequenceEqual(b5)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b6)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b7)) throw new InvalidOperationException();
+
+    var count = (l1.Length / 2) - 1;
+    var sb = new StringBuilder(l1, l1.Length + count);
+
+    for (int i = l1.Length - 2; i >= 2; i -= 2)
+    {
+        sb.Insert(i, ' ');
+    }
+
+    decoder._data = sb.ToString();
+
+    b1 = decoder.IT_Bench();
+    if (!b.SequenceEqual(b1)) throw new InvalidOperationException();
 }
