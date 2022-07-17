@@ -15,7 +15,7 @@ public class Base64_Encode_Benchmark
     internal byte[] _data;
 
     //[Params(14, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
-    [Params(1, 2, 4, 8, 15, 16, 31, 32, 63, 64)]
+    [Params(1, 2, 4, 8, 15, 16, 31, 32, 49, 50, 63, 64)]
     public int Length { get; set; }
 
     [GlobalSetup]
@@ -37,7 +37,7 @@ public class Base64_Encode_Benchmark
     [Benchmark(Description = "IT_Utf8")]
     public String IT_Utf8_Bench() => _base64Utf8.Encode(_data);
 
-    [Benchmark(Description = "K4os")]
+    //[Benchmark(Description = "K4os")]
     public String K4os_Bench() => Base64.Default.Encode(_data);
 
     [Benchmark(Description = "Convert.ToBase64String")]
