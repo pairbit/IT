@@ -9,7 +9,12 @@ Base16Test();
 Base64Test();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Encode_Benchmark));
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Decode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Decode_Benchmark));
+
+Base85Test();
+
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Encode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Decode_Benchmark));
 
 static void Base16Test()
 {
@@ -121,4 +126,23 @@ static void Base64Test()
     if (!b.SequenceEqual(b5)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b6)) throw new InvalidOperationException();
     //if (!b.SequenceEqual(b7)) throw new InvalidOperationException();
+}
+
+static void Base85Test()
+{
+    var encoder = new Base85_Encode_Benchmark();
+
+    encoder.Length = 16;
+    encoder.Setup();
+
+    var u1 = encoder.K4os_Bench();
+    var u2 = encoder.SimpleBase_Bench();
+    var u3 = encoder.Logos_Bench();
+    var u4 = encoder.FsBinaryCodecs_Bench();
+    //var u5 = encoder.ConfluxAddress_Bench();
+
+    if (!u1.Equals(u2)) throw new InvalidOperationException();
+    if (!u1.Equals(u3)) throw new InvalidOperationException();
+    if (!u1.Equals(u4)) throw new InvalidOperationException();
+    //if (!u1.Equals(u5)) throw new InvalidOperationException();
 }
