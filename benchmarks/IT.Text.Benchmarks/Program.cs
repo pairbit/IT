@@ -4,7 +4,11 @@ using System.Text;
 Base16Test();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Encode_Benchmark));
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Decode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Decode_Benchmark));
+
+Base64Test();
+
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Encode_Benchmark));
 
 static void Base16Test()
 {
@@ -73,4 +77,23 @@ static void Base16Test()
 
     b1 = decoder.IT_Bench();
     if (!b.SequenceEqual(b1)) throw new InvalidOperationException();
+}
+
+static void Base64Test()
+{
+    var encoder = new Base64_Encode_Benchmark();
+
+    encoder.Length = 16;
+    encoder.Setup();
+
+    var u1 = encoder.ToBase64String();
+    var u2 = encoder.K4os_Bench();
+    var u3 = encoder.gfoidl_Bench();
+    var u4 = encoder.IT_Bench();
+    var u5 = encoder.Multiformats_Bench();
+
+    if (!u1.Equals(u2)) throw new InvalidOperationException();
+    if (!u1.Equals(u3)) throw new InvalidOperationException();
+    if (!u1.Equals(u4)) throw new InvalidOperationException();
+    if (!u1.Equals(u5)) throw new InvalidOperationException();
 }
