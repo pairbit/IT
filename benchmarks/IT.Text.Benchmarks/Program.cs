@@ -32,11 +32,13 @@ static void Base16Test()
     var l3 = encoder.Lower_K4os();
     var l4 = encoder.Lower_HexMate();
     var l5 = encoder.Lower_IT_HexMate();
+    var l6 = encoder.Lower_Dodo();
 
     if (!l1.Equals(l2)) throw new InvalidOperationException();
     if (!l1.Equals(l3)) throw new InvalidOperationException();
     if (!l1.Equals(l4)) throw new InvalidOperationException();
     if (!l1.Equals(l5)) throw new InvalidOperationException();
+    if (!l1.Equals(l6)) throw new InvalidOperationException();
 
     var decoder = new Base16_Decode_Benchmark();
     decoder._data = l1;

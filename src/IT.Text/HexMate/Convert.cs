@@ -304,6 +304,40 @@ namespace HexMate
 #endif
         }
 
+        internal static string ToHexStringInternal(ReadOnlySpan<byte> bytes, HexFormattingOptions options = default)
+        {
+            var len = bytes.Length;
+            var longlen = (long) len * 2;
+            if (longlen > int.MaxValue) throw new OutOfMemoryException("bytes.Length * 2 > int.MaxValue");
+            var outlen = (int)longlen;
+#if NETSTANDARD2_0
+            var result = new string('\0', outlen);
+            unsafe
+            {
+                fixed (byte* bytesPtr = &MemoryMarshal.GetReference(bytes))
+                fixed (char* outPtr = result)
+                {
+                    ConvertToHexArray(outPtr, outlen, bytesPtr, len, options);
+                }
+            }
+            return result;
+#else
+            unsafe
+            {
+                fixed (byte* bytesPtr = &MemoryMarshal.GetReference(bytes))
+                {
+                    return string.Create(outlen, (Bytes: (IntPtr)bytesPtr, Length: len, Options: options), (span, state) =>
+                    {
+                        fixed (char* outPtr = &MemoryMarshal.GetReference(span))
+                        {
+                            ConvertToHexArray(outPtr, span.Length, (byte*)state.Bytes, state.Length, state.Options);
+                        }
+                    });
+                }
+            }
+#endif
+        }
+
         /// <summary>
         /// Converts the span, which encodes binary data as hex characters, into a span of equivalent 8-bit unsigned integers.
         /// </summary>

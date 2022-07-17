@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
     <PackageReference Include="ByteEncodings" Version="1.2.1" />
+    <PackageReference Include="Dodo.Primitives" Version="1.5.1" />
     <PackageReference Include="HexMate" Version="0.0.3" />
     <PackageReference Include="K4os.Text.BaseX" Version="0.0.4" />
     <PackageReference Include="Multiformats.Base" Version="2.0.2" />

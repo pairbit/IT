@@ -71,13 +71,14 @@ public class HexEncoder : IEncoder
     public string Encode(ReadOnlySpan<byte> bytes)
     {
         var len = bytes.Length;
+        if (len == 0) return String.Empty;
         if (len < 32)
         {
             var result = new string((char)0, bytes.Length * 2);
             unsafe
             {
                 var lookupP = _options == HexMate.HexFormattingOptions.Lowercase ? _lowerLookup32UnsafeP : _upperLookup32UnsafeP;
-                fixed (byte* bytesP = &MemoryMarshal.GetReference(bytes))
+                fixed (byte* bytesP = bytes)
                 fixed (char* resultP = result)
                 {
                     uint* resultP2 = (uint*)resultP;
@@ -92,7 +93,7 @@ public class HexEncoder : IEncoder
         //https://ndportmann.com/breaking-records-with-core-3-0/
         else
         {
-            return HexMate.Convert.ToHexString(bytes, _options);
+            return HexMate.Convert.ToHexStringInternal(bytes, _options);
         }
     }
 
