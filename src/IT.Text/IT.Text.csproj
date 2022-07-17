@@ -33,15 +33,15 @@
   </ItemGroup>
 
   <PropertyGroup Condition="$(TargetFramework) == 'net6.0'">
-    <DefineConstants>INTRINSICS;SPAN;GC_ALLOC_UNINIT</DefineConstants>
+    <DefineConstants>INTRINSICS;SPAN;GC_ALLOC_UNINIT;CAN_USE_CONVERT_BASE64</DefineConstants>
   </PropertyGroup>
 	
   <PropertyGroup Condition="$(TargetFramework) == 'netstandard2.1'">
-    <DefineConstants>SPAN</DefineConstants>
+    <DefineConstants>SPAN;CAN_USE_CONVERT_BASE64</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.1'">
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
   </ItemGroup>
-	
+
 </Project>

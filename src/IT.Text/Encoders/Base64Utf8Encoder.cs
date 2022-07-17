@@ -5,7 +5,7 @@ using System.Text;
 
 namespace IT.Text.Encoders;
 
-public class Base64Encoder : IEncoder
+public class Base64Utf8Encoder : IEncoder
 {
     public int GetMaxEncodedLength(ReadOnlySpan<byte> bytes)
         => Base64.GetMaxEncodedToUtf8Length(bytes.Length);

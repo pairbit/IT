@@ -89,11 +89,15 @@ static void Base64Test()
     var u1 = encoder.ToBase64String();
     var u2 = encoder.K4os_Bench();
     var u3 = encoder.gfoidl_Bench();
-    var u4 = encoder.IT_Bench();
+    var u4 = encoder.IT_Utf8_Bench();
     var u5 = encoder.Multiformats_Bench();
+    var u6 = encoder.Exyll_Bench();
+    var u7 = encoder.IT_gfoidl_Bench();
 
     if (!u1.Equals(u2)) throw new InvalidOperationException();
     if (!u1.Equals(u3)) throw new InvalidOperationException();
     if (!u1.Equals(u4)) throw new InvalidOperationException();
     if (!u1.Equals(u5)) throw new InvalidOperationException();
+    if (!u1.Equals(u6)) throw new InvalidOperationException();
+    if (!u1.Equals(u7)) throw new InvalidOperationException();
 }
