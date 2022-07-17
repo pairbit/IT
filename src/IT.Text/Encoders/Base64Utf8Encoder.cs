@@ -81,11 +81,9 @@ public class Base64Utf8Encoder : IEncoder
     {
         var utf8len = chars.Length;
 
-        var len = Base64.GetMaxDecodedFromUtf8Length(utf8len);
-
         var pool = ArrayPool<byte>.Shared;
 
-        var rented = pool.Rent(len);
+        var rented = pool.Rent(utf8len);
 
         Span<byte> utf8Span = rented;
 
@@ -95,15 +93,15 @@ public class Base64Utf8Encoder : IEncoder
 
             if (count != utf8len) throw new InvalidOperationException();
 
-            var status = Base64.DecodeFromUtf8(utf8Span, bytes, out var consumed, out var written);
+            var status = Base64.DecodeFromUtf8(utf8Span[..utf8len], bytes, out var consumed, out var written);
 
             if (status != OperationStatus.Done) throw new InvalidOperationException(status.ToString());
 
-            if (consumed != len) throw new InvalidOperationException();
+            if (consumed != utf8len) throw new InvalidOperationException();
 
-            if (written != utf8len) throw new InvalidOperationException();
+            bytes = bytes[..written];
 
-            return count;
+            return written;
         }
         finally
         {
