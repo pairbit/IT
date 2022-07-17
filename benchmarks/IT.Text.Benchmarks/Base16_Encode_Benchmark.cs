@@ -18,27 +18,7 @@ public class Base16_Encode_Benchmark
     private IEncoder _base16upperMate;
     internal byte[] _data;
 
-    [Params(
-        1,
-        2,
-        4,
-        8,
-        12,
-        16,
-        18,
-        20,
-        24,
-        30,
-        31,
-        32
-        //128,
-        //1024,
-        //128 * 1024,
-        //510 * 1024,
-        //1024 * 1024,//K4os champions only 1MB
-        //128 * 1024 * 1024,
-        //510 * 1024 * 1024
-        )]
+    [Params(100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
     public int Length { get; set; }
 
     [GlobalSetup]
@@ -85,7 +65,7 @@ public class Base16_Encode_Benchmark
     //[Benchmark]
     public String Lower_K4os() => Base16.Lower.Encode(_data);
 
-    [Benchmark]
+    //[Benchmark]
     public String Upper_DR() => DRDigit.Fast.ToHexString(_data);
 
     [Benchmark(Description = "System.Convert.ToHexString")]

@@ -107,10 +107,5 @@ public class HexEncoder : IEncoder
     public int Decode(ReadOnlySpan<char> chars, Span<byte> bytes)
         => HexMate.Convert.TryFromHexChars(chars, bytes, out var written) ? written : 0;
 
-    public byte[] Decode(ReadOnlySpan<char> chars)
-    {
-        var bytes = new byte[GetMaxDecodedLength(chars)];
-        Decode(chars, bytes);
-        return bytes;
-    }
+    public byte[] Decode(ReadOnlySpan<char> chars) => HexMate.Convert.FromHexString(chars);
 }

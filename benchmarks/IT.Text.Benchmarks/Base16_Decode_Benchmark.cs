@@ -10,10 +10,10 @@ namespace IT.Text.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base16_Decode_Benchmark
 {
-    private IEncoder _base16Mate = new HexMateEncoder();
+    private IEncoder _base16 = new HexEncoder();
     internal String _data;
 
-    [Params(16, 1337, 1024 * 1024)]
+    [Params(100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
     public int Length { get; set; }
 
     [GlobalSetup]
@@ -25,26 +25,23 @@ public class Base16_Decode_Benchmark
     }
 
     [Benchmark]
-    public Span<Byte> IT_HexMate() => _base16Mate.Decode(_data);
+    public Span<Byte> IT_Bench() => _base16.Decode(_data);
 
     [Benchmark]
-    public Span<Byte> HexMate_Convert() => HexMate.Convert.FromHexString(_data);
+    public Span<Byte> HexMate_Bench() => HexMate.Convert.FromHexString(_data);
 
-    [Benchmark]
-    public Span<Byte> Lower_K4os() => Base16.Lower.Decode(_data);
+    //[Benchmark]
+    public Span<Byte> K4os_Bench() => Base16.Default.Decode(_data);
 
-    [Benchmark]
-    public Span<Byte> Upper_K4os() => Base16.Upper.Decode(_data);
+    //[Benchmark]
+    public Span<Byte> DR_Bench() => DRDigit.Fast.FromHexString(_data);
 
-    [Benchmark]
-    public Span<Byte> Lower_DR() => DRDigit.Fast.FromHexString(_data);
+    //[Benchmark]
+    public Span<Byte> SimpleBase_Bench() => SimpleBase.Base16.UpperCase.Decode(_data);
 
-    [Benchmark]
-    public Span<Byte> Lower_SimpleBase() => SimpleBase.Base16.LowerCase.Decode(_data);
+    [Benchmark(Description = "System.Convert.FromHexString")]
+    public Span<Byte> Convert_FromHexString() => Convert.FromHexString(_data);
 
-    [Benchmark]
-    public Span<Byte> Upper_SimpleBase() => SimpleBase.Base16.UpperCase.Decode(_data);
-
-    [Benchmark]
-    public Span<Byte> Upper_Convert() => Convert.FromHexString(_data);
+    //[Benchmark]
+    public Span<Byte> Dodo_Bench() => Dodo.Primitives.Hex.GetBytes(_data)!;
 }

@@ -258,6 +258,35 @@ namespace HexMate
             }
         }
 
+        internal static byte[] FromHexStringInternal(ReadOnlySpan<char> chars)
+        {
+            var len = chars.Length;
+
+            if (len == 0)
+                return Array.Empty<byte>();
+
+            unsafe
+            {
+                fixed (char* inPtr = &MemoryMarshal.GetReference(chars))
+                {
+#if GC_ALLOC_UNINIT
+                    var result = GC.AllocateUninitializedArray<byte>(len / 2);
+#else
+                    var result = new byte[len / 2];
+#endif
+                    fixed (byte* outPtr = result)
+                    {
+                        var res = ConvertFromHexArray(outPtr, result.Length, inPtr, len);
+                        if (res < 0)
+                            throw new FormatException(SR.Format_BadHexChar);
+                        Debug.Assert(res == result.Length);
+                    }
+
+                    return result;
+                }
+            }
+        }
+
         /// <summary>
         /// Converts a span of 8-bit unsigned integers to its equivalent string representation that is encoded with hex characters.
         /// A parameter specifies whether to insert line breaks in the return value and whether to insert upper- or lowercase hex characters.

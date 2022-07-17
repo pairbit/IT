@@ -2,8 +2,8 @@
 
 Base16Test();
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Encode_Benchmark));
-//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Decode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Encode_Benchmark));
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Decode_Benchmark));
 
 static void Base16Test()
 {
@@ -44,14 +44,13 @@ static void Base16Test()
     decoder._data = l1;
 
     var b = encoder._data.AsSpan();
-    var b1 = decoder.Lower_K4os();
-    var b2 = decoder.Lower_DR();
-    var b3 = decoder.Lower_SimpleBase();
-    var b4 = decoder.Upper_K4os();
-    var b5 = decoder.Upper_SimpleBase();
-    var b6 = decoder.Upper_Convert();
-    var b7 = decoder.HexMate_Convert();
-    var b8 = decoder.IT_HexMate();
+    var b1 = decoder.K4os_Bench();
+    var b2 = decoder.DR_Bench();
+    var b3 = decoder.SimpleBase_Bench();
+    var b4 = decoder.Convert_FromHexString();
+    var b5 = decoder.HexMate_Bench();
+    var b6 = decoder.IT_Bench();
+    var b7 = decoder.Dodo_Bench();
 
     if (!b.SequenceEqual(b1)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b2)) throw new InvalidOperationException();
@@ -60,5 +59,4 @@ static void Base16Test()
     if (!b.SequenceEqual(b5)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b6)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b7)) throw new InvalidOperationException();
-    if (!b.SequenceEqual(b8)) throw new InvalidOperationException();
 }
