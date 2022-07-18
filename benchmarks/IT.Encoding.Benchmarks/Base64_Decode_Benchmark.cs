@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
-using IT.Encoding.Encoders;
+using IT.Encoding.Base;
 using K4os.Text.BaseX;
 
 namespace IT.Encoding.Benchmarks;

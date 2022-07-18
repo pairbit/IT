@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IT.Encoding.Encoders;
+namespace IT.Encoding.Base;
 
 public class HexEncoder_HexMate_CodesInChaos : HexEncoder_HexMate
 {

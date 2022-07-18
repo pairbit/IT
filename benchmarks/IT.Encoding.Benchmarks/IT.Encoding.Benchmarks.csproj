@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\IT.Encoding\IT.Encoding.csproj" />
+    <ProjectReference Include="..\..\src\IT.Encoding.Base\IT.Encoding.Base.csproj" />
   </ItemGroup>
 
 </Project>

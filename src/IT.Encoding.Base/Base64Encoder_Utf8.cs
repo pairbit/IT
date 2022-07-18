@@ -2,7 +2,7 @@
 using System.Buffers;
 using System.Buffers.Text;
 
-namespace IT.Encoding.Encoders;
+namespace IT.Encoding.Base;
 
 public class Base64Encoder_Utf8 : TextEncoder
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Buffers;
 
-namespace IT.Encoding.Encoders;
+namespace IT.Encoding.Base;
 
 public class Base64Encoder_gfoidl : TextEncoder
 {

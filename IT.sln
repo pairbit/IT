@@ -153,17 +153,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Samples.NET6", "samples\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Text.Benchmarks", "benchmarks\IT.Text.Benchmarks\IT.Text.Benchmarks.csproj", "{90368EAB-D081-431C-8D92-6FC9A1EE6753}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Encoding", "src\IT.Encoding\IT.Encoding.csproj", "{A8C5847E-31B9-49AD-B837-8BB8E9A4ACA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Encoding", "src\IT.Encoding\IT.Encoding.csproj", "{A8C5847E-31B9-49AD-B837-8BB8E9A4ACA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Compression", "src\IT.Compression\IT.Compression.csproj", "{9233BDA2-4C51-4E07-ACCD-E3BFDFFA03AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Compression", "src\IT.Compression\IT.Compression.csproj", "{9233BDA2-4C51-4E07-ACCD-E3BFDFFA03AC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compression", "Compression", "{41EEE3AE-1AE3-4289-A964-59A9B6E7B1AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Compression.LZ4", "src\IT.Compression.LZ4\IT.Compression.LZ4.csproj", "{B50A35A2-A262-462A-ADBE-84E86B775984}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Compression.LZ4", "src\IT.Compression.LZ4\IT.Compression.LZ4.csproj", "{B50A35A2-A262-462A-ADBE-84E86B775984}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Encoding", "Encoding", "{2040F77F-08E5-4502-AA10-0A0CF453F4C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Encoding.Benchmarks", "benchmarks\IT.Encoding.Benchmarks\IT.Encoding.Benchmarks.csproj", "{ECA06B39-80CD-4F52-A7C6-B960E9CBF3EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Encoding.Benchmarks", "benchmarks\IT.Encoding.Benchmarks\IT.Encoding.Benchmarks.csproj", "{ECA06B39-80CD-4F52-A7C6-B960E9CBF3EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Encoding.Base", "src\IT.Encoding.Base\IT.Encoding.Base.csproj", "{23235120-17DE-423B-9424-F0770A9A29FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -431,6 +433,10 @@ Global
 		{ECA06B39-80CD-4F52-A7C6-B960E9CBF3EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECA06B39-80CD-4F52-A7C6-B960E9CBF3EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECA06B39-80CD-4F52-A7C6-B960E9CBF3EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23235120-17DE-423B-9424-F0770A9A29FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23235120-17DE-423B-9424-F0770A9A29FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23235120-17DE-423B-9424-F0770A9A29FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23235120-17DE-423B-9424-F0770A9A29FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -501,6 +507,7 @@ Global
 		{9233BDA2-4C51-4E07-ACCD-E3BFDFFA03AC} = {41EEE3AE-1AE3-4289-A964-59A9B6E7B1AE}
 		{B50A35A2-A262-462A-ADBE-84E86B775984} = {41EEE3AE-1AE3-4289-A964-59A9B6E7B1AE}
 		{ECA06B39-80CD-4F52-A7C6-B960E9CBF3EE} = {2040F77F-08E5-4502-AA10-0A0CF453F4C6}
+		{23235120-17DE-423B-9424-F0770A9A29FD} = {2040F77F-08E5-4502-AA10-0A0CF453F4C6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E61A39C8-7FE8-4292-A237-B5DBE7E0E57C}
