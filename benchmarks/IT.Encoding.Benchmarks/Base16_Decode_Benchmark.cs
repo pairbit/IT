@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
-using IT.Text.Encoders;
+using IT.Encoding.Encoders;
 using K4os.Text.BaseX;
 
 namespace IT.Encoding.Benchmarks;
@@ -10,7 +10,7 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base16_Decode_Benchmark
 {
-    private IEncoder _base16 = new HexEncoder();
+    private ITextEncoder _base16 = new HexEncoder_HexMate();
     internal String _data;
 
     [Params(100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]

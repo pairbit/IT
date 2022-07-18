@@ -5,7 +5,7 @@ namespace IT.Encoding;
 
 public interface IEncoder
 {
-    Int32 MaxEncodedLength { get; }
+    Int32 MaxDataLength { get; }
 
     Int32 GetMaxEncodedLength(Int32 dataLength);
 
@@ -19,7 +19,7 @@ public interface IEncoder
 
     OperationStatus Decode(ReadOnlySpan<Byte> encoded, Span<Byte> data, out Int32 consumed, out Int32 written, Boolean isFinal = true);
 
-    OperationStatus Encode(Span<Byte> buffer, Int32 length, out Int32 written);
+    OperationStatus Encode(Span<Byte> buffer, Int32 dataLength, out Int32 written);
 
     OperationStatus Decode(Span<Byte> buffer, out Int32 written);
 }

@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
-using IT.Text.Encoders;
+using IT.Encoding.Encoders;
 using K4os.Text.BaseX;
 
 namespace IT.Encoding.Benchmarks;
@@ -10,8 +10,8 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base64_Encode_Benchmark
 {
-    private IEncoder _base64Utf8;
-    private IEncoder _base64gfoidl;
+    private ITextEncoder _base64Utf8;
+    private ITextEncoder _base64gfoidl;
     internal byte[] _data;
 
     //[Params(14, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
@@ -21,8 +21,8 @@ public class Base64_Encode_Benchmark
     [GlobalSetup]
     public void Setup()
     {
-        _base64Utf8 = new Base64Utf8Encoder();
-        _base64gfoidl = new Base64gfoidlEncoder();
+        _base64Utf8 = new Base64Encoder_Utf8();
+        _base64gfoidl = new Base64Encoder_gfoidl();
         var data = new byte[Length];
         Random.Shared.NextBytes(data);
         _data = data;
@@ -34,7 +34,7 @@ public class Base64_Encode_Benchmark
     [Benchmark(Description = "IT_gfoidl")]
     public String IT_gfoidl_Bench() => _base64gfoidl.Encode(_data);
 
-    [Benchmark(Description = "IT_Utf8")]
+    [Benchmark(Description = "System.Buffers.Text.Base64")]
     public String IT_Utf8_Bench() => _base64Utf8.Encode(_data);
 
     //[Benchmark(Description = "K4os")]

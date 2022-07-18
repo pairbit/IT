@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
-using IT.Text.Encoders;
+using IT.Encoding.Encoders;
 using K4os.Text.BaseX;
 
 namespace IT.Encoding.Benchmarks;
@@ -10,12 +10,12 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base16_Encode_Benchmark
 {
-    private IEncoder _base16lower;
-    private IEncoder _base16upper;
-    private IEncoder _base16lowerOld;
-    private IEncoder _base16upperOld;
-    private IEncoder _base16lowerMate;
-    private IEncoder _base16upperMate;
+    private ITextEncoder _base16lower;
+    private ITextEncoder _base16upper;
+    private ITextEncoder _base16lowerOld;
+    private ITextEncoder _base16upperOld;
+    private ITextEncoder _base16lowerMate;
+    private ITextEncoder _base16upperMate;
     internal byte[] _data;
 
     [Params(100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
@@ -24,18 +24,18 @@ public class Base16_Encode_Benchmark
     [GlobalSetup]
     public void Setup()
     {
-        _base16lower = new HexEncoder(false);
-        _base16upper = new HexEncoder(true);
-        _base16lowerOld = new HexOldEncoder(false);
-        _base16upperOld = new HexOldEncoder(true);
-        _base16lowerMate = new HexMateEncoder(false);
-        _base16upperMate = new HexMateEncoder(true);
+        _base16lower = new HexEncoder_HexMate_CodesInChaos(false);
+        _base16upper = new HexEncoder_HexMate_CodesInChaos(true);
+        _base16lowerOld = new HexEncoder_CodesInChaos(false);
+        _base16upperOld = new HexEncoder_CodesInChaos(true);
+        _base16lowerMate = new HexEncoder_HexMate(false);
+        _base16upperMate = new HexEncoder_HexMate(true);
         var data = new byte[Length];
         Random.Shared.NextBytes(data);
         _data = data;
     }
 
-    [Benchmark]
+    [Benchmark(Description = "Upper_IT")]
     public String Upper_IT_new() => _base16upper.Encode(_data);
 
     //[Benchmark]
@@ -47,11 +47,11 @@ public class Base16_Encode_Benchmark
     //[Benchmark]
     public String Lower_IT_HexMate() => _base16lowerMate.Encode(_data);
 
-    [Benchmark]
-    public String Upper_IT_old() => _base16upperOld.Encode(_data);
+    [Benchmark(Description = "Upper_CodesInChaos")]
+    public String Upper_CodesInChaos() => _base16upperOld.Encode(_data);
 
     //[Benchmark]
-    public String Lower_IT_old() => _base16lowerOld.Encode(_data);
+    public String Lower_CodesInChaos() => _base16lowerOld.Encode(_data);
 
     //[Benchmark]
     public String Upper_HexMate() => HexMate.Convert.ToHexString(_data);
