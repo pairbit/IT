@@ -24,12 +24,12 @@ public class Base16_Encode_Benchmark
     [GlobalSetup]
     public void Setup()
     {
-        _base16lower = new HexEncoder_HexMate_CodesInChaos(false);
-        _base16upper = new HexEncoder_HexMate_CodesInChaos(true);
-        _base16lowerOld = new HexEncoder_CodesInChaos(false);
-        _base16upperOld = new HexEncoder_CodesInChaos(true);
-        _base16lowerMate = new HexEncoder_HexMate(false);
-        _base16upperMate = new HexEncoder_HexMate(true);
+        _base16lower = new HexEncoder_HexMate_CodesInChaos(true);
+        _base16upper = new HexEncoder_HexMate_CodesInChaos();
+        _base16lowerOld = new HexEncoder_CodesInChaos(true);
+        _base16upperOld = new HexEncoder_CodesInChaos();
+        _base16lowerMate = new HexEncoder_HexMate(true);
+        _base16upperMate = new HexEncoder_HexMate();
         var data = new byte[Length];
         Random.Shared.NextBytes(data);
         _data = data;

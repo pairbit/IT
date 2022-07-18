@@ -121,7 +121,7 @@ static void Base64Test()
     var b4 = decoder.Multiformats_Bench();
     var b5 = decoder.Exyll_Bench();
     var b6 = decoder.IT_gfoidl_Bench();
-    //var b7 = decoder.IT_Utf8_Bench();
+    var b7 = decoder.IT_Utf8_Bench();
 
     if (!b.SequenceEqual(b1)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b2)) throw new InvalidOperationException();
@@ -129,7 +129,7 @@ static void Base64Test()
     if (!b.SequenceEqual(b4)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b5)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b6)) throw new InvalidOperationException();
-    //if (!b.SequenceEqual(b7)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b7)) throw new InvalidOperationException();
 }
 
 static void Base85Test()
