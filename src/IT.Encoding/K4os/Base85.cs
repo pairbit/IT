@@ -12,7 +12,7 @@ namespace K4os.Text.BaseX
 		internal const char DigitZ = 'z';
 
 		/// <summary>Default Base85 codec.</summary>
-		public static Base85Codec Default { get; } = new Base85Codec();
+		public static Base85Codec Default { get; } = new Base85Codec(Digits85, DigitZ);
 		
 		/// <summary>Converts byte array to Base85 string.</summary>
 		/// <param name="decoded">Decoded buffer.</param>

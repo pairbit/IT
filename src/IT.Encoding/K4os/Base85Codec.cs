@@ -16,13 +16,6 @@ namespace K4os.Text.BaseX
 
 		private readonly char _digitZ;
 
-		/// <summary>
-		/// Create new Base85 codec with default settings.
-		/// Note: it would be better is you just use <see cref="Base85.Default"/>
-		/// </summary>
-		public Base85Codec():
-			this(Base85.Digits85, Base85.DigitZ) { }
-
 		/// <summary>Create new Base85 codec using specific set of digits.</summary>
 		/// <param name="digits">Digits.</param>
 		/// <param name="digitZ">Special digit for 0s (used for RLE compression)</param>
