@@ -41,9 +41,9 @@ public class Base64_Decode_Benchmark
     [Benchmark(Description = "Convert.FromBase64String")]
     public Byte[] FromBase64String() => Convert.FromBase64String(_data);
 
-    [Benchmark(Description = "Multiformats")]
+    //[Benchmark(Description = "Multiformats")]
     public Byte[] Multiformats_Bench() => Multiformats.Base.Multibase.DecodeRaw(Multiformats.Base.MultibaseEncoding.Base64Padded, _data);
 
-    [Benchmark(Description = "Exyll")]
+    //[Benchmark(Description = "Exyll")]
     public Byte[] Exyll_Bench() => Exyll.Base64Encoder.Default.FromBase(_data);
 }

@@ -14,8 +14,9 @@ public class Base64_Encode_Benchmark
     private ITextEncoder _base64gfoidl;
     internal byte[] _data;
 
-    [Params(14, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
+    //[Params(14, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
     //[Params(1, 2, 4, 8, 15, 16, 31, 32, 49, 50, 63, 64)]
+    [Params(14, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 16 * 1024 * 1024, 64 * 1024 * 1024, 128 * 1024 * 1024, 256 * 1024 * 1024, 510 * 1024 * 1024)]
     public int Length { get; set; }
 
     [GlobalSetup]
@@ -43,9 +44,9 @@ public class Base64_Encode_Benchmark
     [Benchmark(Description = "Convert.ToBase64String")]
     public String ToBase64String() => Convert.ToBase64String(_data);
 
-    [Benchmark(Description = "Multiformats")]
+    //[Benchmark(Description = "Multiformats")]
     public String Multiformats_Bench() => Multiformats.Base.Multibase.EncodeRaw(Multiformats.Base.MultibaseEncoding.Base64Padded, _data);
 
-    [Benchmark(Description = "Exyll")]
+    //[Benchmark(Description = "Exyll")]
     public String Exyll_Bench() => Exyll.Base64Encoder.Default.ToBase(_data);
 }
