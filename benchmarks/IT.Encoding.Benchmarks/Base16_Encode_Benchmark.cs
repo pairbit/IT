@@ -18,7 +18,7 @@ public class Base16_Encode_Benchmark
     private ITextEncoder _base16upperMate;
     internal byte[] _data;
 
-    [Params(100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
+    [Params(14, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
     public int Length { get; set; }
 
     [GlobalSetup]
@@ -35,48 +35,48 @@ public class Base16_Encode_Benchmark
         _data = data;
     }
 
-    [Benchmark(Description = "Upper_IT")]
+    [Benchmark(Description = "IT")]
     public String Upper_IT_new() => _base16upper.Encode(_data);
 
     //[Benchmark]
     public String Lower_IT_new() => _base16lower.Encode(_data);
 
-    //[Benchmark]
+    [Benchmark(Description = "IT_HexMate")]
     public String Upper_IT_HexMate() => _base16upperMate.Encode(_data);
 
     //[Benchmark]
     public String Lower_IT_HexMate() => _base16lowerMate.Encode(_data);
 
-    [Benchmark(Description = "Upper_CodesInChaos")]
+    [Benchmark(Description = "CodesInChaos")]
     public String Upper_CodesInChaos() => _base16upperOld.Encode(_data);
 
     //[Benchmark]
     public String Lower_CodesInChaos() => _base16lowerOld.Encode(_data);
 
-    //[Benchmark]
+    [Benchmark(Description = "HexMate")]
     public String Upper_HexMate() => HexMate.Convert.ToHexString(_data);
 
     //[Benchmark]
     public String Lower_HexMate() => HexMate.Convert.ToHexString(_data, HexMate.HexFormattingOptions.Lowercase);
 
-    //[Benchmark]
+    [Benchmark(Description = "K4os")]
     public String Upper_K4os() => Base16.Upper.Encode(_data);
 
     //[Benchmark]
     public String Lower_K4os() => Base16.Lower.Encode(_data);
 
-    //[Benchmark]
+    [Benchmark(Description = "DR")]
     public String Upper_DR() => DRDigit.Fast.ToHexString(_data);
 
-    [Benchmark(Description = "System.Convert.ToHexString")]
+    [Benchmark(Description = "Convert.ToHexString")]
     public String Upper_Convert() => Convert.ToHexString(_data);
 
-    //[Benchmark]
+    [Benchmark(Description = "SimpleBase")]
     public String Upper_SimpleBase() => SimpleBase.Base16.UpperCase.Encode(_data);
 
     //[Benchmark]
     public String Lower_SimpleBase() => SimpleBase.Base16.LowerCase.Encode(_data);
 
-    [Benchmark]
+    [Benchmark(Description = "Dodo")]
     public String Lower_Dodo() => Dodo.Primitives.Hex.GetString(_data)!;
 }

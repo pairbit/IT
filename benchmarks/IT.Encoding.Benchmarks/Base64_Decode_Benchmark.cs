@@ -14,8 +14,8 @@ public class Base64_Decode_Benchmark
     private ITextEncoder _base64gfoidl = new Base64Encoder_gfoidl();
     internal string _data;
 
-    //[Params(14, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
-    [Params(1, 2, 4, 8, 15, 16, 31, 32, 49, 50, 63, 64, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
+    [Params(14, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
+    //[Params(1, 2, 4, 8, 15, 16, 31, 32, 49, 50, 63, 64, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
     public int Length { get; set; }
 
     [GlobalSetup]
@@ -35,15 +35,15 @@ public class Base64_Decode_Benchmark
     [Benchmark(Description = "System.Buffers.Text.Base64")]
     public Byte[] IT_Utf8_Bench() => _base64Utf8.Decode(_data);
 
-    //[Benchmark(Description = "K4os")]
+    [Benchmark(Description = "K4os")]
     public Byte[] K4os_Bench() => Base64.Default.Decode(_data);
 
-    [Benchmark(Description = "Convert.ToBase64String")]
+    [Benchmark(Description = "Convert.FromBase64String")]
     public Byte[] FromBase64String() => Convert.FromBase64String(_data);
 
-    //[Benchmark(Description = "Multiformats")]
+    [Benchmark(Description = "Multiformats")]
     public Byte[] Multiformats_Bench() => Multiformats.Base.Multibase.DecodeRaw(Multiformats.Base.MultibaseEncoding.Base64Padded, _data);
 
-    //[Benchmark(Description = "Exyll")]
+    [Benchmark(Description = "Exyll")]
     public Byte[] Exyll_Bench() => Exyll.Base64Encoder.Default.FromBase(_data);
 }

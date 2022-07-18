@@ -29,9 +29,9 @@ public class Base85_Encode_Benchmark
     [Benchmark(Description = "SimpleBase")]
     public String SimpleBase_Bench() => SimpleBase.Base85.Ascii85.Encode(_data);
 
-    //[Benchmark(Description = "Logos")]
+    [Benchmark(Description = "Logos")]
     public String Logos_Bench() => ReferenceCodec.Logos.Ascii85.Encode(_data);
 
-    //[Benchmark(Description = "Fs.Binary.Codecs")]
+    [Benchmark(Description = "Fs.Binary.Codecs")]
     public String FsBinaryCodecs_Bench() => Fs.Binary.Codecs.BinaryCodecs.Base85Standard.GetString(_data);
 }
