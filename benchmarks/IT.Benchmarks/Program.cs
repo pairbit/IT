@@ -1,7 +1,19 @@
-﻿using IT.Benchmarks;
+﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
+using IT.Benchmarks;
+using Perfolizer.Horology;
 
-var b = new EncodingBenchmark();
-var base64_1 = b.ConvertToBase64String();
+var config = DefaultConfig.Instance.AddJob(
+                Job.Default
+                    .WithIterationTime(TimeInterval.FromMilliseconds(250)) // each iteration should last no longer than 250ms
+                    .WithWarmupCount(1) // one warmup should be enough
+                    .WithMaxIterationCount(20) // we don't need more than 20 iterations
+                    .AsDefault());
+
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(FileWriteBenchmark), config, args);
+
+//var b = new EncodingBenchmark();
+//var base64_1 = b.ConvertToBase64String();
 //var base64_2 = new string(b.TryToBase64Chars());
 //var base64_3 = b.EncodeToUtf8String();
 //var base64_4 = b.EncodeToUtf8InPlaceString();
@@ -28,5 +40,6 @@ var base64_1 = b.ConvertToBase64String();
 
 //var obj1 = finder.NewEtalon();
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(EncodingBenchmark));
+//var test = new
+
 //BenchmarkRunner.Run(typeof(TagFinderBenchmark));
