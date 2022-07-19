@@ -30,12 +30,12 @@ public class Base85Z_Encode_Benchmark
     [Benchmark(Description = "K4os")]
     public String K4os_Bench() => _z85.Encode(_data);
 
+    [Benchmark(Description = "CoenM")]
+    public String CoenM_Bench() => CoenM.Encoding.Z85.Encode(_data);
+
     [Benchmark(Description = "SimpleBase")]
     public String SimpleBase_Bench() => SimpleBase.Base85.Z85.Encode(_data);
 
-    [Benchmark(Description = "Fs.Binary.Codecs")]
+    //[Benchmark(Description = "Fs.Binary.Codecs")]
     public String FsBinaryCodecs_Bench() => Fs.Binary.Codecs.BinaryCodecs.Z85.GetString(_data);
-
-    [Benchmark(Description = "CoenM")]
-    public String CoenM_Bench() => CoenM.Encoding.Z85.Encode(_data);
 }
