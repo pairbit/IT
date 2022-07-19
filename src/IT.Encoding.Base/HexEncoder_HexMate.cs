@@ -3,6 +3,9 @@ using System.Buffers;
 
 namespace IT.Encoding.Base;
 
+/// <summary>
+/// https://ndportmann.com/breaking-records-with-core-3-0/
+/// </summary>
 public class HexEncoder_HexMate : TextEncoder
 {
     private const Int32 _MaxDataLength = int.MaxValue / 2;

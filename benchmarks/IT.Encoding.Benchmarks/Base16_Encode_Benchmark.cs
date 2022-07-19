@@ -39,7 +39,7 @@ public class Base16_Encode_Benchmark
         _data = data;
     }
 
-    [Benchmark(Description = "IT")]
+    [Benchmark(Description = "IT_HexMate_CodesInChaos")]
     public String Upper_IT_new() => _base16upper.Encode(_data);
 
     //[Benchmark]
