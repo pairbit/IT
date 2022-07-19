@@ -94,7 +94,7 @@ public abstract class TextEncoder : Encoder, ITextEncoder
 
     public virtual String EncodeToText(ReadOnlySpan<Byte> data) => EncodeToTextFromChars(data);
 
-    private String EncodeToTextFromChars(ReadOnlySpan<Byte> data)
+    protected String EncodeToTextFromChars(ReadOnlySpan<Byte> data)
     {
         var encodedLength = GetEncodedLength(data);
 
@@ -139,7 +139,7 @@ public abstract class TextEncoder : Encoder, ITextEncoder
 #endif
     }
 
-    private String EncodeToTextFromBytes(ReadOnlySpan<Byte> data)
+    protected String EncodeToTextFromBytes(ReadOnlySpan<Byte> data)
     {
         var encodedLength = GetEncodedLength(data);
 

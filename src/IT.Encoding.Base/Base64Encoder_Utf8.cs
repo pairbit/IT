@@ -29,4 +29,6 @@ public class Base64Encoder_Utf8 : TextEncoder
         => Base64.DecodeFromUtf8InPlace(buffer, out written);
 
     #endregion Encoder
+
+    public override String EncodeToText(ReadOnlySpan<Byte> data) => EncodeToTextFromBytes(data);
 }
