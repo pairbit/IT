@@ -3,18 +3,23 @@ using System.Text;
 
 Base16Test();
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Encode_Benchmark));
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Decode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Encode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Decode_Benchmark));
 
 Base64Test();
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Encode_Benchmark));
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Decode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Encode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Decode_Benchmark));
 
 Base85Test();
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Encode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Encode_Benchmark));
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Decode_Benchmark));
+
+Base85ZTest();
+
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Encode_Benchmark));
+
 
 static void Base16Test()
 {
@@ -149,4 +154,43 @@ static void Base85Test()
     if (!u1.Equals(u3)) throw new InvalidOperationException();
     if (!u1.Equals(u4)) throw new InvalidOperationException();
     //if (!u1.Equals(u5)) throw new InvalidOperationException();
+
+    encoder._data = new byte[] { 0, 0, 0, 0 };
+
+    u1 = encoder.K4os_Bench();
+    u2 = encoder.SimpleBase_Bench();
+    u3 = encoder.FsBinaryCodecs_Bench();
+    u4 = encoder.Logos_Bench();
+
+    //if (!u1.Equals(u2)) throw new InvalidOperationException();
+    //if (!u1.Equals(u3)) throw new InvalidOperationException();
+    //if (!u1.Equals(u4)) throw new InvalidOperationException();
+}
+
+static void Base85ZTest()
+{
+    var encoder = new Base85Z_Encode_Benchmark();
+
+    encoder.Length = 16;
+    encoder.Setup();
+
+    var u1 = encoder.K4os_Bench();
+    var u2 = encoder.SimpleBase_Bench();
+    var u3 = encoder.FsBinaryCodecs_Bench();
+    var u4 = encoder.CoenM_Bench();
+
+    if (!u1.Equals(u2)) throw new InvalidOperationException();
+    if (!u1.Equals(u3)) throw new InvalidOperationException();
+    if (!u1.Equals(u4)) throw new InvalidOperationException();
+
+    encoder._data = new byte[] { 0, 0, 0, 0 };//Encoding.UTF8.GetBytes("        ");
+
+    u1 = encoder.K4os_Bench();
+    u2 = encoder.SimpleBase_Bench();
+    u3 = encoder.FsBinaryCodecs_Bench();
+    u4 = encoder.CoenM_Bench();
+
+    if (!u1.Equals(u2)) throw new InvalidOperationException();
+    if (!u1.Equals(u3)) throw new InvalidOperationException();
+    if (!u1.Equals(u4)) throw new InvalidOperationException();
 }
