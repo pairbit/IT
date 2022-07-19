@@ -29,9 +29,11 @@ public abstract class Encoder : IEncoder
 
     public abstract OperationStatus Decode(ReadOnlySpan<Byte> encoded, Span<Byte> data, out Int32 consumed, out Int32 written, Boolean isFinal = true);
 
-    public abstract OperationStatus Encode(Span<Byte> buffer, Int32 dataLength, out Int32 written);
+    public virtual OperationStatus Encode(Span<Byte> buffer, Int32 dataLength, out Int32 written)
+        => throw new NotImplementedException();
 
-    public abstract OperationStatus Decode(Span<Byte> buffer, out Int32 written);
+    public virtual OperationStatus Decode(Span<Byte> buffer, out Int32 written)
+        => throw new NotImplementedException();
 
     public virtual Byte[] Encode(ReadOnlySpan<Byte> data)
     {

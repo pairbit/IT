@@ -18,6 +18,20 @@ public abstract class TextEncoder : Encoder, ITextEncoder
         _encoding = encoding;
     }
 
+    #region Encoder
+
+    public override OperationStatus Encode(ReadOnlySpan<Byte> data, Span<Byte> encoded, out Int32 consumed, out Int32 written, Boolean isFinal = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override OperationStatus Decode(ReadOnlySpan<Byte> encoded, Span<Byte> data, out Int32 consumed, out Int32 written, Boolean isFinal = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion Encoder
+
     public virtual Int32 GetEncodedLength(ReadOnlySpan<Char> data)
         => GetMaxEncodedLength(data.Length);
 

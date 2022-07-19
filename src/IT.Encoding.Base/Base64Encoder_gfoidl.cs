@@ -32,10 +32,6 @@ public class Base64Encoder_gfoidl : TextEncoder
     public override OperationStatus Decode(ReadOnlySpan<Byte> encoded, Span<Byte> data, out Int32 consumed, out Int32 written, Boolean isFinal = true)
         => _base64.Decode(encoded, data, out consumed, out written, isFinal);
 
-    public override OperationStatus Encode(Span<Byte> buffer, Int32 dataLength, out Int32 written) => throw new NotImplementedException();
-
-    public override OperationStatus Decode(Span<Byte> buffer, out Int32 written) => throw new NotImplementedException();
-
     #endregion Encoder
 
     #region TextEncoder
