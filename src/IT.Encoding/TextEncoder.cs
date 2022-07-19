@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace IT.Encoding;
@@ -56,7 +57,7 @@ public abstract class TextEncoder : Encoder, ITextEncoder
 
             if (status == OperationStatus.Done || status == OperationStatus.NeedMoreData)
             {
-                _encoding.GetChars(encodedBytes[..consumed], encoded);
+                _encoding.GetChars(encodedBytes[..written], encoded);
             }
 
             return status;
@@ -91,7 +92,54 @@ public abstract class TextEncoder : Encoder, ITextEncoder
         }
     }
 
-    public virtual String EncodeToText(ReadOnlySpan<Byte> data)
+    public virtual String EncodeToText(ReadOnlySpan<Byte> data) => EncodeToTextFromChars(data);
+
+    private String EncodeToTextFromChars(ReadOnlySpan<Byte> data)
+    {
+        var encodedLength = GetEncodedLength(data);
+
+#if NETSTANDARD2_0
+        unsafe
+        {
+            fixed (byte* dataPtr = data)
+            {
+                return _String.Create(encodedLength, (Ptr: (IntPtr)dataPtr, data.Length), (encoded, state) =>
+                {
+                    var data = new ReadOnlySpan<Byte>((Byte*)state.Ptr, state.Length);
+
+                    var status = Encode(data, encoded, out var consumed, out var written);
+
+                    if (status != OperationStatus.Done) throw new InvalidOperationException(status.ToString());
+
+                    if (consumed != data.Length) throw new InvalidOperationException();
+
+                    if (written != encoded.Length) throw new InvalidOperationException();
+                });
+            }
+        }
+#else
+        unsafe
+        {
+            fixed (byte* dataPtr = data)
+            {
+                return String.Create(encodedLength, (Ptr: (IntPtr)dataPtr, data.Length), (encoded, state) =>
+                {
+                    var data = new ReadOnlySpan<Byte>((Byte*)state.Ptr, state.Length);
+
+                    var status = Encode(data, encoded, out var consumed, out var written);
+
+                    if (status != OperationStatus.Done) throw new InvalidOperationException(status.ToString());
+
+                    if (consumed != data.Length) throw new InvalidOperationException();
+
+                    if (written != encoded.Length) throw new InvalidOperationException();
+                });
+            }
+        }
+#endif
+    }
+
+    private String EncodeToTextFromBytes(ReadOnlySpan<Byte> data)
     {
         var encodedLength = GetEncodedLength(data);
 

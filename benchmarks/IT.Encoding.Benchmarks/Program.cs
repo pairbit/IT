@@ -178,19 +178,22 @@ static void Base85ZTest()
     var u2 = encoder.SimpleBase_Bench();
     var u3 = encoder.FsBinaryCodecs_Bench();
     var u4 = encoder.CoenM_Bench();
+    var u5 = encoder.ITCoenM_Bench();
 
     if (!u1.Equals(u2)) throw new InvalidOperationException();
     if (!u1.Equals(u3)) throw new InvalidOperationException();
     if (!u1.Equals(u4)) throw new InvalidOperationException();
+    if (!u1.Equals(u5)) throw new InvalidOperationException();
 
     encoder._data = new byte[] { 0, 0, 0, 0 };//Encoding.UTF8.GetBytes("        ");
 
     u1 = encoder.SimpleBase_Bench();
     u2 = encoder.FsBinaryCodecs_Bench();
     u3 = encoder.CoenM_Bench();
-    u4 = encoder.K4os_Bench();
+    u4 = encoder.ITCoenM_Bench();
+    u5 = encoder.K4os_Bench();
 
     if (!u1.Equals(u2)) throw new InvalidOperationException();
     if (!u1.Equals(u3)) throw new InvalidOperationException();
-    //if (!u1.Equals(u4)) throw new InvalidOperationException();
+    if (!u1.Equals(u4)) throw new InvalidOperationException();
 }
