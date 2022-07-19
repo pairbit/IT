@@ -6,7 +6,7 @@ public class HexEncoder_HexMate_CodesInChaos : HexEncoder_HexMate
 {
     public HexEncoder_HexMate_CodesInChaos(Boolean isLower = false) : base(isLower) { }
 
-    public override String Encode(ReadOnlySpan<Byte> data)
+    public override String EncodeToText(ReadOnlySpan<Byte> data)
     {
         var len = data.Length;
         if (len < 32)
@@ -15,6 +15,6 @@ public class HexEncoder_HexMate_CodesInChaos : HexEncoder_HexMate
                 ? CodesInChaos.Hex.EncodeLower(data)
                 : CodesInChaos.Hex.EncodeUpper(data);
         }
-        return base.Encode(data);
+        return base.EncodeToText(data);
     }
 }

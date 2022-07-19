@@ -48,7 +48,7 @@ public class Base64Encoder_gfoidl : TextEncoder
     public override OperationStatus Decode(ReadOnlySpan<Char> encoded, Span<Byte> data, out Int32 consumed, out Int32 written, Boolean isFinal = true)
         => _base64.Decode(encoded, data, out consumed, out written, isFinal);
 
-    public override String Encode(ReadOnlySpan<Byte> data) => _base64.Encode(data);
+    public override String EncodeToText(ReadOnlySpan<Byte> data) => _base64.Encode(data);
 
     public override Byte[] Decode(ReadOnlySpan<Char> encoded) => _base64.Decode(encoded);
 

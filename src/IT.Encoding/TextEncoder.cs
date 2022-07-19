@@ -6,8 +6,25 @@ namespace IT.Encoding;
 
 public abstract class TextEncoder : Encoder, ITextEncoder
 {
+    private readonly System.Text.Encoding _encoding;
+
+    public TextEncoder()
+    {
+        _encoding = System.Text.Encoding.ASCII;
+    }
+
+    public TextEncoder(System.Text.Encoding encoding)
+    {
+        _encoding = encoding;
+    }
+
+    public virtual Int32 GetEncodedLength(ReadOnlySpan<Char> data)
+        => GetMaxEncodedLength(data.Length);
+
     public virtual Int32 GetDecodedLength(ReadOnlySpan<Char> encoded)
         => GetMaxDecodedLength(encoded.Length);
+
+    #region ByteToText
 
     public virtual OperationStatus Encode(ReadOnlySpan<Byte> data, Span<Char> encoded, out Int32 consumed, out Int32 written, Boolean isFinal = true)
     {
@@ -21,11 +38,11 @@ public abstract class TextEncoder : Encoder, ITextEncoder
 
         try
         {
-            var status = Encode(data, encodedBytes, out consumed, out written);
+            var status = Encode(data, encodedBytes, out consumed, out written, isFinal);
 
             if (status == OperationStatus.Done || status == OperationStatus.NeedMoreData)
             {
-                System.Text.Encoding.ASCII.GetChars(encodedBytes[..consumed], encoded);
+                _encoding.GetChars(encodedBytes[..consumed], encoded);
             }
 
             return status;
@@ -40,15 +57,15 @@ public abstract class TextEncoder : Encoder, ITextEncoder
     {
         var encodedLength = encoded.Length;
 
-        var pool = ArrayPool<byte>.Shared;
+        var pool = ArrayPool<Byte>.Shared;
 
         var rented = pool.Rent(encodedLength);
 
-        Span<byte> encodedBytes = rented;
+        Span<Byte> encodedBytes = rented;
 
         try
         {
-            var count = System.Text.Encoding.ASCII.GetBytes(encoded, encodedBytes);
+            var count = _encoding.GetBytes(encoded, encodedBytes);
 
             if (count != encodedLength) throw new InvalidOperationException();
 
@@ -60,15 +77,15 @@ public abstract class TextEncoder : Encoder, ITextEncoder
         }
     }
 
-    public virtual String Encode(ReadOnlySpan<Byte> data)
+    public virtual String EncodeToText(ReadOnlySpan<Byte> data)
     {
         var encodedLength = GetEncodedLength(data);
 
-        var pool = ArrayPool<byte>.Shared;
+        var pool = ArrayPool<Byte>.Shared;
 
         var rented = pool.Rent(encodedLength);
 
-        Span<byte> encoded = rented;
+        Span<Byte> encoded = rented;
 
         try
         {
@@ -80,7 +97,7 @@ public abstract class TextEncoder : Encoder, ITextEncoder
 
             if (written != encodedLength) throw new InvalidOperationException();
 
-            return System.Text.Encoding.ASCII.GetString(encoded[..encodedLength]);
+            return _encoding.GetString(encoded[..encodedLength]);
         }
         finally
         {
@@ -90,18 +107,74 @@ public abstract class TextEncoder : Encoder, ITextEncoder
 
     public virtual Byte[] Decode(ReadOnlySpan<Char> encoded)
     {
+        if (encoded.IsEmpty) return Array.Empty<Byte>();
+
         var decodedLength = GetDecodedLength(encoded);
 
-        var bytes = new byte[decodedLength];
+#if NET6_0
+        var dataArray = GC.AllocateUninitializedArray<Byte>(decodedLength);
+#else
+        var dataArray = new Byte[decodedLength];
+#endif
 
-        var data = bytes.AsSpan();
+        var data = dataArray.AsSpan();
 
         var status = Decode(encoded, data, out var consumed, out var written);
 
         if (status != OperationStatus.Done) throw new InvalidOperationException(status.ToString());
 
-        if (consumed != encoded.Length) throw new InvalidOperationException();
+        if (consumed != encoded.Length) throw new InvalidOperationException($"(consumed == {consumed}) != (encoded.Length == {encoded.Length})");
 
-        return written != decodedLength ? data[..written].ToArray() : bytes;
+        return written < data.Length ? data[..written].ToArray() : dataArray;
     }
+
+    #endregion ByteToText
+
+    #region TextToByte
+
+    public virtual OperationStatus Encode(ReadOnlySpan<Char> data, Span<Byte> encoded, out Int32 consumed, out Int32 written, Boolean isFinal = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual OperationStatus Decode(ReadOnlySpan<Byte> encoded, Span<Char> data, out Int32 consumed, out Int32 written, Boolean isFinal = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual Byte[] Encode(ReadOnlySpan<Char> data)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual String DecodeToText(ReadOnlySpan<Byte> encoded)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion TextToByte
+
+    #region TextToText
+
+    public virtual OperationStatus Encode(ReadOnlySpan<Char> data, Span<Char> encoded, out Int32 consumed, out Int32 written, Boolean isFinal = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual OperationStatus Decode(ReadOnlySpan<Char> encoded, Span<Char> data, out Int32 consumed, out Int32 written, Boolean isFinal = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual String EncodeToText(ReadOnlySpan<Char> data)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual String DecodeToText(ReadOnlySpan<Char> encoded)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion TextToText
 }

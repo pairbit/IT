@@ -35,10 +35,10 @@ public class Base64_Encode_Benchmark
     public String gfoidl_Bench() => gfoidl.Base64.Base64.Default.Encode(_data);
 
     [Benchmark(Description = "IT_gfoidl")]
-    public String IT_gfoidl_Bench() => _base64gfoidl.Encode(_data);
+    public String IT_gfoidl_Bench() => _base64gfoidl.EncodeToText(_data);
 
     [Benchmark(Description = "System.Buffers.Text.Base64")]
-    public String IT_Utf8_Bench() => _base64Utf8.Encode(_data);
+    public String IT_Utf8_Bench() => _base64Utf8.EncodeToText(_data);
 
     [Benchmark(Description = "K4os")]
     public String K4os_Bench() => Base64.Default.Encode(_data);

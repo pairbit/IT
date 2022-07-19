@@ -54,7 +54,7 @@ public class HexEncoder_HexMate : TextEncoder
         throw new NotImplementedException();
     }
 
-    public override String Encode(ReadOnlySpan<Byte> data) => HexMate.Convert.ToHexString(data, _options);
+    public override String EncodeToText(ReadOnlySpan<Byte> data) => HexMate.Convert.ToHexString(data, _options);
 
     public override Byte[] Decode(ReadOnlySpan<Char> encoded) => HexMate.Convert.FromHexString(encoded);
 

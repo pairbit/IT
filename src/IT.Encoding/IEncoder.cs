@@ -22,4 +22,8 @@ public interface IEncoder
     OperationStatus Encode(Span<Byte> buffer, Int32 dataLength, out Int32 written);
 
     OperationStatus Decode(Span<Byte> buffer, out Int32 written);
+
+    Byte[] Encode(ReadOnlySpan<Byte> data);
+
+    Byte[] Decode(ReadOnlySpan<Byte> encoded);
 }

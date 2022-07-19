@@ -40,22 +40,22 @@ public class Base16_Encode_Benchmark
     }
 
     [Benchmark(Description = "IT_HexMate_CodesInChaos")]
-    public String Upper_IT_new() => _base16upper.Encode(_data);
+    public String Upper_IT_new() => _base16upper.EncodeToText(_data);
 
     //[Benchmark]
-    public String Lower_IT_new() => _base16lower.Encode(_data);
+    public String Lower_IT_new() => _base16lower.EncodeToText(_data);
 
     [Benchmark(Description = "IT_HexMate")]
-    public String Upper_IT_HexMate() => _base16upperMate.Encode(_data);
+    public String Upper_IT_HexMate() => _base16upperMate.EncodeToText(_data);
 
     //[Benchmark]
-    public String Lower_IT_HexMate() => _base16lowerMate.Encode(_data);
+    public String Lower_IT_HexMate() => _base16lowerMate.EncodeToText(_data);
 
     [Benchmark(Description = "CodesInChaos")]
-    public String Upper_CodesInChaos() => _base16upperOld.Encode(_data);
+    public String Upper_CodesInChaos() => _base16upperOld.EncodeToText(_data);
 
     //[Benchmark]
-    public String Lower_CodesInChaos() => _base16lowerOld.Encode(_data);
+    public String Lower_CodesInChaos() => _base16lowerOld.EncodeToText(_data);
 
     [Benchmark(Description = "HexMate")]
     public String Upper_HexMate() => HexMate.Convert.ToHexString(_data);
