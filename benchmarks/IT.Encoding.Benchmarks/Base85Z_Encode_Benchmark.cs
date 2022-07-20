@@ -42,6 +42,9 @@ public class Base85Z_Encode_Benchmark
     [Benchmark(Description = "CoenM")]
     public String CoenM_Bench() => CoenM.Encoding.Z85.Encode(_data);
 
+    [Benchmark(Description = "CoenM_Extended")]
+    public String CoenM_Extended_Bench() => CoenM.Encoding.Z85Extended.Encode(_data);
+
     [Benchmark(Description = "SimpleBase")]
     public String SimpleBase_Bench() => SimpleBase.Base85.Z85.Encode(_data);
 
