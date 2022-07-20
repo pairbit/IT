@@ -34,12 +34,12 @@ public class Base85_Decode_Benchmark
     [Benchmark(Description = "K4os")]
     public Byte[] K4os_Bench() => Base85.Default.Decode(_data);
 
-    [Benchmark(Description = "SimpleBase")]
+    //[Benchmark(Description = "SimpleBase")]
     public Span<Byte> SimpleBase_Bench() => SimpleBase.Base85.Ascii85.Decode(_data);
 
-    [Benchmark(Description = "Logos")]
+    //[Benchmark(Description = "Logos")]
     public Byte[] Logos_Bench() => ReferenceCodec.Logos.Ascii85.Decode(_data);
 
-    [Benchmark(Description = "Fs.Binary.Codecs")]
+    //[Benchmark(Description = "Fs.Binary.Codecs")]
     public Byte[] FsBinaryCodecs_Bench() => Fs.Binary.Codecs.BinaryCodecs.BtoA.GetBytes(_data);
 }

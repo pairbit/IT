@@ -45,9 +45,9 @@ public class Base85Z_Decode_Benchmark
     [Benchmark(Description = "CoenM_Extended")]
     public byte[] CoenM_Extended_Bench() => CoenM.Encoding.Z85Extended.Decode(_data);
 
-    [Benchmark(Description = "SimpleBase")]
+    //[Benchmark(Description = "SimpleBase")]
     public Span<byte> SimpleBase_Bench() => SimpleBase.Base85.Z85.Decode(_data);
 
-    [Benchmark(Description = "Fs.Binary.Codecs")]
+    //[Benchmark(Description = "Fs.Binary.Codecs")]
     public byte[] FsBinaryCodecs_Bench() => Fs.Binary.Codecs.BinaryCodecs.Z85.GetBytes(_data);
 }
