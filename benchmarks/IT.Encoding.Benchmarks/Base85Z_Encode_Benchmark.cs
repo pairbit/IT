@@ -10,7 +10,8 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base85Z_Encode_Benchmark
 {
-    private ITextEncoder _textEncoder = new Base85ZEncoder_CoenM();
+    private ITextEncoder _k4os = new Base85Encoder_K4os(true);
+    private ITextEncoder _coenM = new Base85ZEncoder_CoenM();
     private Base85Codec _z85 = new("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#", '\0');
     internal byte[] _data;
 
@@ -29,11 +30,14 @@ public class Base85Z_Encode_Benchmark
         _data = data;
     }
 
+    [Benchmark(Description = "IT_K4os")]
+    public String ITK4os_Bench() => _k4os.EncodeToText(_data);
+
     [Benchmark(Description = "K4os")]
     public String K4os_Bench() => _z85.Encode(_data);
 
     [Benchmark(Description = "IT_CoenM")]
-    public String ITCoenM_Bench() => _textEncoder.EncodeToText(_data);
+    public String ITCoenM_Bench() => _coenM.EncodeToText(_data);
 
     [Benchmark(Description = "CoenM")]
     public String CoenM_Bench() => CoenM.Encoding.Z85.Encode(_data);

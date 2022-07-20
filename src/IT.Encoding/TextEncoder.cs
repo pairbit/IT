@@ -92,10 +92,12 @@ public abstract class TextEncoder : Encoder, ITextEncoder
         }
     }
 
-    public virtual String EncodeToText(ReadOnlySpan<Byte> data) => EncodeToTextFromChars(data);
+    public virtual String EncodeToText(ReadOnlySpan<Byte> data) => EncodeToTextFromCharsFixLen(data);
 
-    protected String EncodeToTextFromChars(ReadOnlySpan<Byte> data)
+    protected String EncodeToTextFromCharsFixLen(ReadOnlySpan<Byte> data)
     {
+        if (data.IsEmpty) return String.Empty;
+
         var encodedLength = GetEncodedLength(data);
 
 #if NETSTANDARD2_0
@@ -139,8 +141,50 @@ public abstract class TextEncoder : Encoder, ITextEncoder
 #endif
     }
 
+    protected String EncodeToTextFromCharsVarLen(ReadOnlySpan<Byte> data)
+    {
+        if (data.IsEmpty) return String.Empty;
+
+        var encodedLength = GetEncodedLength(data);
+
+        var pool = ArrayPool<Char>.Shared;
+
+        var rented = pool.Rent(encodedLength);
+
+        Span<Char> encoded = rented;
+
+        try
+        {
+            var status = Encode(data, encoded, out var consumed, out var written);
+
+            if (status != OperationStatus.Done) throw new InvalidOperationException(status.ToString());
+
+            if (consumed != data.Length) throw new InvalidOperationException();
+
+#if NETSTANDARD2_0
+            encoded = encoded[..written];
+
+            unsafe
+            {
+                fixed (char* encodedPtr = encoded)
+                {
+                    return new String(encodedPtr);
+                }
+            }
+#else
+            return new String(encoded[..written]);
+#endif
+        }
+        finally
+        {
+            pool.Return(rented);
+        }
+    }
+
     protected String EncodeToTextFromBytes(ReadOnlySpan<Byte> data)
     {
+        if (data.IsEmpty) return String.Empty;
+
         var encodedLength = GetEncodedLength(data);
 
         var pool = ArrayPool<Byte>.Shared;

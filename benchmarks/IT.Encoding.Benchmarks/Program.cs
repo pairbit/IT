@@ -148,12 +148,12 @@ static void Base85Test()
     var u2 = encoder.SimpleBase_Bench();
     var u3 = encoder.Logos_Bench();
     var u4 = encoder.FsBinaryCodecs_Bench();
-    //var u5 = encoder.ConfluxAddress_Bench();
+    var u5 = encoder.ITK4os_Bench();
 
     if (!u1.Equals(u2)) throw new InvalidOperationException();
     if (!u1.Equals(u3)) throw new InvalidOperationException();
     if (!u1.Equals(u4)) throw new InvalidOperationException();
-    //if (!u1.Equals(u5)) throw new InvalidOperationException();
+    if (!u1.Equals(u5)) throw new InvalidOperationException();
 
     encoder._data = new byte[] { 0, 0, 0, 0 };
 
@@ -161,6 +161,7 @@ static void Base85Test()
     u2 = encoder.SimpleBase_Bench();
     u3 = encoder.FsBinaryCodecs_Bench();
     u4 = encoder.Logos_Bench();
+    u5 = encoder.ITK4os_Bench();
 
     //if (!u1.Equals(u2)) throw new InvalidOperationException();
     //if (!u1.Equals(u3)) throw new InvalidOperationException();
@@ -179,12 +180,13 @@ static void Base85ZTest()
     var u3 = encoder.FsBinaryCodecs_Bench();
     var u4 = encoder.ITCoenM_Bench();
     var u5 = encoder.CoenM_Bench();
-    
+    var u6 = encoder.ITK4os_Bench();
 
     if (!u1.Equals(u2)) throw new InvalidOperationException();
     if (!u1.Equals(u3)) throw new InvalidOperationException();
     if (!u1.Equals(u4)) throw new InvalidOperationException();
     if (!u1.Equals(u5)) throw new InvalidOperationException();
+    if (!u1.Equals(u6)) throw new InvalidOperationException();
 
     encoder._data = new byte[] { 0, 0, 0, 0 };//Encoding.UTF8.GetBytes("        ");
 
@@ -192,9 +194,12 @@ static void Base85ZTest()
     u2 = encoder.FsBinaryCodecs_Bench();
     u3 = encoder.CoenM_Bench();
     u4 = encoder.ITCoenM_Bench();
-    u5 = encoder.K4os_Bench();
+    u5 = encoder.ITK4os_Bench();
+    u6 = encoder.K4os_Bench();
 
     if (!u1.Equals(u2)) throw new InvalidOperationException();
     if (!u1.Equals(u3)) throw new InvalidOperationException();
     if (!u1.Equals(u4)) throw new InvalidOperationException();
+    if (!u1.Equals(u5)) throw new InvalidOperationException();
+    //if (!u1.Equals(u6)) throw new InvalidOperationException();
 }

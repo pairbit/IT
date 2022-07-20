@@ -5,19 +5,19 @@ namespace K4os.Text.BaseX
 	/// <summary>Static class with helper and factory methods for Base85 codec.</summary>
 	internal static class Base85
 	{
-		internal const string Digits85 =
+		private const string DigitsZ85 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#";
+
+		private const string Digits85 =
 			"!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
 			"[\\]^_`abcdefghijklmnopqrstu";
 
-		internal const string ZDigits85 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#";
-
-		internal const char DigitZ = 'z';
+		private const char DigitZ = 'z';
 
 		/// <summary>Default Base85 codec.</summary>
 		public static Base85Codec Default { get; } = new Base85Codec(Digits85, DigitZ);
 
 		/// <summary>Z85 codec.</summary>
-		//public static Base85Codec Z85 { get; } = new Base85Codec(Digits85);
+		public static Base85ZCodec Z85 { get; } = new Base85ZCodec(DigitsZ85);
 
 		/// <summary>Converts byte array to Base85 string.</summary>
 		/// <param name="decoded">Decoded buffer.</param>

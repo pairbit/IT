@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
+using IT.Encoding.Base;
 using K4os.Text.BaseX;
 
 namespace IT.Encoding.Benchmarks;
@@ -9,6 +10,7 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base85_Encode_Benchmark
 {
+    private ITextEncoder _k4os = new Base85Encoder_K4os();
     internal byte[] _data;
 
     //[Params(12, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
@@ -26,6 +28,9 @@ public class Base85_Encode_Benchmark
         _data = data;
     }
 
+    [Benchmark(Description = "IT_K4os")]
+    public String ITK4os_Bench() => _k4os.EncodeToText(_data);
+
     [Benchmark(Description = "K4os")]
     public String K4os_Bench() => Base85.Default.Encode(_data);
 
@@ -36,5 +41,5 @@ public class Base85_Encode_Benchmark
     public String Logos_Bench() => ReferenceCodec.Logos.Ascii85.Encode(_data);
 
     //[Benchmark(Description = "Fs.Binary.Codecs")]
-    public String FsBinaryCodecs_Bench() => Fs.Binary.Codecs.BinaryCodecs.Base85Standard.GetString(_data);
+    public String FsBinaryCodecs_Bench() => Fs.Binary.Codecs.BinaryCodecs.BtoA.GetString(_data);
 }
