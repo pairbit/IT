@@ -13,13 +13,13 @@ Base64Test();
 
 Base85Test();
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Encode_Benchmark));
-//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Decode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Encode_Benchmark));
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Decode_Benchmark));
 
 Base85ZTest();
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Encode_Benchmark));
-
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Encode_Benchmark));
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Decode_Benchmark));
 
 static void Base16Test()
 {
@@ -155,17 +155,33 @@ static void Base85Test()
     if (!u1.Equals(u4)) throw new InvalidOperationException();
     //if (!u1.Equals(u5)) throw new InvalidOperationException();
 
-    encoder._data = new byte[] { 0, 0, 0, 0 };
+    //encoder._data = new byte[] { 0, 0, 0, 0 };
 
-    u1 = encoder.K4os_Bench();
-    u2 = encoder.SimpleBase_Bench();
-    u3 = encoder.FsBinaryCodecs_Bench();
-    u4 = encoder.Logos_Bench();
-    u5 = encoder.ITK4os_Bench();
+    //u1 = encoder.K4os_Bench();
+    //u2 = encoder.SimpleBase_Bench();
+    //u3 = encoder.FsBinaryCodecs_Bench();
+    //u4 = encoder.Logos_Bench();
+    //u5 = encoder.ITK4os_Bench();
 
     //if (!u1.Equals(u2)) throw new InvalidOperationException();
     //if (!u1.Equals(u3)) throw new InvalidOperationException();
     //if (!u1.Equals(u4)) throw new InvalidOperationException();
+
+    var decoder = new Base85_Decode_Benchmark();
+    decoder._data = u1;
+
+    var b1 = decoder.SimpleBase_Bench();
+    var b2 = decoder.K4os_Bench();
+    var b3 = decoder.Logos_Bench();
+    var b4 = decoder.ITK4os_Bench();
+    var b5 = decoder.FsBinaryCodecs_Bench();
+
+    var b = encoder._data.AsSpan();
+    if (!b.SequenceEqual(b1)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b2)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b3)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b4)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b5)) throw new InvalidOperationException();
 }
 
 static void Base85ZTest()
@@ -188,18 +204,37 @@ static void Base85ZTest()
     if (!u1.Equals(u5)) throw new InvalidOperationException();
     if (!u1.Equals(u6)) throw new InvalidOperationException();
 
-    encoder._data = new byte[] { 0, 0, 0, 0 };//Encoding.UTF8.GetBytes("        ");
+    //encoder._data = new byte[] { 0, 0, 0, 0 };//Encoding.UTF8.GetBytes("        ");
 
-    u1 = encoder.SimpleBase_Bench();
-    u2 = encoder.FsBinaryCodecs_Bench();
-    u3 = encoder.CoenM_Bench();
-    u4 = encoder.ITCoenM_Bench();
-    u5 = encoder.ITK4os_Bench();
-    u6 = encoder.K4os_Bench();
+    //u1 = encoder.SimpleBase_Bench();
+    //u2 = encoder.FsBinaryCodecs_Bench();
+    //u3 = encoder.CoenM_Bench();
+    //u4 = encoder.ITCoenM_Bench();
+    //u5 = encoder.ITK4os_Bench();
+    //u6 = encoder.K4os_Bench();
 
-    if (!u1.Equals(u2)) throw new InvalidOperationException();
-    if (!u1.Equals(u3)) throw new InvalidOperationException();
-    if (!u1.Equals(u4)) throw new InvalidOperationException();
-    if (!u1.Equals(u5)) throw new InvalidOperationException();
+    //if (!u1.Equals(u2)) throw new InvalidOperationException();
+    //if (!u1.Equals(u3)) throw new InvalidOperationException();
+    //if (!u1.Equals(u4)) throw new InvalidOperationException();
+    //if (!u1.Equals(u5)) throw new InvalidOperationException();
     //if (!u1.Equals(u6)) throw new InvalidOperationException();
+
+    var decoder = new Base85Z_Decode_Benchmark();
+    decoder._data = u1;
+
+    var b = encoder._data.AsSpan();
+    var b1 = decoder.SimpleBase_Bench();
+    var b2 = decoder.ITK4os_Bench();
+    var b3 = decoder.K4os_Bench();
+    var b4 = decoder.CoenM_Bench();
+    var b5 = decoder.ITCoenM_Bench();
+    var b6 = decoder.FsBinaryCodecs_Bench();
+    
+    if (!b.SequenceEqual(b1)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b2)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b3)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b4)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b5)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b5)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b6)) throw new InvalidOperationException();
 }

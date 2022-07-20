@@ -41,7 +41,7 @@ public class Base85Encoder_K4os : TextEncoder
     public override OperationStatus Decode(ReadOnlySpan<Char> encoded, Span<Byte> data, out Int32 consumed, out Int32 written, Boolean isFinal = true)
     {
         written = _codec.Decode(encoded, data);
-        consumed = data.Length;
+        consumed = encoded.Length;
         return OperationStatus.Done;
     }
 
