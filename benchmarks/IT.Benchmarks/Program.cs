@@ -5,7 +5,7 @@ using Perfolizer.Horology;
 
 var config = DefaultConfig.Instance.AddJob(
                 Job.Default
-                    .WithIterationTime(TimeInterval.FromMilliseconds(250)) // each iteration should last no longer than 250ms
+                    //.WithIterationTime(TimeInterval.FromMilliseconds(250)) // each iteration should last no longer than 250ms
                     .WithWarmupCount(1) // one warmup should be enough
                     .WithMaxIterationCount(20) // we don't need more than 20 iterations
                     .AsDefault());
