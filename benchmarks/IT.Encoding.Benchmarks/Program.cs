@@ -14,12 +14,12 @@ Base64Test();
 Base85Test();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Encode_Benchmark));
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Decode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Decode_Benchmark));
 
 Base85ZTest();
 
-//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Encode_Benchmark));
-//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Decode_Benchmark));
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Encode_Benchmark));
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Decode_Benchmark));
 
 static void Base16Test()
 {
