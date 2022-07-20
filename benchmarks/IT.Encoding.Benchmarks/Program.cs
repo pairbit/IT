@@ -177,8 +177,9 @@ static void Base85ZTest()
     var u1 = encoder.K4os_Bench();
     var u2 = encoder.SimpleBase_Bench();
     var u3 = encoder.FsBinaryCodecs_Bench();
-    var u4 = encoder.CoenM_Bench();
-    var u5 = encoder.ITCoenM_Bench();
+    var u4 = encoder.ITCoenM_Bench();
+    var u5 = encoder.CoenM_Bench();
+    
 
     if (!u1.Equals(u2)) throw new InvalidOperationException();
     if (!u1.Equals(u3)) throw new InvalidOperationException();
