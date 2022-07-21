@@ -16,12 +16,4 @@
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\IT.Messaging.AlterNats\IT.Messaging.AlterNats.csproj" />
-    <ProjectReference Include="..\..\src\IT.Messaging.Kafka\IT.Messaging.Kafka.csproj" />
-    <ProjectReference Include="..\..\src\IT.Messaging.NATS\IT.Messaging.NATS.csproj" />
-    <ProjectReference Include="..\..\src\IT.Messaging.RabbitMQ\IT.Messaging.RabbitMQ.csproj" />
-    <ProjectReference Include="..\..\src\IT.Messaging.Redis\IT.Messaging.Redis.csproj" />
-  </ItemGroup>
-
 </Project>

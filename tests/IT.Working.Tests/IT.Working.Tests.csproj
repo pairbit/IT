@@ -9,19 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hangfire.Core" Version="1.7.30" />
+    <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
+    <PackageReference Include="Hangfire.Mongo" Version="1.7.2" />
+    <PackageReference Include="Hangfire.Redis.StackExchange" Version="1.8.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\IT.Messaging.AlterNats\IT.Messaging.AlterNats.csproj" />
-    <ProjectReference Include="..\..\src\IT.Messaging.Kafka\IT.Messaging.Kafka.csproj" />
-    <ProjectReference Include="..\..\src\IT.Messaging.NATS\IT.Messaging.NATS.csproj" />
-    <ProjectReference Include="..\..\src\IT.Messaging.RabbitMQ\IT.Messaging.RabbitMQ.csproj" />
-    <ProjectReference Include="..\..\src\IT.Messaging.Redis\IT.Messaging.Redis.csproj" />
   </ItemGroup>
 
 </Project>
