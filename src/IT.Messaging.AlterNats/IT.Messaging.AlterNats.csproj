@@ -8,4 +8,8 @@
     <PackageReference Include="AlterNats" Version="1.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IT.Messaging\IT.Messaging.csproj" />
+  </ItemGroup>
+
 </Project>

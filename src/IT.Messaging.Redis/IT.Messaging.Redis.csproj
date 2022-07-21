@@ -8,4 +8,8 @@
     <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IT.Messaging\IT.Messaging.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -8,4 +8,8 @@
     <PackageReference Include="NATS.Client" Version="0.14.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IT.Messaging\IT.Messaging.csproj" />
+  </ItemGroup>
+
 </Project>
