@@ -9,7 +9,9 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base32_Encode_Benchmark
 {
-    private ITextEncoder _base32 = new Base32Encoder_deniszykov();
+    private ITextEncoder _base32 = new Base32Encoder_deniszykov_Wiry();
+    private ITextEncoder _base32_deniszykov = new Base32Encoder_deniszykov();
+    private ITextEncoder _base32_Wiry = new Base32Encoder_Wiry();
     internal byte[] _data;
     //private static readonly SimpleBase.Base32 _simpleBase = new SimpleBase.Base32(new SimpleBase.Base32Alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567", '='));
 
@@ -18,7 +20,7 @@ public class Base32_Encode_Benchmark
     //[Params(1, 2, 4, 8, 12, 15, 16, 31, 32, 49, 50, 63, 64, 128, 256, 512, 1024)]
     //[Params(2 * 1024, 4 * 1024, 8 * 1024, 16 * 1024, 32 * 1024, 64 * 1024, 128 * 1024, 256 * 1024, 512 * 1024, 1024 * 1024)]
     //[Params(2 * 1024 * 1024, 4 * 1024 * 1024, 8 * 1024 * 1024, 16 * 1024 * 1024, 32 * 1024 * 1024, 64 * 1024 * 1024, 128 * 1024 * 1024, 256 * 1024 * 1024, 510 * 1024 * 1024)]
-    [Params(1024 * 1024)]
+    [Params(510 * 1024 * 1024)]
     public int Length { get; set; }
 
     [GlobalSetup]
@@ -29,8 +31,11 @@ public class Base32_Encode_Benchmark
         _data = data;
     }
 
+    [Benchmark(Description = "IT")]
+    public String IT_Bench() => _base32.EncodeToText(_data);
+
     [Benchmark(Description = "IT_deniszykov")]
-    public String IT_deniszykov_Bench() => _base32.EncodeToText(_data);
+    public String IT_deniszykov_Bench() => _base32_deniszykov.EncodeToText(_data);
 
     [Benchmark(Description = "deniszykov")]
     public String deniszykov_Bench() => deniszykov.BaseN.Base32Convert.ToString(_data);
@@ -40,6 +45,9 @@ public class Base32_Encode_Benchmark
 
     [Benchmark(Description = "KodeAid")]
     public String KodeAid_Bench() => KodeAid.Base32Encoder.EncodeBytes(_data);
+
+    [Benchmark(Description = "IT_Wiry")]
+    public String IT_Wiry_Bench() => _base32_Wiry.EncodeToText(_data);
 
     [Benchmark(Description = "Wiry")]
     public String Wiry_Bench() => Wiry.Base32.Base32Encoding.Standard.GetString(_data);

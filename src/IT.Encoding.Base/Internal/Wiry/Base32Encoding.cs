@@ -47,76 +47,44 @@ namespace Wiry.Base32
         /// </summary>
         protected abstract char? PadSymbol { get; }
 
+        public Base32Encoding()
+        {
+            _lookupTable = BuildLookupTable(Alphabet);
+        }
+
         /// <summary>
         /// Get encoded string
         /// </summary>
-        public virtual string GetString(byte[] bytes)
+        public virtual string GetString(ReadOnlySpan<Byte> bytes)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
-            return GetString(bytes, 0, bytes.Length);
-        }
-
-        /// <summary>
-        /// When overridden in a derived class, encodes bytes a string.
-        /// </summary>
-        public virtual string GetString(byte[] bytes, int index, int count)
-        {
-            return ToBase32(bytes, index, count, Alphabet, PadSymbol);
+            return ToBase32(bytes, Alphabet, PadSymbol);
         }
 
         /// <summary>
         /// When overridden in a derived class, decodes string data to bytes.
         /// </summary>
-        public virtual byte[] ToBytes(string encoded)
+        public virtual byte[] ToBytes(ReadOnlySpan<Char> encoded)
         {
-            if (encoded == null)
-                throw new ArgumentNullException(nameof(encoded));
-
-            return ToBytes(encoded, 0, encoded.Length);
+            return ToBytes(encoded, PadSymbol, _lookupTable);
         }
 
-        /// <summary>
-        /// When overridden in a derived class, decodes string data to bytes.
-        /// </summary>
-        public virtual byte[] ToBytes(string encoded, int index, int length)
-        {
-            return ToBytes(encoded, index, length, PadSymbol, GetOrCreateLookupTable(Alphabet));
-        }
-
-        /// <summary>
-        /// Validate input data.
-        /// </summary>
-        public virtual ValidationResult Validate(string encoded)
-        {
-            if (encoded == null)
-                return ValidationResult.InvalidArguments;
-
-            return Validate(encoded, 0, encoded.Length);
-        }
 
         /// <summary>
         /// Validate input data
         /// </summary>
-        public virtual ValidationResult Validate(string encoded, int index, int length)
+        public virtual ValidationResult Validate(ReadOnlySpan<Char> encoded)
         {
-            return Validate(encoded, index, length, PadSymbol, GetOrCreateLookupTable(Alphabet));
-        }
-
-        internal LookupTable GetOrCreateLookupTable(string alphabet)
-        {
-            return _lookupTable ?? (_lookupTable = BuildLookupTable(alphabet));
+            return Validate(encoded, PadSymbol, _lookupTable);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int GetSymbolsCount(int bytesCount)
+        internal static int GetSymbolsCount(int bytesCount)
         {
             return (bytesCount * 8 + 4) / 5;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int GetBytesCount(int symbolsCount)
+        internal static int GetBytesCount(int symbolsCount)
         {
             return symbolsCount * 5 / 8;
         }
@@ -189,11 +157,11 @@ namespace Wiry.Base32
             return symbols;
         }
 
-        private static unsafe void ToBase32Unsafe(byte[] input, int inputOffset, char[] output, int outputOffset,
+        private static unsafe void ToBase32Unsafe(ReadOnlySpan<Byte> input, Span<Char> output,
             int inputGroupsCount, int remainder, string alphabet, char? padSymbol)
         {
-            fixed (byte* pInput = &input[inputOffset])
-            fixed (char* pOutput = &output[outputOffset])
+            fixed (byte* pInput = input)
+            fixed (char* pOutput = output)
             fixed (char* pAlphabet = alphabet)
             {
                 if (inputGroupsCount > 0)
@@ -284,16 +252,15 @@ namespace Wiry.Base32
             *pOutput = (byte)value;
         }
 
-        private static unsafe void ToBytesUnsafe(string encoded, int index, byte[] output, int outputOffset,
+        private static unsafe void ToBytesUnsafe(ReadOnlySpan<Char> encoded, byte[] output,
             int encodedGroupsCount, int remainder, LookupTable lookupTable)
         {
             int[] lookupValues = lookupTable.Values;
             int lowCode = lookupTable.LowCode;
-            fixed (char* pEncodedBegin = encoded)
-            fixed (byte* pOutput = &output[outputOffset])
+            fixed (char* pEncoded = encoded)
+            fixed (byte* pOutput = output)
             fixed (int* pLookup = lookupValues)
             {
-                char* pEncoded = pEncodedBegin + index;
                 if (encodedGroupsCount > 0)
                 {
                     ToBytesGroupsUnsafe(pEncoded, pOutput, encodedGroupsCount, pLookup,
@@ -310,22 +277,9 @@ namespace Wiry.Base32
             }
         }
 
-        internal static string ToBase32(byte[] bytes, int index, int count, string alphabet, char? padSymbol)
+        internal static string ToBase32(ReadOnlySpan<Byte> bytes, string alphabet, char? padSymbol)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
-            if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            if (count < 0 || count > bytes.Length - index)
-                throw new ArgumentOutOfRangeException(nameof(count));
-
-            if (alphabet == null)
-                throw new ArgumentNullException(nameof(alphabet));
-
-            if (alphabet.Length < AlphabetLength)
-                throw new ArgumentException("Alphabet length must be greater or equal than 32");
+            var count = bytes.Length;
 
             if (count == 0)
                 return string.Empty;
@@ -343,37 +297,47 @@ namespace Wiry.Base32
                 symbolsCount += 8;
             }
 
-            var symbols = new char[symbolsCount];
-            ToBase32Unsafe(bytes, index, symbols, 0, groupsCount, remainder, alphabet, padSymbol);
-            return new string(symbols);
-        }
+#if NETSTANDARD2_0
+            unsafe
+            {
+                fixed (byte* dataPtr = bytes)
+                {
+                    return _String.Create(symbolsCount, (Ptr: (IntPtr)dataPtr, bytes.Length, groupsCount, remainder, alphabet, padSymbol), (encoded, state) =>
+                    {
+                        var data = new ReadOnlySpan<Byte>((Byte*)state.Ptr, state.Length);
 
-        private static void CheckToBytesArguments(string encoded, int index, int length, LookupTable lookupTable)
+                        ToBase32Unsafe(data, encoded, state.groupsCount, state.remainder, state.alphabet, state.padSymbol);
+                    });
+                }
+            }
+#else
+        unsafe
         {
-            if (encoded == null)
-                throw new ArgumentNullException(nameof(encoded));
+            fixed (byte* dataPtr = bytes)
+            {
+                return String.Create(symbolsCount, (Ptr: (IntPtr)dataPtr, bytes.Length, groupsCount, remainder, alphabet, padSymbol), (encoded, state) =>
+                {
+                    var data = new ReadOnlySpan<Byte>((Byte*)state.Ptr, state.Length);
 
-            if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            if (length < 0 || length > encoded.Length - index)
-                throw new ArgumentOutOfRangeException(nameof(length));
-
-            if (lookupTable == null)
-                throw new ArgumentNullException(nameof(lookupTable));
+                    ToBase32Unsafe(data, encoded, state.groupsCount, state.remainder, state.alphabet, state.padSymbol);
+                });
+            }
+        }
+#endif
         }
 
-        private static int GetRemainderWithChecks(string encoded, int index, int length, char? padSymbol)
+
+        private static int GetRemainderWithChecks(ReadOnlySpan<Char> encoded, char? padSymbol)
         {
             if (padSymbol == null)
-                return length % 8;
+                return encoded.Length % 8;
 
-            if (length % 8 != 0)
+            if (encoded.Length % 8 != 0)
                 throw new FormatException(ErrorMessageInvalidLength);
 
             int remainder = 8;
             char padChar = padSymbol.Value;
-            for (int i = index + length - 1; i >= index; i--)
+            for (int i = encoded.Length - 1; i >= 0; i--)
             {
                 if (encoded[i] != padChar)
                     break;
@@ -385,14 +349,12 @@ namespace Wiry.Base32
             return remainder;
         }
 
-        internal static byte[] ToBytes(string encoded, int index, int length, char? padSymbol, LookupTable lookupTable)
+        internal static byte[] ToBytes(ReadOnlySpan<Char> encoded, char? padSymbol, LookupTable lookupTable)
         {
-            CheckToBytesArguments(encoded, index, length, lookupTable);
+            var length = encoded.Length;
+            if (length == 0) return Array.Empty<Byte>();
 
-            if (length == 0)
-                return new byte[0];
-
-            int remainder = GetRemainderWithChecks(encoded, index, length, padSymbol);
+            int remainder = GetRemainderWithChecks(encoded, padSymbol);
 
             int groupsCount = length / 8;
 
@@ -413,19 +375,18 @@ namespace Wiry.Base32
             var bytes = new byte[bytesCount];
             if (bytesCount > 0)
             {
-                ToBytesUnsafe(encoded, index, bytes, 0, groupsCount, remainder, lookupTable);
+                ToBytesUnsafe(encoded, bytes, groupsCount, remainder, lookupTable);
             }
 
             return bytes;
         }
 
-        internal static ValidationResult Validate(string encoded, int index, int length, char? padSymbol,
+        internal static ValidationResult Validate(ReadOnlySpan<Char> encoded, char? padSymbol,
             LookupTable lookupTable)
         {
             try
             {
-                CheckToBytesArguments(encoded, index, length, lookupTable);
-
+                var length = encoded.Length;
                 int bytesCount = GetBytesCount(length);
                 int symbolsCount = GetSymbolsCount(bytesCount);
                 if (symbolsCount != length)
@@ -434,7 +395,7 @@ namespace Wiry.Base32
                 int remainder;
                 try
                 {
-                    remainder = GetRemainderWithChecks(encoded, index, length, padSymbol);
+                    remainder = GetRemainderWithChecks(encoded, padSymbol);
                 }
                 catch (FormatException fex)
                 {
@@ -456,7 +417,7 @@ namespace Wiry.Base32
                     length -= 8 - remainder; // ignore padding
                 }
 
-                if (!CheckAlphabet(encoded, index, length, lookupTable))
+                if (!CheckAlphabet(encoded, lookupTable))
                     return ValidationResult.InvalidCharacter;
 
                 return ValidationResult.Ok;
@@ -467,7 +428,7 @@ namespace Wiry.Base32
             }
         }
 
-        private static unsafe bool CheckAlphabet(string encoded, int index, int length, LookupTable lookupTable)
+        private static unsafe bool CheckAlphabet(ReadOnlySpan<Char> encoded, LookupTable lookupTable)
         {
             int[] lookupValues = lookupTable.Values;
             int lowCode = lookupTable.LowCode;
@@ -475,8 +436,8 @@ namespace Wiry.Base32
             fixed (char* pEncodedBegin = encoded)
             fixed (int* pLookup = lookupValues)
             {
-                char* pEncoded = pEncodedBegin + index;
-                char* pEnd = pEncoded + length;
+                char* pEncoded = pEncodedBegin;
+                char* pEnd = pEncoded + encoded.Length;
                 while (pEncoded < pEnd)
                 {
                     int lookupIndex = *pEncoded - lowCode;

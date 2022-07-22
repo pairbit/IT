@@ -1,27 +1,27 @@
 ﻿using IT.Encoding.Benchmarks;
 using System.Text;
 
-Base16Test();
+//Base16Test();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Encode_Benchmark));
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Decode_Benchmark));
 
 Base32Test();
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base32_Encode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base32_Encode_Benchmark));
 BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base32_Decode_Benchmark));
 
-Base64Test();
+//Base64Test();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Encode_Benchmark));
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Decode_Benchmark));
 
-Base85Test();
+//Base85Test();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Encode_Benchmark));
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Decode_Benchmark));
 
-Base85ZTest();
+//Base85ZTest();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Encode_Benchmark));
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Decode_Benchmark));
@@ -114,6 +114,8 @@ static void Base32Test()
     var u6 = encoder.Multiformats_Bench();
     var u7 = encoder.KodeAid_Bench();
     var u8 = encoder.IT_deniszykov_Bench();
+    var u9 = encoder.IT_Wiry_Bench();
+    var u10 = encoder.IT_Bench();
 
     if (!u1.Equals(u2)) throw new InvalidOperationException();
     if (!u1.Equals(u3)) throw new InvalidOperationException();
@@ -122,6 +124,8 @@ static void Base32Test()
     if (!u1.Equals(u6)) throw new InvalidOperationException();
     if (!u1.Equals(u7)) throw new InvalidOperationException();
     if (!u1.Equals(u8)) throw new InvalidOperationException();
+    if (!u1.Equals(u9)) throw new InvalidOperationException();
+    if (!u1.Equals(u10)) throw new InvalidOperationException();
 
     var decoder = new Base32_Decode_Benchmark();
     decoder._data = u1;
@@ -135,6 +139,8 @@ static void Base32Test()
     var b6 = decoder.Multiformats_Bench();
     var b7 = decoder.KodeAid_Bench();
     var b8 = decoder.IT_deniszykov_Bench();
+    var b9 = decoder.IT_Wiry_Bench();
+    var b10 = decoder.IT_Bench();
 
     if (!b.SequenceEqual(b1)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b2)) throw new InvalidOperationException();
@@ -144,6 +150,8 @@ static void Base32Test()
     if (!b.SequenceEqual(b6)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b7)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b8)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b9)) throw new InvalidOperationException();
+    if (!b.SequenceEqual(b10)) throw new InvalidOperationException();
 }
 
 static void Base64Test()
