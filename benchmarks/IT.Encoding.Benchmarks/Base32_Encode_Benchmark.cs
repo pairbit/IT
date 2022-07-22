@@ -43,9 +43,6 @@ public class Base32_Encode_Benchmark
     [Benchmark(Description = "deniszykov2")]
     public String deniszykov2_Bench() => deniszykov.BaseN.BaseNEncoding.Base32.GetString(_data);
 
-    [Benchmark(Description = "KodeAid")]
-    public String KodeAid_Bench() => KodeAid.Base32Encoder.EncodeBytes(_data);
-
     [Benchmark(Description = "IT_Wiry")]
     public String IT_Wiry_Bench() => _base32_Wiry.EncodeToText(_data);
 

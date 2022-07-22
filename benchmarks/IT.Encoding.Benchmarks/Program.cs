@@ -112,10 +112,9 @@ static void Base32Test()
     var u4 = encoder.MikValSor_Bench();
     var u5 = encoder.deniszykov_Bench();
     var u6 = encoder.Multiformats_Bench();
-    var u7 = encoder.KodeAid_Bench();
-    var u8 = encoder.IT_deniszykov_Bench();
-    var u9 = encoder.IT_Wiry_Bench();
-    var u10 = encoder.IT_Bench();
+    var u7 = encoder.IT_deniszykov_Bench();
+    var u8 = encoder.IT_Wiry_Bench();
+    var u9 = encoder.IT_Bench();
 
     if (!u1.Equals(u2)) throw new InvalidOperationException();
     if (!u1.Equals(u3)) throw new InvalidOperationException();
@@ -125,7 +124,6 @@ static void Base32Test()
     if (!u1.Equals(u7)) throw new InvalidOperationException();
     if (!u1.Equals(u8)) throw new InvalidOperationException();
     if (!u1.Equals(u9)) throw new InvalidOperationException();
-    if (!u1.Equals(u10)) throw new InvalidOperationException();
 
     var decoder = new Base32_Decode_Benchmark();
     decoder._data = u1;
@@ -137,10 +135,9 @@ static void Base32Test()
     var b4 = decoder.MikValSor_Bench();
     var b5 = decoder.deniszykov_Bench();
     var b6 = decoder.Multiformats_Bench();
-    var b7 = decoder.KodeAid_Bench();
-    var b8 = decoder.IT_deniszykov_Bench();
-    var b9 = decoder.IT_Wiry_Bench();
-    var b10 = decoder.IT_Bench();
+    var b7 = decoder.IT_deniszykov_Bench();
+    var b8 = decoder.IT_Wiry_Bench();
+    var b9 = decoder.IT_Bench();
 
     if (!b.SequenceEqual(b1)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b2)) throw new InvalidOperationException();
@@ -151,7 +148,6 @@ static void Base32Test()
     if (!b.SequenceEqual(b7)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b8)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b9)) throw new InvalidOperationException();
-    if (!b.SequenceEqual(b10)) throw new InvalidOperationException();
 }
 
 static void Base64Test()

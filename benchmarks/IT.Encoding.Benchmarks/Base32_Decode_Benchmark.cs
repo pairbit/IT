@@ -39,9 +39,6 @@ public class Base32_Decode_Benchmark
     [Benchmark(Description = "Wiry")]
     public Byte[] Wiry_Bench() => Wiry.Base32.Base32Encoding.Standard.ToBytes(_data);
 
-    [Benchmark(Description = "KodeAid")]
-    public Byte[] KodeAid_Bench() => KodeAid.Base32Encoder.DecodeBytes(_data);
-
     [Benchmark(Description = "IT_deniszykov")]
     public Byte[] IT_deniszykov_Bench() => _base32_deniszykov.Decode(_data);
 
