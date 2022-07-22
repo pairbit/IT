@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
+using IT.Encoding.Base;
 
 namespace IT.Encoding.Benchmarks;
 
@@ -8,14 +9,15 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base32_Decode_Benchmark
 {
+    private ITextEncoder _base32 = new Base32Encoder_deniszykov();
     internal string _data;
 
     //[Params(12, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]
 
     //[Params(1, 2, 4, 8, 12, 15, 16, 31, 32, 49, 50, 63, 64, 128, 256, 512, 1024)]
-    [Params(2 * 1024, 4 * 1024, 8 * 1024, 16 * 1024, 32 * 1024, 64 * 1024, 128 * 1024, 256 * 1024, 512 * 1024, 1024 * 1024)]
+    //[Params(2 * 1024, 4 * 1024, 8 * 1024, 16 * 1024, 32 * 1024, 64 * 1024, 128 * 1024, 256 * 1024, 512 * 1024, 1024 * 1024)]
     //[Params(2 * 1024 * 1024, 4 * 1024 * 1024, 8 * 1024 * 1024, 16 * 1024 * 1024, 32 * 1024 * 1024, 64 * 1024 * 1024, 128 * 1024 * 1024, 256 * 1024 * 1024, 510 * 1024 * 1024)]
-    //[Params(1024 * 1024)]
+    [Params(1024 * 1024)]
     public int Length { get; set; }
 
     [GlobalSetup]
@@ -32,11 +34,17 @@ public class Base32_Decode_Benchmark
     [Benchmark(Description = "KodeAid")]
     public Byte[] KodeAid_Bench() => KodeAid.Base32Encoder.DecodeBytes(_data);
 
-    //[Benchmark(Description = "SimpleBase")]
-    public Span<Byte> SimpleBase_Bench() => SimpleBase.Base32.Rfc4648.Decode(_data);
+    [Benchmark(Description = "IT_deniszykov")]
+    public Byte[] IT_deniszykov_Bench() => _base32.Decode(_data);
 
-    //[Benchmark(Description = "deniszykov")]
+    [Benchmark(Description = "deniszykov")]
+    public Byte[] deniszykov2_Bench() => deniszykov.BaseN.BaseNEncoding.Base32.GetBytes(_data);
+
+    [Benchmark(Description = "deniszykov")]
     public Byte[] deniszykov_Bench() => deniszykov.BaseN.Base32Convert.ToBytes(_data);
+
+    [Benchmark(Description = "SimpleBase")]
+    public Span<Byte> SimpleBase_Bench() => SimpleBase.Base32.Rfc4648.Decode(_data);
 
     //[Benchmark(Description = "MikValSor")]
     public Byte[] MikValSor_Bench() => MikValSor.Encoding.Base32Decoder.Decode(_data);
