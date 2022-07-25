@@ -1,11 +1,11 @@
 namespace IT.Messaging.Tests;
 
-public class PublisherTest
+public class PublisherGenericTest
 {
-    private IChannel _channel;
+    private IChannel<Guid> _channel;
 
     [SetUp]
-    public void Setup(IChannel channel)
+    public void Setup(IChannel<Guid> channel)
     {
         _channel = channel;
     }
@@ -15,7 +15,7 @@ public class PublisherTest
     {
         var guid = Guid.NewGuid();
 
-        _channel.Subscribe<Guid>("POIB-*", (channel, guid) =>
+        _channel.Subscribe("POIB-*", (channel, guid) =>
         {
             Console.WriteLine($"[{channel}] -> {guid}");
         });
