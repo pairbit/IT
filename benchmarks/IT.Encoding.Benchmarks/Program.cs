@@ -6,10 +6,14 @@ using System.Text;
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Encode_Benchmark));
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Decode_Benchmark));
 
-Base32Test();
+//Base32Test();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base32_Encode_Benchmark));
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base32_Decode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base32_Decode_Benchmark));
+
+Base32ZTest();
+
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base32Z_Encode_Benchmark));
 
 //Base64Test();
 
@@ -149,6 +153,55 @@ static void Base32Test()
     if (!b.SequenceEqual(b8)) throw new InvalidOperationException();
     if (!b.SequenceEqual(b9)) throw new InvalidOperationException();
 }
+
+static void Base32ZTest()
+{
+    var encoder = new Base32Z_Encode_Benchmark();
+
+    encoder.Length = 16;
+    encoder.Setup();
+
+    var u1 = encoder.Wiry_Bench();
+    var u2 = encoder.SimpleBase_Bench();
+    var u3 = encoder.MikValSor_Bench();
+    var u4 = encoder.deniszykov_Bench();
+    var u5 = encoder.Multiformats_Bench();
+    var u6 = encoder.IT_deniszykov_Bench();
+    var u7 = encoder.IT_Wiry_Bench();
+    var u8 = encoder.IT_Bench();
+
+    if (!u1.Equals(u2)) throw new InvalidOperationException();
+    if (!u1.Equals(u3)) throw new InvalidOperationException();
+    if (!u1.Equals(u4)) throw new InvalidOperationException();
+    if (!u1.Equals(u5)) throw new InvalidOperationException();
+    if (!u1.Equals(u6)) throw new InvalidOperationException();
+    if (!u1.Equals(u7)) throw new InvalidOperationException();
+    if (!u1.Equals(u8)) throw new InvalidOperationException();
+
+    //var decoder = new Base32_Decode_Benchmark();
+    //decoder._data = u1;
+
+    //var b = encoder._data.AsSpan();
+    //var b1 = decoder.Wiry_Bench();
+    //var b2 = decoder.SimpleBase_Bench();
+    //var b3 = decoder.Albireo_Bench();
+    //var b4 = decoder.MikValSor_Bench();
+    //var b5 = decoder.deniszykov_Bench();
+    //var b6 = decoder.Multiformats_Bench();
+    //var b7 = decoder.IT_deniszykov_Bench();
+    //var b8 = decoder.IT_Wiry_Bench();
+    //var b9 = decoder.IT_Bench();
+
+    //if (!b.SequenceEqual(b1)) throw new InvalidOperationException();
+    //if (!b.SequenceEqual(b2)) throw new InvalidOperationException();
+    //if (!b.SequenceEqual(b3)) throw new InvalidOperationException();
+    //if (!b.SequenceEqual(b4)) throw new InvalidOperationException();
+    //if (!b.SequenceEqual(b5)) throw new InvalidOperationException();
+    //if (!b.SequenceEqual(b6)) throw new InvalidOperationException();
+    //if (!b.SequenceEqual(b7)) throw new InvalidOperationException();
+    //if (!b.SequenceEqual(b8)) throw new InvalidOperationException();
+}
+
 
 static void Base64Test()
 {
