@@ -177,6 +177,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Working.Tests", "tests\I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Encoding.Tests", "tests\IT.Encoding.Tests\IT.Encoding.Tests.csproj", "{4ADF1156-DCB9-4410-AB65-F0BEADD7256B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Encoding.Web", "src\IT.Encoding.Web\IT.Encoding.Web.csproj", "{3C1CB2A9-57E1-466E-AA6F-5576C3E34B46}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -463,6 +465,10 @@ Global
 		{4ADF1156-DCB9-4410-AB65-F0BEADD7256B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4ADF1156-DCB9-4410-AB65-F0BEADD7256B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4ADF1156-DCB9-4410-AB65-F0BEADD7256B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C1CB2A9-57E1-466E-AA6F-5576C3E34B46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C1CB2A9-57E1-466E-AA6F-5576C3E34B46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C1CB2A9-57E1-466E-AA6F-5576C3E34B46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C1CB2A9-57E1-466E-AA6F-5576C3E34B46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -538,6 +544,7 @@ Global
 		{230F47A4-469C-44F8-97D7-3D55037E4A69} = {D3FFCD4A-8A92-42ED-9A66-EA03689767DA}
 		{0E3EA6E1-0575-4DBB-9886-00B7E4941F96} = {650C0F0B-D687-44D9-A455-85EDEE5AA8E4}
 		{4ADF1156-DCB9-4410-AB65-F0BEADD7256B} = {2040F77F-08E5-4502-AA10-0A0CF453F4C6}
+		{3C1CB2A9-57E1-466E-AA6F-5576C3E34B46} = {2040F77F-08E5-4502-AA10-0A0CF453F4C6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E61A39C8-7FE8-4292-A237-B5DBE7E0E57C}
