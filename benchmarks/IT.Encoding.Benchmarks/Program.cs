@@ -1,31 +1,31 @@
 ﻿using IT.Encoding.Benchmarks;
 using System.Text;
 
-//Base16Test();
+Base16Test();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Encode_Benchmark));
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base16_Decode_Benchmark));
 
-//Base32Test();
+Base32Test();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base32_Encode_Benchmark));
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base32_Decode_Benchmark));
 
 Base32ZTest();
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base32Z_Encode_Benchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base32Z_Encode_Benchmark));
 
-//Base64Test();
+Base64Test();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Encode_Benchmark));
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base64_Decode_Benchmark));
 
-//Base85Test();
+Base85Test();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Encode_Benchmark));
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85_Decode_Benchmark));
 
-//Base85ZTest();
+Base85ZTest();
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Encode_Benchmark));
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(Base85Z_Decode_Benchmark));
