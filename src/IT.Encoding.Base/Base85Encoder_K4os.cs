@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Buffers;
+using IT.Encoding.Internal;
 using K4os.Text.BaseX;
 
 namespace IT.Encoding.Base;
 
-public class Base85Encoder_K4os : TextEncoder
+public class Base85Encoder_K4os : TextEncoding
 {
     private readonly BaseXCodec _codec;
 
@@ -45,7 +46,7 @@ public class Base85Encoder_K4os : TextEncoder
         return OperationStatus.Done;
     }
 
-    public override String EncodeToText(ReadOnlySpan<Byte> data) => EncodeToTextFromCharsVarLen(data);
+    public override String EncodeToText(ReadOnlySpan<Byte> data) => this.EncodeToTextFromCharsVarLen(data);
 
     #endregion TextEncoder
 }

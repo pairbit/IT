@@ -3,7 +3,7 @@ using Wiry.Base32;
 
 namespace IT.Encoding.Base;
 
-public class Base32Encoder_Wiry : TextEncoder
+public class Base32Encoder_Wiry : TextEncoding
 {
     private readonly Base32Encoding _base;
 

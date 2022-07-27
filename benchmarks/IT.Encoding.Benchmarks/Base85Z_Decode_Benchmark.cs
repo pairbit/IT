@@ -10,8 +10,8 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base85Z_Decode_Benchmark
 {
-    private ITextEncoder _k4os = new Base85Encoder_K4os(true);
-    private ITextEncoder _coenM = new Base85ZEncoder_CoenM();
+    private ITextDecoder _k4os = new Base85Encoder_K4os(true);
+    private ITextDecoder _coenM = new Base85ZEncoder_CoenM();
     private Base85Codec _z85 = new("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#", '\0');
     internal string _data;
 

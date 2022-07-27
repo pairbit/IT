@@ -1,10 +1,11 @@
-﻿using System;
+﻿using IT.Encoding.Internal;
+using System;
 using System.Buffers;
 using System.Buffers.Text;
 
 namespace IT.Encoding.Base;
 
-public class Base64Encoder_Utf8 : TextEncoder
+public class Base64Encoder_Utf8 : TextEncoding
 {
     #region Encoder
 
@@ -30,5 +31,5 @@ public class Base64Encoder_Utf8 : TextEncoder
 
     #endregion Encoder
 
-    public override String EncodeToText(ReadOnlySpan<Byte> data) => EncodeToTextFromBytes(data);
+    public override String EncodeToText(ReadOnlySpan<Byte> data) => this.EncodeToTextFromBytes(data, _encoding);
 }

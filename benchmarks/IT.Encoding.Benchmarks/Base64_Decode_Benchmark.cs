@@ -10,8 +10,8 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base64_Decode_Benchmark
 {
-    private ITextEncoder _base64Utf8 = new Base64Encoder_Utf8();
-    private ITextEncoder _base64gfoidl = new Base64Encoder_gfoidl();
+    private ITextDecoder _base64Utf8 = new Base64Encoder_Utf8();
+    private ITextDecoder _base64gfoidl = new Base64Encoder_gfoidl();
     internal string _data;
 
     //[Params(12, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]

@@ -10,7 +10,7 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base85_Decode_Benchmark
 {
-    private ITextEncoder _k4os = new Base85Encoder_K4os();
+    private ITextDecoder _k4os = new Base85Encoder_K4os();
     internal string _data;
 
     //[Params(12, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]

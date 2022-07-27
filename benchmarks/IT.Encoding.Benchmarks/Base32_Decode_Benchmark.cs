@@ -9,9 +9,9 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base32_Decode_Benchmark
 {
-    private ITextEncoder _base32 = new Base32Encoder_deniszykov_Wiry();
-    private ITextEncoder _base32_deniszykov = new Base32Encoder_deniszykov();
-    private ITextEncoder _base32_Wiry = new Base32Encoder_Wiry();
+    private ITextDecoder _base32 = new Base32Encoder_deniszykov_Wiry();
+    private ITextDecoder _base32_deniszykov = new Base32Encoder_deniszykov();
+    private ITextDecoder _base32_Wiry = new Base32Encoder_Wiry();
     internal string _data;
 
     //[Params(12, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]

@@ -4,7 +4,7 @@ using System.Buffers;
 
 namespace IT.Encoding.Base;
 
-public class Base85ZEncoder_CoenM : TextEncoder
+public class Base85ZEncoder_CoenM : TextEncoding
 {
     #region Encoder
 

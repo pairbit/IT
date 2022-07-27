@@ -3,7 +3,7 @@ using System.Buffers;
 
 namespace IT.Encoding.Base;
 
-public class Base64Encoder_gfoidl : TextEncoder
+public class Base64Encoder_gfoidl : TextEncoding
 {
     private gfoidl.Base64.IBase64 _base64;
 

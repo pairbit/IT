@@ -10,7 +10,7 @@ namespace IT.Encoding.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class Base16_Decode_Benchmark
 {
-    private ITextEncoder _base16 = new HexEncoder_HexMate();
+    private ITextDecoder _base16 = new HexEncoder_HexMate();
     internal String _data;
 
     //[Params(12, 100, 510, 1024, 510 * 1024, 2 * 1024 * 1024, 510 * 1024 * 1024)]

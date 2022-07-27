@@ -3,7 +3,7 @@ using System.Text;
 
 namespace IT.Encoding.Base;
 
-public class Base32Encoder_deniszykov_Wiry : TextEncoder
+public class Base32Encoder_deniszykov_Wiry : TextEncoding
 {
     private readonly deniszykov.BaseN.BaseNEncoding _baseNEncoding;
     private readonly Wiry.Base32.Base32Encoding _base;

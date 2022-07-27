@@ -5,7 +5,7 @@ using System.Text;
 
 namespace IT.Encoding.Base;
 
-public class Base32Encoder_deniszykov : TextEncoder
+public class Base32Encoder_deniszykov : TextEncoding
 {
     private readonly BaseNEncoding _baseNEncoding;
 
