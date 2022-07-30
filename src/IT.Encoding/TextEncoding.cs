@@ -1,4 +1,4 @@
-﻿using IT.Encoding.Internal;
+﻿using IT.Encoding.Impl;
 using System;
 using System.Buffers;
 

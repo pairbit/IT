@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\IT.Encoding.Base\IT.Encoding.Base.csproj" />
+    <ProjectReference Include="..\..\src\IT.Encoding.Web\IT.Encoding.Web.csproj" />
   </ItemGroup>
 
 </Project>

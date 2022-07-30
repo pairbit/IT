@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Buffers;
-using IT.Encoding.Internal;
+using IT.Encoding.Impl;
 using K4os.Text.BaseX;
 
 namespace IT.Encoding.Base;

@@ -2,7 +2,7 @@
 using System.Buffers;
 using System.Text;
 
-namespace IT.Encoding.Internal;
+namespace IT.Encoding.Impl;
 
 public static class xITextEncoder
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Buffers;
 
-namespace IT.Encoding.Internal;
+namespace IT.Encoding.Impl;
 
 public static class xIEncoder
 {
