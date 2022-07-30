@@ -12,12 +12,9 @@ public class WebEncoder : TextEncoder
         _textEncoder = textEncoder;
     }
 
-    public override int MaxDataLength => throw new NotImplementedException();
+    public override Int32 MaxDataLength => throw new NotImplementedException();
 
-    public override int GetMaxEncodedLength(int dataLength)
-    {
-        throw new NotImplementedException();
-    }
+    public override Int32 GetMaxEncodedLength(Int32 dataLength) => dataLength * _textEncoder.MaxOutputCharactersPerInputCharacter;
 
     public override OperationStatus Encode(ReadOnlySpan<byte> data, Span<byte> encoded, out int consumed, out int written, bool isFinal = true)
         => _textEncoder.EncodeUtf8(data, encoded, out consumed, out written, isFinal);
