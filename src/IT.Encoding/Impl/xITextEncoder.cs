@@ -120,6 +120,46 @@ public static class xITextEncoder
         }
     }
 
+    public static String EncodeToTextFromCharsVarLen(this ITextEncoder textEncoder, ReadOnlySpan<Char> data)
+    {
+        if (data.IsEmpty) return String.Empty;
+
+        var encodedLength = textEncoder.GetEncodedLength(data);
+
+        var pool = ArrayPool<Char>.Shared;
+
+        var rented = pool.Rent(encodedLength);
+
+        Span<Char> encoded = rented;
+
+        try
+        {
+            var status = textEncoder.Encode(data, encoded, out var consumed, out var written);
+
+            if (status != OperationStatus.Done) throw new InvalidOperationException(status.ToString());
+
+            if (consumed != data.Length) throw new InvalidOperationException();
+
+#if NETSTANDARD2_0
+            encoded = encoded[..written];
+
+            unsafe
+            {
+                fixed (char* encodedPtr = encoded)
+                {
+                    return new String(encodedPtr);
+                }
+            }
+#else
+            return new String(encoded[..written]);
+#endif
+        }
+        finally
+        {
+            pool.Return(rented);
+        }
+    }
+
     public static String EncodeToTextFromBytes(this ITextEncoder textEncoder, ReadOnlySpan<Byte> data, System.Text.Encoding encoding)
     {
         if (data.IsEmpty) return String.Empty;

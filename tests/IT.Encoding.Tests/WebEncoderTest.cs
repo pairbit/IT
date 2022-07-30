@@ -4,9 +4,44 @@ namespace IT.Encoding.Tests;
 
 public class WebEncoderTest
 {
+    private ITextEncoder _textEncoder;
+
     [SetUp]
     public void Setup()
     {
+        _textEncoder = new IT.Encoding.Web.WebEncoder(System.Text.Encodings.Web.HtmlEncoder.Default);
+    }
+
+    [Test]
+    public void WebTest()
+    {
+        Assert.That(_textEncoder.EncodeToText("я"), Is.EqualTo("&#x44F;"));
+
+        Assert.That(_textEncoder.EncodeToText("&nbsp;"), Is.EqualTo("&amp;nbsp;"));
+
+        Assert.That(_textEncoder.EncodeToText("<p>My text</p>"), Is.EqualTo("&lt;p&gt;My text&lt;/p&gt;"));
+
+        Assert.That(_textEncoder.EncodeToText("�"), Is.EqualTo("&#xFFFD;"));
+
+        Assert.That(_textEncoder.EncodeToText("􀀀"), Is.EqualTo("&#x100000;"));
+
+        Assert.That(_textEncoder.EncodeToText("􏿿"), Is.EqualTo("&#x10FFFF;"));
+
+        var maxDataLength = _textEncoder.MaxDataLength;
+
+        var maxEncodedLength = _textEncoder.GetMaxEncodedLength(maxDataLength);
+
+        var maxData = new String('�', maxDataLength);
+
+        var encoded = _textEncoder.EncodeToText(maxData);
+
+        Assert.That(encoded.Length, Is.EqualTo(maxEncodedLength));
+
+        maxData = new String('x', maxDataLength);
+
+        encoded = _textEncoder.EncodeToText(maxData);
+
+        Assert.That(encoded.Length, Is.LessThanOrEqualTo(maxEncodedLength));
     }
 
     [Test]
