@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Diagnostics;
 
 namespace IT.Encoding.Tests;
 
@@ -101,7 +102,23 @@ public class WebEncoderTest
         
         maxData = new String('�', maxUnicode);
 
+        var stopwatch = Stopwatch.StartNew();
+
+        encoded = _textEncoder.EncodeToText(maxData.AsSpan());
+
+        stopwatch.Stop();
+
+        Console.WriteLine($"Span: {stopwatch.Elapsed}");
+
+        Assert.That(encoded.Length, Is.LessThanOrEqualTo(maxEncodedLength));
+
+        stopwatch = Stopwatch.StartNew();
+
         encoded = _textEncoder.EncodeToText(maxData);
+
+        stopwatch.Stop();
+
+        Console.WriteLine($"String: {stopwatch.Elapsed}");
 
         Assert.That(encoded.Length, Is.LessThanOrEqualTo(maxEncodedLength));
     }
