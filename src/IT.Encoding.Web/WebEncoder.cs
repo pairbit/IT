@@ -31,4 +31,6 @@ public class WebEncoder : TextEncoder
         => _textEncoder.Encode(data, encoded, out consumed, out written, isFinal);
 
     public override String EncodeToText(ReadOnlySpan<Char> data) => _textEncoder.Encode(data);
+
+    public override String EncodeToText(String data) => _textEncoder.Encode(data);
 }

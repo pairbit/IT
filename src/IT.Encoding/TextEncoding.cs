@@ -51,6 +51,8 @@ public abstract class TextEncoding : Encoding, ITextEncoding
 
     public virtual String EncodeToText(ReadOnlySpan<Char> data) => this.EncodeToTextFromCharsVarLen(data);
 
+    public virtual String EncodeToText(String data) => this.EncodeToTextFromCharsVarLen(data.AsSpan());
+
     #endregion ITextEncoder
 
     #region ITextDecoder
@@ -71,6 +73,8 @@ public abstract class TextEncoding : Encoding, ITextEncoding
     public virtual String DecodeToText(ReadOnlySpan<Byte> encoded) => throw new NotImplementedException();
 
     public virtual String DecodeToText(ReadOnlySpan<Char> encoded) => throw new NotImplementedException();
+
+    public virtual String DecodeToText(String encoded) => throw new NotImplementedException();
 
     #endregion ITextDecoder
 }

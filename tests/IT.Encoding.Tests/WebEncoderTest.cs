@@ -87,8 +87,16 @@ public class WebEncoderTest
 
         var encoded = _textEncoder.EncodeToText(maxData);
 
+        Assert.True(ReferenceEquals(encoded, maxData));
+        Assert.That(encoded, Is.EqualTo(maxData));
         Assert.That(encoded.Length, Is.EqualTo(maxEncodedLength));
-        
+
+        encoded = _textEncoder.EncodeToText(maxData.AsSpan());
+
+        Assert.False(ReferenceEquals(encoded, maxData));
+        Assert.That(encoded, Is.EqualTo(maxData));
+        Assert.That(encoded.Length, Is.EqualTo(maxEncodedLength));
+
         var maxUnicode = (maxDataLength / 8) - 90;
         
         maxData = new String('�', maxUnicode);

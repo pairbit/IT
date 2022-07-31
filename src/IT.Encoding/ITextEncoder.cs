@@ -18,4 +18,6 @@ public interface ITextEncoder : IEncoder
     String EncodeToText(ReadOnlySpan<Byte> data);
 
     String EncodeToText(ReadOnlySpan<Char> data);
+
+    String EncodeToText(String data);
 }

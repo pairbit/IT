@@ -46,5 +46,7 @@ public abstract class TextDecoder : Decoder, ITextDecoder
 
     public virtual String DecodeToText(ReadOnlySpan<Char> encoded) => throw new NotImplementedException();
 
+    public virtual String DecodeToText(String encoded) => throw new NotImplementedException();
+
     #endregion ITextDecoder
 }

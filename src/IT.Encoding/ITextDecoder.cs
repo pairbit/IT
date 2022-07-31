@@ -18,4 +18,6 @@ public interface ITextDecoder : IDecoder
     String DecodeToText(ReadOnlySpan<Byte> encoded);
 
     String DecodeToText(ReadOnlySpan<Char> encoded);
+
+    String DecodeToText(String encoded);
 }

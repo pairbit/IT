@@ -46,5 +46,7 @@ public abstract class TextEncoder : Encoder, ITextEncoder
 
     public virtual String EncodeToText(ReadOnlySpan<Char> data) => this.EncodeToTextFromCharsVarLen(data);
 
+    public virtual String EncodeToText(String data) => this.EncodeToTextFromCharsVarLen(data.AsSpan());
+
     #endregion ITextEncoder
 }
