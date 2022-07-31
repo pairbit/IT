@@ -25,6 +25,7 @@ public class WebEncoderTest
 
         Assert.That(_textEncoder.Encode(GetBytes("<p>My text</p>")), Is.EqualTo(GetBytes("&lt;p&gt;My text&lt;/p&gt;")));
 
+        Assert.That(_textEncoder.Encode(new byte[] { 255 }), Is.EqualTo(GetBytes("&#xFFFD;")));
         Assert.That(_textEncoder.Encode(GetBytes("�")), Is.EqualTo(GetBytes("&#xFFFD;")));
 
         Assert.That(_textEncoder.Encode(GetBytes("􀀀")), Is.EqualTo(GetBytes("&#x100000;")));
