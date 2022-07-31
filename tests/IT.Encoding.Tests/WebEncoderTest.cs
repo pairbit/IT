@@ -35,17 +35,31 @@ public class WebEncoderTest
 
         var maxEncodedLength = _textEncoder.GetMaxEncodedLength(maxDataLength);
 
-        var maxData = new String('�', maxDataLength);
+        var maxUnicode = (maxDataLength / 8) - 90;
 
-        var encoded = _textEncoder.Encode(GetBytes(maxData));
+        var maxData = new String('�', maxUnicode);
 
-        Assert.That(encoded.Length, Is.EqualTo(maxEncodedLength));
+        var bytes = GetBytes(maxData);
+
+        var byteslen = bytes.Length;
+
+        Assert.That(byteslen / 3, Is.EqualTo(maxUnicode));
+
+        var encoded = _textEncoder.Encode(bytes);
+
+        Assert.That(encoded.Length, Is.LessThanOrEqualTo(maxEncodedLength));
 
         maxData = new String('x', maxDataLength);
 
-        encoded = _textEncoder.Encode(GetBytes(maxData));
+        bytes = GetBytes(maxData);
 
-        Assert.That(encoded.Length, Is.LessThanOrEqualTo(maxEncodedLength));
+        byteslen = bytes.Length;
+
+        encoded = _textEncoder.Encode(bytes);
+
+        Assert.That(encoded.Length, Is.EqualTo(byteslen));
+
+        Assert.That(encoded.Length, Is.EqualTo(maxEncodedLength));
     }
 
     [Test]
