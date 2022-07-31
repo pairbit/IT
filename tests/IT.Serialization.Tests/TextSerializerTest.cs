@@ -4,13 +4,13 @@ namespace IT.Serialization.Tests;
 
 public abstract class TextSerializerTest : SerializerTest
 {
-    private readonly ITextSerializer _textSerializer;
-    private readonly ITextSerializer<Person> _textSerializerPerson;
+    private readonly ITextSerialization _textSerializer;
+    private readonly ITextSerialization<Person> _textSerializerPerson;
 
-    public TextSerializerTest(ITextSerializer textSerializer) : base(textSerializer)
+    public TextSerializerTest(ITextSerialization textSerializer) : base(textSerializer)
     {
         _textSerializer = textSerializer;
-        _textSerializerPerson = new TextSerializerProxy<Person>(textSerializer);
+        _textSerializerPerson = new TextSerializationProxy<Person>(textSerializer);
     }
 
     [Test]

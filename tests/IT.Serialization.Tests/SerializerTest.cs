@@ -9,13 +9,13 @@ public abstract class SerializerTest
     protected static readonly Person _person = _generator.Generate<Person>();
     protected static readonly object _personObject = _generator.Generate(typeof(Person));
 
-    private readonly ISerializer _serializer;
-    private readonly ISerializer<Person> _serializerPerson;
+    private readonly ISerialization _serializer;
+    private readonly ISerialization<Person> _serializerPerson;
 
-    public SerializerTest(ISerializer serializer)
+    public SerializerTest(ISerialization serializer)
     {
         _serializer = serializer;
-        _serializerPerson = new SerializerProxy<Person>(serializer);
+        _serializerPerson = new SerializationProxy<Person>(serializer);
     }
 
     protected virtual void Dump<T>(T obj, Byte[] bytes) { }

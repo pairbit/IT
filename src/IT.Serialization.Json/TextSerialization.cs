@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace IT.Serialization.Json;
 
-public class TextSerializer : ITextSerializer
+public class TextSerialization : ITextSerialization
 {
     private readonly Func<JsonSerializerOptions>? _getOptions;
 
-    public TextSerializer(Func<JsonSerializerOptions>? getOptions = null)
+    public TextSerialization(Func<JsonSerializerOptions>? getOptions = null)
     {
         _getOptions = getOptions;
     }

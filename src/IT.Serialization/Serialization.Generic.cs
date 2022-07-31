@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IT.Serialization;
 
-public abstract class Serializer<T> : ISerializer<T>
+public abstract class Serialization<T> : ISerialization<T>
 {
     #region IAsyncSerializer
 

@@ -5,11 +5,11 @@ using System.Threading;
 
 namespace IT.Serialization;
 
-public abstract class TextSerializer<T> : Serializer<T>, ITextSerializer<T>
+public abstract class TextSerialization<T> : Serialization<T>, ITextSerialization<T>
 {
     private readonly Encoding _encoding;
 
-    public TextSerializer(Encoding? encoding = null)
+    public TextSerialization(Encoding? encoding = null)
     {
         _encoding = encoding ?? Encoding.UTF8;
     }

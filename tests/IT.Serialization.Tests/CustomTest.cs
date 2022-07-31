@@ -8,9 +8,9 @@ public class CustomTest
     protected static readonly IGenerator _generator = new Generation.KGySoft.Generator();
     protected static readonly City _city = _generator.Generate<City>();
 
-    private static ITextSerializer<City> _serializer = new CitySerializer();
+    private static ITextSerialization<City> _serializer = new CitySerializer();
 
-    class CitySerializer : TextSerializer<City>
+    class CitySerializer : TextSerialization<City>
     {
         public override City? Deserialize(ReadOnlyMemory<char> memory, CancellationToken cancellationToken)
         {

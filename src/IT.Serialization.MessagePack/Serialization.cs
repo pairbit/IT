@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace IT.Serialization.MessagePack;
 
-public class Serializer : ISerializer
+public class Serialization : ISerialization
 {
     private readonly MessagePackSerializerOptions? _options;
 
-    public Serializer(MessagePackSerializerOptions? options = null)
+    public Serialization(MessagePackSerializerOptions? options = null)
     {
         _options = options;
     }

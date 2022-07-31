@@ -7,6 +7,4 @@ namespace IT.Serialization;
 public interface IAsyncSerializer<T>
 {
     Task SerializeAsync(Stream stream, T value, CancellationToken cancellationToken = default);
-
-    ValueTask<T?> DeserializeAsync(Stream stream, CancellationToken cancellationToken = default);
 }

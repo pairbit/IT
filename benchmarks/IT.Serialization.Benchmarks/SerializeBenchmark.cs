@@ -14,20 +14,20 @@ public class SerializeBenchmark
     protected static readonly Person _person = _generator.Generate<Person>();
     protected static readonly Object _personObject = _generator.Generate(typeof(Person));
 
-    private readonly ISerializer _jsonSerializer;
+    private readonly ISerialization _jsonSerializer;
     private readonly byte[] _jsonSerializerBytes;
-    private readonly ISerializer _messagePackSerializer;
+    private readonly ISerialization _messagePackSerializer;
     private readonly byte[] _messagePackSerializerBytes;
-    private readonly ISerializer _utf8jsonSerializer;
+    private readonly ISerialization _utf8jsonSerializer;
     private readonly byte[] _utf8jsonSerializerBytes;
 
     public SerializeBenchmark()
     {
-        _jsonSerializer = new Json.TextSerializer();
+        _jsonSerializer = new Json.TextSerialization();
         _jsonSerializerBytes = Json_Serialize();
-        _messagePackSerializer = new MessagePack.Serializer();
+        _messagePackSerializer = new MessagePack.Serialization();
         _messagePackSerializerBytes = MessagePack_Serialize();
-        _utf8jsonSerializer = new Utf8Json.TextSerializer();
+        _utf8jsonSerializer = new Utf8Json.TextSerialization();
         _utf8jsonSerializerBytes = Utf8Json_Serialize();
     }
 
@@ -58,7 +58,7 @@ public class SerializeBenchmark
     [Benchmark]
     public Person Utf8Json() => SerializeDeserialize(_utf8jsonSerializer);
 
-    private Person SerializeDeserialize(ISerializer serializer)
+    private Person SerializeDeserialize(ISerialization serializer)
     {
         var bytes = serializer.Serialize(_person);
         var person = serializer.Deserialize<Person>(bytes);

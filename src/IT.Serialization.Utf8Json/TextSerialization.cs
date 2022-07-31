@@ -9,12 +9,12 @@ using Utf8Json;
 
 namespace IT.Serialization.Utf8Json;
 
-public class TextSerializer : ITextSerializer
+public class TextSerialization : ITextSerialization
 {
     private readonly IJsonFormatterResolver? _resolver;
     private static readonly Encoding _encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
-    public TextSerializer(IJsonFormatterResolver? resolver = null)
+    public TextSerialization(IJsonFormatterResolver? resolver = null)
     {
         _resolver = resolver;
     }

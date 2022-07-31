@@ -3,16 +3,16 @@ using System.Threading;
 
 namespace IT.Serialization;
 
-public class TextSerializerProxy<T> : SerializerProxy<T>, ITextSerializer<T>
+public class TextSerializationProxy<T> : SerializationProxy<T>, ITextSerialization<T>
 {
-    private readonly ITextSerializer _textSerializer;
+    private readonly ITextSerialization _textSerialization;
 
-    public TextSerializerProxy(ITextSerializer textSerializer) : base(textSerializer)
+    public TextSerializationProxy(ITextSerialization textSerialization) : base(textSerialization)
     {
-        _textSerializer = textSerializer;
+        _textSerialization = textSerialization;
     }
 
-    #region ITextSerializer
+    #region ITextSerialization
 
     //public virtual void Serialize(IBufferWriter<Char> writer, T value, CancellationToken cancellationToken)
     //{
@@ -20,15 +20,15 @@ public class TextSerializerProxy<T> : SerializerProxy<T>, ITextSerializer<T>
     //}
 
     public String SerializeToText(T value, CancellationToken cancellationToken)
-        => _textSerializer.SerializeToText(value, cancellationToken);
+        => _textSerialization.SerializeToText(value, cancellationToken);
 
     public T? Deserialize(ReadOnlyMemory<Char> memory, CancellationToken cancellationToken)
-        => _textSerializer.Deserialize<T>(memory, cancellationToken);
+        => _textSerialization.Deserialize<T>(memory, cancellationToken);
 
     //public virtual T? Deserialize(in ReadOnlySequence<Char> sequence, CancellationToken cancellationToken)
     //{
     //    throw new NotImplementedException();
     //}
 
-    #endregion ITextSerializer
+    #endregion ITextSerialization
 }
