@@ -9,11 +9,12 @@ public class WebEncoderTest
     [SetUp]
     public void Setup()
     {
-        _textEncoder = new IT.Encoding.Web.WebEncoder(System.Text.Encodings.Web.HtmlEncoder.Default);
+        _textEncoder = new Web.WebEncoder(System.Text.Encodings.Web.HtmlEncoder.Default);
     }
 
     private static Byte[] GetBytes(String text)=> System.Text.Encoding.UTF8.GetBytes(text);
 
+    //https://unicode-table.com/en/FFE6/
     [Test]
     public void ByteTest()
     {

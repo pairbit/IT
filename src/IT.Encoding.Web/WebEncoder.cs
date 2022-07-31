@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Text.Encodings.Web;
 
 namespace IT.Encoding.Web;
 
@@ -28,4 +29,6 @@ public class WebEncoder : TextEncoder
 
     public override OperationStatus Encode(ReadOnlySpan<char> data, Span<char> encoded, out int consumed, out int written, bool isFinal = true)
         => _textEncoder.Encode(data, encoded, out consumed, out written, isFinal);
+
+    public override String EncodeToText(ReadOnlySpan<Char> data) => _textEncoder.Encode(data);
 }
