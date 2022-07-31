@@ -15,9 +15,13 @@ public class WebEncoder : TextEncoder
         _maxDataLengthFrom = (_maxDataLengthTo / _textEncoder.MaxOutputCharactersPerInputCharacter) - 90;
     }
 
-    public override Int32 MaxDataLength => _maxDataLengthFrom;
+    public override Int32 MaxDataLength => _maxDataLengthTo;
 
-    public override Int32 GetMaxEncodedLength(Int32 dataLength) => dataLength * _textEncoder.MaxOutputCharactersPerInputCharacter;
+    public override Int32 GetMaxEncodedLength(Int32 dataLength)
+    {
+        var max = (long)dataLength * _textEncoder.MaxOutputCharactersPerInputCharacter;
+        return max >= _maxDataLengthTo ? _maxDataLengthTo : (Int32)max;
+    }
 
     public override OperationStatus Encode(ReadOnlySpan<byte> data, Span<byte> encoded, out int consumed, out int written, bool isFinal = true)
         => _textEncoder.EncodeUtf8(data, encoded, out consumed, out written, isFinal);

@@ -12,8 +12,44 @@ public class WebEncoderTest
         _textEncoder = new IT.Encoding.Web.WebEncoder(System.Text.Encodings.Web.HtmlEncoder.Default);
     }
 
+    private static Byte[] GetBytes(String text)=> System.Text.Encoding.UTF8.GetBytes(text);
+
     [Test]
-    public void WebTest()
+    public void ByteTest()
+    {
+        Assert.That(_textEncoder.Encode(GetBytes("y")), Is.EqualTo(GetBytes("y")));
+
+        Assert.That(_textEncoder.Encode(GetBytes("я")), Is.EqualTo(GetBytes("&#x44F;")));
+
+        Assert.That(_textEncoder.Encode(GetBytes("&nbsp;")), Is.EqualTo(GetBytes("&amp;nbsp;")));
+
+        Assert.That(_textEncoder.Encode(GetBytes("<p>My text</p>")), Is.EqualTo(GetBytes("&lt;p&gt;My text&lt;/p&gt;")));
+
+        Assert.That(_textEncoder.Encode(GetBytes("�")), Is.EqualTo(GetBytes("&#xFFFD;")));
+
+        Assert.That(_textEncoder.Encode(GetBytes("􀀀")), Is.EqualTo(GetBytes("&#x100000;")));
+
+        Assert.That(_textEncoder.Encode(GetBytes("􏿿")), Is.EqualTo(GetBytes("&#x10FFFF;")));
+
+        var maxDataLength = _textEncoder.MaxDataLength;
+
+        var maxEncodedLength = _textEncoder.GetMaxEncodedLength(maxDataLength);
+
+        var maxData = new String('�', maxDataLength);
+
+        var encoded = _textEncoder.Encode(GetBytes(maxData));
+
+        Assert.That(encoded.Length, Is.EqualTo(maxEncodedLength));
+
+        maxData = new String('x', maxDataLength);
+
+        encoded = _textEncoder.Encode(GetBytes(maxData));
+
+        Assert.That(encoded.Length, Is.LessThanOrEqualTo(maxEncodedLength));
+    }
+
+    [Test]
+    public void TextTest()
     {
         Assert.That(_textEncoder.EncodeToText("я"), Is.EqualTo("&#x44F;"));
 
@@ -31,17 +67,17 @@ public class WebEncoderTest
 
         var maxEncodedLength = _textEncoder.GetMaxEncodedLength(maxDataLength);
 
-        var maxData = new String('�', maxDataLength);
+        var maxData = new String('x', maxDataLength);
 
         var encoded = _textEncoder.EncodeToText(maxData);
 
-        Assert.That(encoded.Length, Is.EqualTo(maxEncodedLength));
+        Assert.That(encoded.Length, Is.LessThanOrEqualTo(maxEncodedLength));
 
-        maxData = new String('x', maxDataLength);
+        maxData = new String('�', maxDataLength);
 
         encoded = _textEncoder.EncodeToText(maxData);
 
-        Assert.That(encoded.Length, Is.LessThanOrEqualTo(maxEncodedLength));
+        Assert.That(encoded.Length, Is.EqualTo(maxEncodedLength));
     }
 
     [Test]
