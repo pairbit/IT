@@ -67,6 +67,6 @@ internal static class Soap
             => $@"{Begin}<ValidationRequestType {NS}><signedData>{signedData}</signedData><createAdvanced>{createAdvanced}</createAdvanced></ValidationRequestType>{End}";
 
         public static String Enhance(String signedData, String createAdvanced, String externalData)
-            => $@"{Begin}<ValidationRequestType {NS}><signedData>{signedData}</signedData><createAdvanced>{createAdvanced}</createAdvanced><externalData>{externalData}</externalData></ValidationRequestType>{End}";
+            => $@"{Begin}<ValidationRequestType {NS}><signedData>{signedData}</signedData><externalData>{externalData}</externalData><createAdvanced>{createAdvanced}</createAdvanced></ValidationRequestType>{End}";
     }
 }
