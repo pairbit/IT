@@ -13,9 +13,9 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.0-pre3</Version>
+	<Version>2.0.0-pre4</Version>
 	<PackageReleaseNotes>
-
+		up System.Security.Cryptography.Xml 6.0.1
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
