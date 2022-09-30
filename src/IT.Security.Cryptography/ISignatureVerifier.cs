@@ -4,7 +4,7 @@ namespace IT.Security.Cryptography;
 
 using Models;
 
-public interface ISignVerifier : IAsyncSignVerifier
+public interface ISignatureVerifier : IAsyncSignatureVerifier
 {
     Boolean Verify(String signature, String? detachedData = null);
 

@@ -11,7 +11,7 @@ namespace IT.Security.Cryptography.JinnServer;
 using Internal;
 using Models;
 
-public class ValidationService : ISignEnhancer, ISignVerifier
+public class ValidationService : ISignatureEnhancer, ISignatureVerifier
 {
     private static readonly CultureInfo _cultureInfo = CultureInfo.CreateSpecificCulture("ru-RU");
     private static readonly StringComparison _comparison = StringComparison.OrdinalIgnoreCase;

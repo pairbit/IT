@@ -3,7 +3,7 @@ using System;
 
 namespace IT.Security.Cryptography;
 
-public interface ISignEnhancer : IAsyncSignEnhancer
+public interface ISignatureEnhancer : IAsyncSignatureEnhancer
 {
     String Enhance(String signature, String format, String? detachedData = null);
 

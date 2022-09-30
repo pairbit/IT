@@ -6,7 +6,7 @@ namespace IT.Security.Cryptography;
 
 using Models;
 
-public interface IAsyncSignVerifier
+public interface IAsyncSignatureVerifier
 {
     Task<Boolean> VerifyAsync(String signature, String? detachedData = null, CancellationToken cancellationToken = default);
 

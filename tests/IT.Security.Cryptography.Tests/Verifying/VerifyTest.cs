@@ -4,10 +4,10 @@ namespace IT.Security.Cryptography.Tests.Verifying;
 
 public abstract class VerifyTest
 {
-    private readonly ISignVerifier _verifier;
-    private readonly ISignEnhancer _enhancer;
+    private readonly ISignatureVerifier _verifier;
+    private readonly ISignatureEnhancer _enhancer;
 
-    public VerifyTest(ISignVerifier verifier, ISignEnhancer enhancer)
+    public VerifyTest(ISignatureVerifier verifier, ISignatureEnhancer enhancer)
     {
         _verifier = verifier;
         _enhancer = enhancer;

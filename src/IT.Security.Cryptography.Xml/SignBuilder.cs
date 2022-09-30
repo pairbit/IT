@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IT.Security.Cryptography.Xml;
 
-public class SignBuilder : Cryptography.SignBuilder
+public class SignBuilder : Cryptography.SignatureBuilder
 {
 
 }

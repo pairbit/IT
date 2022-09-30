@@ -13,7 +13,7 @@
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
-	<Version>2.0.0-pre4</Version>
+	<Version>2.0.0-pre5</Version>
 	<PackageReleaseNotes>
 		up System.Security.Cryptography.Xml 6.0.1
 	</PackageReleaseNotes>

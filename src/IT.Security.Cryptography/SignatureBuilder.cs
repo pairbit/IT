@@ -4,7 +4,7 @@ using System.Xml;
 
 namespace IT.Security.Cryptography;
 
-public class SignBuilder : ISignBuilder
+public class SignatureBuilder : ISignatureBuilder
 {
     private const String XmlDsigExcC14NTransformUrl = "http://www.w3.org/2001/10/xml-exc-c14n#";
 

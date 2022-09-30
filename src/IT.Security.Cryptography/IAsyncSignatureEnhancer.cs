@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IT.Security.Cryptography;
 
-public interface IAsyncSignEnhancer
+public interface IAsyncSignatureEnhancer
 {
     IReadOnlyCollection<String> Formats { get; }
 

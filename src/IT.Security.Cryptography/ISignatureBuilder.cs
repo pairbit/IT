@@ -3,7 +3,7 @@ using System.Text;
 
 namespace IT.Security.Cryptography;
 
-public interface ISignBuilder
+public interface ISignatureBuilder
 {
     void ReplaceSignatureMethod(StringBuilder mask, String signatureMethod);
 
