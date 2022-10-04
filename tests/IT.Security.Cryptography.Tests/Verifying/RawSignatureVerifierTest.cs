@@ -1,4 +1,5 @@
 ﻿using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Cms;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
@@ -68,6 +69,8 @@ public abstract class RawSignatureVerifierTest
 
         foreach (SignerInformation signer in si.GetSigners())
         {
+            var messageDigest = GetMessageDigest(signer);
+
             var signature = signer.GetSignature();
 
             var encodedSignedAttributes = signer.GetEncodedSignedAttributes();
@@ -78,6 +81,27 @@ public abstract class RawSignatureVerifierTest
 
             Assert.True(isVerified);
         }
+    }
+
+    private static Byte[] GetMessageDigest(SignerInformation signerInfo)
+    {
+        var signedAttributes = signerInfo.SignedAttributes;
+
+        if (signedAttributes == null) throw new InvalidOperationException("SignedAttributes is null");
+
+        var attrMessageDigest = signedAttributes[CmsAttributes.MessageDigest];
+
+        if (attrMessageDigest == null) throw new InvalidOperationException("MessageDigest is null");
+
+        var attrValues = attrMessageDigest.AttrValues;
+
+        if (attrValues.Count != 1) throw new InvalidOperationException("MessageDigest (AttrValues.Count != 1)");
+
+        var messageDigest = attrValues[0].ToAsn1Object() as Asn1OctetString;
+
+        if (messageDigest == null) throw new InvalidOperationException("MessageDigest.AttrValues[0] != Asn1OctetString");
+
+        return messageDigest.GetOctets();
     }
 
     public static bool Verify(string data, string signature, X509Certificate2 serverCert)
