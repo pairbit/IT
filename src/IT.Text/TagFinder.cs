@@ -295,7 +295,7 @@ public class TagFinder : ITagFinder
                     if (i < chars.Length)
                     {
                         var ch = chars[i];
-                        if (ch == Gt || ch == Space)
+                        if (ch == Gt || Char.IsWhiteSpace(ch))
                         {
                             i = li - 1;
                             if (chars[i] == Lt) return i + (len - chars.Length);
@@ -326,7 +326,7 @@ public class TagFinder : ITagFinder
                     if (i < chars.Length)
                     {
                         var ch = chars[i];
-                        if (ch == Gt || ch == Space)
+                        if (ch == Gt || Char.IsWhiteSpace(ch))
                         {
                             i = li - 1;
                             if (chars[i] == Colon)//:
@@ -545,7 +545,7 @@ public class TagFinder : ITagFinder
                     if (i < chars.Length)
                     {
                         var ch = chars[i];
-                        if (ch == Gt || ch == Space)
+                        if (ch == Gt || Char.IsWhiteSpace(ch))
                         {
                             i = li - 1;
                             if (chars[i] == Lt) return i;
@@ -576,7 +576,7 @@ public class TagFinder : ITagFinder
                     if (i < chars.Length)
                     {
                         var ch = chars[i];
-                        if (ch == Gt || ch == Space)
+                        if (ch == Gt || Char.IsWhiteSpace(ch))
                         {
                             i = li - 1;
                             if (chars[i] == Colon)//:
