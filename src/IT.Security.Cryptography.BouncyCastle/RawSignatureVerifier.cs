@@ -15,26 +15,23 @@ public class RawSignatureVerifier : IRawSignatureVerifier
         var x509Certificate = x509CertificateParser.ReadCertificate(certificate);
         var publicKey = x509Certificate.GetPublicKey();
 
-        var dsa = GetDsa(publicKey, out var size);
+        var dsa = GetDsa(publicKey);
         dsa.Init(false, publicKey);
 
-        var r = new BigInteger(1, rawSignature, size, size);
-        var s = new BigInteger(1, rawSignature, 0, size);
+        var halfSize = rawSignature.Length / 2;
+        var r = new BigInteger(1, rawSignature, halfSize, halfSize);
+        var s = new BigInteger(1, rawSignature, 0, halfSize);
 
         return dsa.VerifySignature(hash, r, s);
     }
 
-    private static IDsa GetDsa(AsymmetricKeyParameter key, out Int32 size)
+    private static IDsa GetDsa(AsymmetricKeyParameter key)
     {
         //SignerUtilities.GetSigner
 
         if (key is ECKeyParameters eckey)
         {
-            if (eckey.Parameters is ECGost3410Parameters)
-            {
-                size = 32;
-                return new ECGost3410Signer();
-            }
+            if (eckey.Parameters is ECGost3410Parameters) return new ECGost3410Signer();
         }
 
         throw new NotSupportedException();
