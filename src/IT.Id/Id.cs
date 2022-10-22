@@ -8,6 +8,9 @@ namespace System;
 
 [Serializable]
 public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
+#if NET6_0
+, ISpanFormattable
+#endif
 {
     private static readonly DateTime _unixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     private static readonly Int64 _unixEpochTicks = _unixEpoch.Ticks;
@@ -626,16 +629,25 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         throw new NotImplementedException();
     }
 
-    public String ToString(String format, IFormatProvider formatProvider) => format switch
+    public String ToString(String? format, IFormatProvider? formatProvider) => format switch
     {
+        "b64" or "64" or null => ToString(Idf.Base64Url),
+        "B64" => ToString(Idf.Base64),
         "h" or "b16" or "16" => ToString(Idf.HexLower),
         "H" or "B16" => ToString(Idf.HexUpper),
-        "b64" or "64" => ToString(Idf.Base64Url),
-        "B64" => ToString(Idf.Base64),
         "p2" => ToString(Idf.Path2),
         "p3" => ToString(Idf.Path3),
         _ => throw new FormatException($"The '{format}' format string is not supported."),
     };
+
+#if NET6_0
+
+    public Boolean TryFormat(Span<Char> destination, out Int32 charsWritten, ReadOnlySpan<Char> format, IFormatProvider? provider)
+    {
+        throw new NotImplementedException();
+    }
+
+#endif
 
     public UInt32 Hash32()
     {
