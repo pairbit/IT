@@ -15,7 +15,8 @@
 	<Copyright>Ivan Tikhonov © 2022</Copyright>
 	<Version>2.0.0-pre1</Version>
     <PackageReleaseNotes>
-		add Id struct
+		add Id8, Id16 struct
+		change IdCoding to Idf
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>

@@ -7,7 +7,7 @@ using System.Threading;
 namespace System;
 
 [Serializable]
-public readonly struct Id : IComparable<Id>, IEquatable<Id>
+public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 {
     private static readonly DateTime _unixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     private static readonly Int64 _unixEpochTicks = _unixEpoch.Ticks;
@@ -293,22 +293,22 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>
     {
         if (value is null) throw new ArgumentNullException(nameof(value));
 
-        if (value.Length == 24) return Parse(value, IdCoding.HexLower);
+        if (value.Length == 24) return Parse(value, Idf.HexLower);
 
-        if (value.Length == 19) return Parse(value, IdCoding.Path3);
+        if (value.Length == 19) return Parse(value, Idf.Path3);
 
-        if (value.Length == 18) return Parse(value, IdCoding.Path2);
+        if (value.Length == 18) return Parse(value, Idf.Path2);
 
-        if (value.Length == 16) return Parse(value, IdCoding.Base64);
+        if (value.Length == 16) return Parse(value, Idf.Base64);
 
         throw new FormatException();
     }
 
-    public static Id Parse(String value, IdCoding coding)
+    public static Id Parse(String value, Idf format)
     {
         if (value is null) throw new ArgumentNullException(nameof(value));
 
-        if (coding == IdCoding.HexUpper || coding == IdCoding.HexLower)
+        if (format == Idf.HexUpper || format == Idf.HexLower)
         {
             if (value.Length != 24) throw new ArgumentException("Byte array must be 12 bytes long", nameof(value));
 
@@ -316,17 +316,17 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>
 
             return new Id(timestamp, b, c);
         }
-        else if (coding == IdCoding.Base64 || coding == IdCoding.Base64Url)
+        else if (format == Idf.Base64 || format == Idf.Base64Url)
         {
             if (value.Length != 16) throw new ArgumentException("Byte array must be 16 bytes long", nameof(value));
 
-            if (coding == IdCoding.Base64Url) value = value.Replace('_', '/').Replace('-', '+');
+            if (format == Idf.Base64Url) value = value.Replace('_', '/').Replace('-', '+');
 
             FromByteArray(Base64.ToBytes(value), 0, out var timestamp, out var b, out var c);
 
             return new Id(timestamp, b, c);
         }
-        else if (coding == IdCoding.Path2 || coding == IdCoding.Path3)
+        else if (format == Idf.Path2 || format == Idf.Path3)
         {
             throw new NotImplementedException();
         }
@@ -443,12 +443,12 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>
         return result;
     }
 
-    public String ToString(IdCoding type)
+    public String ToString(Idf format)
     {
-        if (type == IdCoding.Base64 || type == IdCoding.Base64Url)
+        if (format == Idf.Base64 || format == Idf.Base64Url)
         {
             var result = new string((char)0, 16);
-            var table = type == IdCoding.Base64Url ? Base64.tableUrl : Base64.table;
+            var table = format == Idf.Base64Url ? Base64.tableUrl : Base64.table;
 
             unsafe
             {
@@ -494,12 +494,12 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>
             }
             return result;
         }
-        else if (type == IdCoding.HexLower || type == IdCoding.HexUpper)
+        else if (format == Idf.HexLower || format == Idf.HexUpper)
         {
             var result = new string((char)0, 24);
             unsafe
             {
-                var lookupP = type == IdCoding.HexUpper ? Hex._upperLookup32UnsafeP : Hex._lowerLookup32UnsafeP;
+                var lookupP = format == Idf.HexUpper ? Hex._upperLookup32UnsafeP : Hex._lowerLookup32UnsafeP;
                 fixed (char* resultP = result)
                 {
                     uint* resultP2 = (uint*)resultP;
@@ -519,7 +519,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>
             }
             return result;
         }
-        else if (type == IdCoding.Path2)
+        else if (format == Idf.Path2)
         {
             var result = new string((char)0, 18);
             var table = Base64.tableUrl;
@@ -570,7 +570,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>
             }
             return result;
         }
-        if (type == IdCoding.Path3)
+        if (format == Idf.Path3)
         {
             var result = new string((char)0, 19);
             var table = Base64.tableUrl;
@@ -625,6 +625,17 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>
 
         throw new NotImplementedException();
     }
+
+    public String ToString(String format, IFormatProvider formatProvider) => format switch
+    {
+        "h" or "b16" or "16" => ToString(Idf.HexLower),
+        "H" or "B16" => ToString(Idf.HexUpper),
+        "b64" or "64" => ToString(Idf.Base64Url),
+        "B64" => ToString(Idf.Base64),
+        "p2" => ToString(Idf.Path2),
+        "p3" => ToString(Idf.Path3),
+        _ => throw new FormatException($"The '{format}' format string is not supported."),
+    };
 
     public UInt32 Hash32()
     {

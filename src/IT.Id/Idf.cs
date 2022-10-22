@@ -1,6 +1,6 @@
 ﻿namespace System;
 
-public enum IdCoding
+public enum Idf
 {
     /// <summary>
     /// Base16
