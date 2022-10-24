@@ -423,189 +423,189 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     public override String ToString() => ToBase64Url();
 
     /*
-    public String ToString(Idf format)
+public String ToString(Idf format)
+{
+    if (format == Idf.Base64 || format == Idf.Base64Url)
     {
-        if (format == Idf.Base64 || format == Idf.Base64Url)
+        var result = new string((char)0, 16);
+        var table = format == Idf.Base64Url ? Base64.tableUrl : Base64.table;
+
+        unsafe
         {
-            var result = new string((char)0, 16);
-            var table = format == Idf.Base64Url ? Base64.tableUrl : Base64.table;
-
-            unsafe
+            fixed (char* resultP = result)
+            fixed (char* base64 = &table[0])
             {
-                fixed (char* resultP = result)
-                fixed (char* base64 = &table[0])
-                {
-                    var byte0 = (byte)(_timestamp >> 24);
-                    var byte1 = (byte)(_timestamp >> 16);
-                    var byte2 = (byte)(_timestamp >> 8);
+                var byte0 = (byte)(_timestamp >> 24);
+                var byte1 = (byte)(_timestamp >> 16);
+                var byte2 = (byte)(_timestamp >> 8);
 
-                    resultP[0] = base64[(byte0 & 0xfc) >> 2];
-                    resultP[1] = base64[((byte0 & 0x03) << 4) | ((byte1 & 0xf0) >> 4)];
-                    resultP[2] = base64[((byte1 & 0x0f) << 2) | ((byte2 & 0xc0) >> 6)];
-                    resultP[3] = base64[byte2 & 0x3f];
+                resultP[0] = base64[(byte0 & 0xfc) >> 2];
+                resultP[1] = base64[((byte0 & 0x03) << 4) | ((byte1 & 0xf0) >> 4)];
+                resultP[2] = base64[((byte1 & 0x0f) << 2) | ((byte2 & 0xc0) >> 6)];
+                resultP[3] = base64[byte2 & 0x3f];
 
-                    var byte3 = (byte)(_timestamp);
-                    var byte4 = (byte)(_b >> 24);
-                    var byte5 = (byte)(_b >> 16);
+                var byte3 = (byte)(_timestamp);
+                var byte4 = (byte)(_b >> 24);
+                var byte5 = (byte)(_b >> 16);
 
-                    resultP[4] = base64[(byte3 & 0xfc) >> 2];
-                    resultP[5] = base64[((byte3 & 0x03) << 4) | ((byte4 & 0xf0) >> 4)];
-                    resultP[6] = base64[((byte4 & 0x0f) << 2) | ((byte5 & 0xc0) >> 6)];
-                    resultP[7] = base64[byte5 & 0x3f];
+                resultP[4] = base64[(byte3 & 0xfc) >> 2];
+                resultP[5] = base64[((byte3 & 0x03) << 4) | ((byte4 & 0xf0) >> 4)];
+                resultP[6] = base64[((byte4 & 0x0f) << 2) | ((byte5 & 0xc0) >> 6)];
+                resultP[7] = base64[byte5 & 0x3f];
 
-                    var byte6 = (byte)(_b >> 8);
-                    var byte7 = (byte)(_b);
-                    var byte8 = (byte)(_c >> 24);
+                var byte6 = (byte)(_b >> 8);
+                var byte7 = (byte)(_b);
+                var byte8 = (byte)(_c >> 24);
 
-                    resultP[8] = base64[(byte6 & 0xfc) >> 2];
-                    resultP[9] = base64[((byte6 & 0x03) << 4) | ((byte7 & 0xf0) >> 4)];
-                    resultP[10] = base64[((byte7 & 0x0f) << 2) | ((byte8 & 0xc0) >> 6)];
-                    resultP[11] = base64[byte8 & 0x3f];
+                resultP[8] = base64[(byte6 & 0xfc) >> 2];
+                resultP[9] = base64[((byte6 & 0x03) << 4) | ((byte7 & 0xf0) >> 4)];
+                resultP[10] = base64[((byte7 & 0x0f) << 2) | ((byte8 & 0xc0) >> 6)];
+                resultP[11] = base64[byte8 & 0x3f];
 
-                    var byte9 = (byte)(_c >> 16);
-                    var byte10 = (byte)(_c >> 8);
-                    var byte11 = (byte)(_c);
+                var byte9 = (byte)(_c >> 16);
+                var byte10 = (byte)(_c >> 8);
+                var byte11 = (byte)(_c);
 
-                    resultP[12] = base64[(byte9 & 0xfc) >> 2];
-                    resultP[13] = base64[((byte9 & 0x03) << 4) | ((byte10 & 0xf0) >> 4)];
-                    resultP[14] = base64[((byte10 & 0x0f) << 2) | ((byte11 & 0xc0) >> 6)];
-                    resultP[15] = base64[byte11 & 0x3f];
-                }
+                resultP[12] = base64[(byte9 & 0xfc) >> 2];
+                resultP[13] = base64[((byte9 & 0x03) << 4) | ((byte10 & 0xf0) >> 4)];
+                resultP[14] = base64[((byte10 & 0x0f) << 2) | ((byte11 & 0xc0) >> 6)];
+                resultP[15] = base64[byte11 & 0x3f];
             }
-            return result;
         }
-        else if (format == Idf.HexLower || format == Idf.HexUpper)
-        {
-            var result = new string((char)0, 24);
-            unsafe
-            {
-                var lookupP = format == Idf.HexUpper ? Hex._upperLookup32UnsafeP : Hex._lowerLookup32UnsafeP;
-                fixed (char* resultP = result)
-                {
-                    uint* resultP2 = (uint*)resultP;
-                    resultP2[0] = lookupP[(byte)(_timestamp >> 24)];
-                    resultP2[1] = lookupP[(byte)(_timestamp >> 16)];
-                    resultP2[2] = lookupP[(byte)(_timestamp >> 8)];
-                    resultP2[3] = lookupP[(byte)(_timestamp)];
-                    resultP2[4] = lookupP[(byte)(_b >> 24)];
-                    resultP2[5] = lookupP[(byte)(_b >> 16)];
-                    resultP2[6] = lookupP[(byte)(_b >> 8)];
-                    resultP2[7] = lookupP[(byte)(_b)];
-                    resultP2[8] = lookupP[(byte)(_c >> 24)];
-                    resultP2[9] = lookupP[(byte)(_c >> 16)];
-                    resultP2[10] = lookupP[(byte)(_c >> 8)];
-                    resultP2[11] = lookupP[(byte)(_c)];
-                }
-            }
-            return result;
-        }
-        else if (format == Idf.Path2)
-        {
-            var result = new string((char)0, 18);
-            var table = Base64.tableUrl;
-            var sep = Path.DirectorySeparatorChar;
-            unsafe
-            {
-                fixed (char* resultP = result)
-                fixed (char* base64 = &table[0])
-                {
-                    var byte0 = (byte)(_timestamp >> 24);
-                    var byte1 = (byte)(_timestamp >> 16);
-                    var byte2 = (byte)(_timestamp >> 8);
-
-                    resultP[17] = base64[(byte0 & 0xfc) >> 2];
-                    resultP[16] = base64[((byte0 & 0x03) << 4) | ((byte1 & 0xf0) >> 4)];
-                    resultP[15] = base64[((byte1 & 0x0f) << 2) | ((byte2 & 0xc0) >> 6)];
-                    resultP[14] = base64[byte2 & 0x3f];
-
-                    var byte3 = (byte)(_timestamp);
-                    var byte4 = (byte)(_b >> 24);
-                    var byte5 = (byte)(_b >> 16);
-
-                    resultP[13] = base64[(byte3 & 0xfc) >> 2];
-                    resultP[12] = base64[((byte3 & 0x03) << 4) | ((byte4 & 0xf0) >> 4)];
-                    resultP[11] = base64[((byte4 & 0x0f) << 2) | ((byte5 & 0xc0) >> 6)];
-                    resultP[10] = base64[byte5 & 0x3f];
-
-                    var byte6 = (byte)(_b >> 8);
-                    var byte7 = (byte)(_b);
-                    var byte8 = (byte)(_c >> 24);
-
-                    resultP[9] = base64[(byte6 & 0xfc) >> 2];
-                    resultP[8] = base64[((byte6 & 0x03) << 4) | ((byte7 & 0xf0) >> 4)];
-                    resultP[7] = base64[((byte7 & 0x0f) << 2) | ((byte8 & 0xc0) >> 6)];
-                    resultP[6] = base64[byte8 & 0x3f];
-
-                    var byte9 = (byte)(_c >> 16);
-                    var byte10 = (byte)(_c >> 8);
-                    var byte11 = (byte)(_c);
-
-                    resultP[5] = base64[(byte9 & 0xfc) >> 2];
-                    resultP[4] = base64[((byte9 & 0x03) << 4) | ((byte10 & 0xf0) >> 4)];
-                    resultP[3] = sep;
-                    resultP[2] = base64[((byte10 & 0x0f) << 2) | ((byte11 & 0xc0) >> 6)];
-                    resultP[1] = sep;
-                    resultP[0] = base64[byte11 & 0x3f];
-                }
-            }
-            return result;
-        }
-        if (format == Idf.Path3)
-        {
-            var result = new string((char)0, 19);
-            var table = Base64.tableUrl;
-            var sep = Path.DirectorySeparatorChar;
-            unsafe
-            {
-                fixed (char* resultP = result)
-                fixed (char* base64 = &table[0])
-                {
-                    var byte0 = (byte)(_timestamp >> 24);
-                    var byte1 = (byte)(_timestamp >> 16);
-                    var byte2 = (byte)(_timestamp >> 8);
-
-                    resultP[18] = base64[(byte0 & 0xfc) >> 2];
-                    resultP[17] = base64[((byte0 & 0x03) << 4) | ((byte1 & 0xf0) >> 4)];
-                    resultP[16] = base64[((byte1 & 0x0f) << 2) | ((byte2 & 0xc0) >> 6)];
-                    resultP[15] = base64[byte2 & 0x3f];
-
-                    var byte3 = (byte)(_timestamp);
-                    var byte4 = (byte)(_b >> 24);
-                    var byte5 = (byte)(_b >> 16);
-
-                    resultP[14] = base64[(byte3 & 0xfc) >> 2];
-                    resultP[13] = base64[((byte3 & 0x03) << 4) | ((byte4 & 0xf0) >> 4)];
-                    resultP[12] = base64[((byte4 & 0x0f) << 2) | ((byte5 & 0xc0) >> 6)];
-                    resultP[11] = base64[byte5 & 0x3f];
-
-                    var byte6 = (byte)(_b >> 8);
-                    var byte7 = (byte)(_b);
-                    var byte8 = (byte)(_c >> 24);
-
-                    resultP[10] = base64[(byte6 & 0xfc) >> 2];
-                    resultP[9] = base64[((byte6 & 0x03) << 4) | ((byte7 & 0xf0) >> 4)];
-                    resultP[8] = base64[((byte7 & 0x0f) << 2) | ((byte8 & 0xc0) >> 6)];
-                    resultP[7] = base64[byte8 & 0x3f];
-
-                    var byte9 = (byte)(_c >> 16);
-                    var byte10 = (byte)(_c >> 8);
-                    var byte11 = (byte)(_c);
-
-                    resultP[6] = base64[(byte9 & 0xfc) >> 2];
-                    resultP[5] = sep;
-                    resultP[4] = base64[((byte9 & 0x03) << 4) | ((byte10 & 0xf0) >> 4)];
-                    resultP[3] = sep;
-                    resultP[2] = base64[((byte10 & 0x0f) << 2) | ((byte11 & 0xc0) >> 6)];
-                    resultP[1] = sep;
-                    resultP[0] = base64[byte11 & 0x3f];
-                }
-            }
-            return result;
-        }
-
-        throw new NotImplementedException();
+        return result;
     }
-    */
+    else if (format == Idf.HexLower || format == Idf.HexUpper)
+    {
+        var result = new string((char)0, 24);
+        unsafe
+        {
+            var lookupP = format == Idf.HexUpper ? Hex._upperLookup32UnsafeP : Hex._lowerLookup32UnsafeP;
+            fixed (char* resultP = result)
+            {
+                uint* resultP2 = (uint*)resultP;
+                resultP2[0] = lookupP[(byte)(_timestamp >> 24)];
+                resultP2[1] = lookupP[(byte)(_timestamp >> 16)];
+                resultP2[2] = lookupP[(byte)(_timestamp >> 8)];
+                resultP2[3] = lookupP[(byte)(_timestamp)];
+                resultP2[4] = lookupP[(byte)(_b >> 24)];
+                resultP2[5] = lookupP[(byte)(_b >> 16)];
+                resultP2[6] = lookupP[(byte)(_b >> 8)];
+                resultP2[7] = lookupP[(byte)(_b)];
+                resultP2[8] = lookupP[(byte)(_c >> 24)];
+                resultP2[9] = lookupP[(byte)(_c >> 16)];
+                resultP2[10] = lookupP[(byte)(_c >> 8)];
+                resultP2[11] = lookupP[(byte)(_c)];
+            }
+        }
+        return result;
+    }
+    else if (format == Idf.Path2)
+    {
+        var result = new string((char)0, 18);
+        var table = Base64.tableUrl;
+        var sep = Path.DirectorySeparatorChar;
+        unsafe
+        {
+            fixed (char* resultP = result)
+            fixed (char* base64 = &table[0])
+            {
+                var byte0 = (byte)(_timestamp >> 24);
+                var byte1 = (byte)(_timestamp >> 16);
+                var byte2 = (byte)(_timestamp >> 8);
+
+                resultP[17] = base64[(byte0 & 0xfc) >> 2];
+                resultP[16] = base64[((byte0 & 0x03) << 4) | ((byte1 & 0xf0) >> 4)];
+                resultP[15] = base64[((byte1 & 0x0f) << 2) | ((byte2 & 0xc0) >> 6)];
+                resultP[14] = base64[byte2 & 0x3f];
+
+                var byte3 = (byte)(_timestamp);
+                var byte4 = (byte)(_b >> 24);
+                var byte5 = (byte)(_b >> 16);
+
+                resultP[13] = base64[(byte3 & 0xfc) >> 2];
+                resultP[12] = base64[((byte3 & 0x03) << 4) | ((byte4 & 0xf0) >> 4)];
+                resultP[11] = base64[((byte4 & 0x0f) << 2) | ((byte5 & 0xc0) >> 6)];
+                resultP[10] = base64[byte5 & 0x3f];
+
+                var byte6 = (byte)(_b >> 8);
+                var byte7 = (byte)(_b);
+                var byte8 = (byte)(_c >> 24);
+
+                resultP[9] = base64[(byte6 & 0xfc) >> 2];
+                resultP[8] = base64[((byte6 & 0x03) << 4) | ((byte7 & 0xf0) >> 4)];
+                resultP[7] = base64[((byte7 & 0x0f) << 2) | ((byte8 & 0xc0) >> 6)];
+                resultP[6] = base64[byte8 & 0x3f];
+
+                var byte9 = (byte)(_c >> 16);
+                var byte10 = (byte)(_c >> 8);
+                var byte11 = (byte)(_c);
+
+                resultP[5] = base64[(byte9 & 0xfc) >> 2];
+                resultP[4] = base64[((byte9 & 0x03) << 4) | ((byte10 & 0xf0) >> 4)];
+                resultP[3] = sep;
+                resultP[2] = base64[((byte10 & 0x0f) << 2) | ((byte11 & 0xc0) >> 6)];
+                resultP[1] = sep;
+                resultP[0] = base64[byte11 & 0x3f];
+            }
+        }
+        return result;
+    }
+    if (format == Idf.Path3)
+    {
+        var result = new string((char)0, 19);
+        var table = Base64.tableUrl;
+        var sep = Path.DirectorySeparatorChar;
+        unsafe
+        {
+            fixed (char* resultP = result)
+            fixed (char* base64 = &table[0])
+            {
+                var byte0 = (byte)(_timestamp >> 24);
+                var byte1 = (byte)(_timestamp >> 16);
+                var byte2 = (byte)(_timestamp >> 8);
+
+                resultP[18] = base64[(byte0 & 0xfc) >> 2];
+                resultP[17] = base64[((byte0 & 0x03) << 4) | ((byte1 & 0xf0) >> 4)];
+                resultP[16] = base64[((byte1 & 0x0f) << 2) | ((byte2 & 0xc0) >> 6)];
+                resultP[15] = base64[byte2 & 0x3f];
+
+                var byte3 = (byte)(_timestamp);
+                var byte4 = (byte)(_b >> 24);
+                var byte5 = (byte)(_b >> 16);
+
+                resultP[14] = base64[(byte3 & 0xfc) >> 2];
+                resultP[13] = base64[((byte3 & 0x03) << 4) | ((byte4 & 0xf0) >> 4)];
+                resultP[12] = base64[((byte4 & 0x0f) << 2) | ((byte5 & 0xc0) >> 6)];
+                resultP[11] = base64[byte5 & 0x3f];
+
+                var byte6 = (byte)(_b >> 8);
+                var byte7 = (byte)(_b);
+                var byte8 = (byte)(_c >> 24);
+
+                resultP[10] = base64[(byte6 & 0xfc) >> 2];
+                resultP[9] = base64[((byte6 & 0x03) << 4) | ((byte7 & 0xf0) >> 4)];
+                resultP[8] = base64[((byte7 & 0x0f) << 2) | ((byte8 & 0xc0) >> 6)];
+                resultP[7] = base64[byte8 & 0x3f];
+
+                var byte9 = (byte)(_c >> 16);
+                var byte10 = (byte)(_c >> 8);
+                var byte11 = (byte)(_c);
+
+                resultP[6] = base64[(byte9 & 0xfc) >> 2];
+                resultP[5] = sep;
+                resultP[4] = base64[((byte9 & 0x03) << 4) | ((byte10 & 0xf0) >> 4)];
+                resultP[3] = sep;
+                resultP[2] = base64[((byte10 & 0x0f) << 2) | ((byte11 & 0xc0) >> 6)];
+                resultP[1] = sep;
+                resultP[0] = base64[byte11 & 0x3f];
+            }
+        }
+        return result;
+    }
+
+    throw new NotImplementedException();
+}
+*/
 
     public String ToString(String? format, IFormatProvider? formatProvider) => format switch
     {
@@ -633,7 +633,60 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     public Boolean TryFormat(Span<Char> destination, out Int32 charsWritten, ReadOnlySpan<Char> format, IFormatProvider? provider)
     {
-        throw new NotImplementedException();
+        if (format.IsEmpty || format.SequenceEqual("b64") || format.SequenceEqual("64"))
+        {
+            charsWritten = 16;
+            ToBase64(destination, Base64.tableUrl);
+            return true;
+        }
+
+        if (format.SequenceEqual("B64"))
+        {
+            charsWritten = 16;
+            ToBase64(destination, Base64.table);
+            return true;
+        }
+
+        if (format[0] == 'h' || format.SequenceEqual("b16") || format.SequenceEqual("16"))
+        {
+            charsWritten = 24;
+            unsafe
+            {
+                ToHex(destination, Hex._lowerLookup32UnsafeP);
+            }
+
+            return true;
+        }
+
+        if (format[0] == 'H' || format.SequenceEqual("B16"))
+        {
+            charsWritten = 24;
+            unsafe
+            {
+                ToHex(destination, Hex._upperLookup32UnsafeP);
+            }
+
+            return true;
+        }
+
+        if (format.SequenceEqual("p2"))
+        {
+            charsWritten = 18;
+            ToPath2(destination);
+
+            return true;
+        }
+
+        if (format.SequenceEqual("p3"))
+        {
+            charsWritten = 19;
+            ToPath2(destination);
+
+            return true;
+        }
+
+        charsWritten = 0;
+        return false;
     }
 
 #endif
@@ -1013,6 +1066,177 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         }
         return result;
     }
+
+#if NET6_0
+
+    private void ToBase64(Span<Char> destination, Char[] table)
+    {
+        unsafe
+        {
+            fixed (char* resultP = destination)
+            fixed (char* base64 = &table[0])
+            {
+                var byte0 = (byte)(_timestamp >> 24);
+                var byte1 = (byte)(_timestamp >> 16);
+                var byte2 = (byte)(_timestamp >> 8);
+
+                resultP[0] = base64[(byte0 & 0xfc) >> 2];
+                resultP[1] = base64[((byte0 & 0x03) << 4) | ((byte1 & 0xf0) >> 4)];
+                resultP[2] = base64[((byte1 & 0x0f) << 2) | ((byte2 & 0xc0) >> 6)];
+                resultP[3] = base64[byte2 & 0x3f];
+
+                var byte3 = (byte)(_timestamp);
+                var byte4 = (byte)(_b >> 24);
+                var byte5 = (byte)(_b >> 16);
+
+                resultP[4] = base64[(byte3 & 0xfc) >> 2];
+                resultP[5] = base64[((byte3 & 0x03) << 4) | ((byte4 & 0xf0) >> 4)];
+                resultP[6] = base64[((byte4 & 0x0f) << 2) | ((byte5 & 0xc0) >> 6)];
+                resultP[7] = base64[byte5 & 0x3f];
+
+                var byte6 = (byte)(_b >> 8);
+                var byte7 = (byte)(_b);
+                var byte8 = (byte)(_c >> 24);
+
+                resultP[8] = base64[(byte6 & 0xfc) >> 2];
+                resultP[9] = base64[((byte6 & 0x03) << 4) | ((byte7 & 0xf0) >> 4)];
+                resultP[10] = base64[((byte7 & 0x0f) << 2) | ((byte8 & 0xc0) >> 6)];
+                resultP[11] = base64[byte8 & 0x3f];
+
+                var byte9 = (byte)(_c >> 16);
+                var byte10 = (byte)(_c >> 8);
+                var byte11 = (byte)(_c);
+
+                resultP[12] = base64[(byte9 & 0xfc) >> 2];
+                resultP[13] = base64[((byte9 & 0x03) << 4) | ((byte10 & 0xf0) >> 4)];
+                resultP[14] = base64[((byte10 & 0x0f) << 2) | ((byte11 & 0xc0) >> 6)];
+                resultP[15] = base64[byte11 & 0x3f];
+            }
+        }
+    }
+
+    private unsafe void ToHex(Span<Char> destination, uint* lookupP)
+    {
+        fixed (char* resultP = destination)
+        {
+            uint* resultP2 = (uint*)resultP;
+            resultP2[0] = lookupP[(byte)(_timestamp >> 24)];
+            resultP2[1] = lookupP[(byte)(_timestamp >> 16)];
+            resultP2[2] = lookupP[(byte)(_timestamp >> 8)];
+            resultP2[3] = lookupP[(byte)(_timestamp)];
+            resultP2[4] = lookupP[(byte)(_b >> 24)];
+            resultP2[5] = lookupP[(byte)(_b >> 16)];
+            resultP2[6] = lookupP[(byte)(_b >> 8)];
+            resultP2[7] = lookupP[(byte)(_b)];
+            resultP2[8] = lookupP[(byte)(_c >> 24)];
+            resultP2[9] = lookupP[(byte)(_c >> 16)];
+            resultP2[10] = lookupP[(byte)(_c >> 8)];
+            resultP2[11] = lookupP[(byte)(_c)];
+        }
+    }
+
+    private void ToPath2(Span<Char> destination)
+    {
+        var table = Base64.tableUrl;
+        var sep = Path.DirectorySeparatorChar;
+        unsafe
+        {
+            fixed (char* resultP = destination)
+            fixed (char* base64 = &table[0])
+            {
+                var byte0 = (byte)(_timestamp >> 24);
+                var byte1 = (byte)(_timestamp >> 16);
+                var byte2 = (byte)(_timestamp >> 8);
+
+                resultP[17] = base64[(byte0 & 0xfc) >> 2];
+                resultP[16] = base64[((byte0 & 0x03) << 4) | ((byte1 & 0xf0) >> 4)];
+                resultP[15] = base64[((byte1 & 0x0f) << 2) | ((byte2 & 0xc0) >> 6)];
+                resultP[14] = base64[byte2 & 0x3f];
+
+                var byte3 = (byte)(_timestamp);
+                var byte4 = (byte)(_b >> 24);
+                var byte5 = (byte)(_b >> 16);
+
+                resultP[13] = base64[(byte3 & 0xfc) >> 2];
+                resultP[12] = base64[((byte3 & 0x03) << 4) | ((byte4 & 0xf0) >> 4)];
+                resultP[11] = base64[((byte4 & 0x0f) << 2) | ((byte5 & 0xc0) >> 6)];
+                resultP[10] = base64[byte5 & 0x3f];
+
+                var byte6 = (byte)(_b >> 8);
+                var byte7 = (byte)(_b);
+                var byte8 = (byte)(_c >> 24);
+
+                resultP[9] = base64[(byte6 & 0xfc) >> 2];
+                resultP[8] = base64[((byte6 & 0x03) << 4) | ((byte7 & 0xf0) >> 4)];
+                resultP[7] = base64[((byte7 & 0x0f) << 2) | ((byte8 & 0xc0) >> 6)];
+                resultP[6] = base64[byte8 & 0x3f];
+
+                var byte9 = (byte)(_c >> 16);
+                var byte10 = (byte)(_c >> 8);
+                var byte11 = (byte)(_c);
+
+                resultP[5] = base64[(byte9 & 0xfc) >> 2];
+                resultP[4] = base64[((byte9 & 0x03) << 4) | ((byte10 & 0xf0) >> 4)];
+                resultP[3] = sep;
+                resultP[2] = base64[((byte10 & 0x0f) << 2) | ((byte11 & 0xc0) >> 6)];
+                resultP[1] = sep;
+                resultP[0] = base64[byte11 & 0x3f];
+            }
+        }
+    }
+
+    private void ToPath3(Span<Char> destination)
+    {
+        var table = Base64.tableUrl;
+        var sep = Path.DirectorySeparatorChar;
+        unsafe
+        {
+            fixed (char* resultP = destination)
+            fixed (char* base64 = &table[0])
+            {
+                var byte0 = (byte)(_timestamp >> 24);
+                var byte1 = (byte)(_timestamp >> 16);
+                var byte2 = (byte)(_timestamp >> 8);
+
+                resultP[18] = base64[(byte0 & 0xfc) >> 2];
+                resultP[17] = base64[((byte0 & 0x03) << 4) | ((byte1 & 0xf0) >> 4)];
+                resultP[16] = base64[((byte1 & 0x0f) << 2) | ((byte2 & 0xc0) >> 6)];
+                resultP[15] = base64[byte2 & 0x3f];
+
+                var byte3 = (byte)(_timestamp);
+                var byte4 = (byte)(_b >> 24);
+                var byte5 = (byte)(_b >> 16);
+
+                resultP[14] = base64[(byte3 & 0xfc) >> 2];
+                resultP[13] = base64[((byte3 & 0x03) << 4) | ((byte4 & 0xf0) >> 4)];
+                resultP[12] = base64[((byte4 & 0x0f) << 2) | ((byte5 & 0xc0) >> 6)];
+                resultP[11] = base64[byte5 & 0x3f];
+
+                var byte6 = (byte)(_b >> 8);
+                var byte7 = (byte)(_b);
+                var byte8 = (byte)(_c >> 24);
+
+                resultP[10] = base64[(byte6 & 0xfc) >> 2];
+                resultP[9] = base64[((byte6 & 0x03) << 4) | ((byte7 & 0xf0) >> 4)];
+                resultP[8] = base64[((byte7 & 0x0f) << 2) | ((byte8 & 0xc0) >> 6)];
+                resultP[7] = base64[byte8 & 0x3f];
+
+                var byte9 = (byte)(_c >> 16);
+                var byte10 = (byte)(_c >> 8);
+                var byte11 = (byte)(_c);
+
+                resultP[6] = base64[(byte9 & 0xfc) >> 2];
+                resultP[5] = sep;
+                resultP[4] = base64[((byte9 & 0x03) << 4) | ((byte10 & 0xf0) >> 4)];
+                resultP[3] = sep;
+                resultP[2] = base64[((byte10 & 0x0f) << 2) | ((byte11 & 0xc0) >> 6)];
+                resultP[1] = sep;
+                resultP[0] = base64[byte11 & 0x3f];
+            }
+        }
+    }
+
+#endif
 
     private static long CalculateRandomValue()
     {
