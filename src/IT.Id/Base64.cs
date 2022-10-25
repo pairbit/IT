@@ -25,129 +25,49 @@ internal static class Base64
         return Convert.FromBase64String(new StringBuilder(base64).Replace('_', '/').Replace('-', '+').Append('=', repeat).ToString());
     }
 
-    public static bool TryDecodeFromUtf16(ReadOnlySpan<char> utf16, Span<byte> bytes, out int consumed, out int written)
+    public static void TryDecodeFromUtf16(ReadOnlySpan<char> utf16, Span<byte> bytes)
     {
         ref char srcChars = ref MemoryMarshal.GetReference(utf16);
         ref byte destBytes = ref MemoryMarshal.GetReference(bytes);
-
-        int srcLength = utf16.Length & ~0x3;  // only decode input up to the closest multiple of 4.
-        int destLength = bytes.Length;
-
-        int sourceIndex = 0;
-        int destIndex = 0;
-
-        if (utf16.Length == 0)
-            goto DoneExit;
-
+        
         ref sbyte decodingMap = ref MemoryMarshal.GetReference(DecodingMap);
 
-        // Last bytes could have padding characters, so process them separately and treat them as valid.
-        const int skipLastChunk = 4;
+        int r = Decode(ref Unsafe.Add(ref srcChars, 0), ref decodingMap);
 
-        int maxSrcLength;
-        if (destLength >= (srcLength >> 2) * 3)
-        {
-            maxSrcLength = srcLength - skipLastChunk;
-        }
-        else
-        {
-            // This should never overflow since destLength here is less than int.MaxValue / 4 * 3 (i.e. 1610612733)
-            // Therefore, (destLength / 3) * 4 will always be less than 2147483641
-            maxSrcLength = (destLength / 3) * 4;
-        }
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 0), r);
 
-        while (sourceIndex < maxSrcLength)
-        {
-            int result = Decode(ref Unsafe.Add(ref srcChars, sourceIndex), ref decodingMap);
-            if (result < 0)
-                goto InvalidExit;
-            WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, destIndex), result);
-            destIndex += 3;
-            sourceIndex += 4;
-        }
+        r = Decode(ref Unsafe.Add(ref srcChars, 4), ref decodingMap);
 
-        if (maxSrcLength != srcLength - skipLastChunk)
-            goto InvalidExit;
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 3), r);
 
-        // If input is less than 4 bytes, srcLength == sourceIndex == 0
-        // If input is not a multiple of 4, sourceIndex == srcLength != 0
-        if (sourceIndex == srcLength)
-        {
-            goto InvalidExit;
-        }
+        r = Decode(ref Unsafe.Add(ref srcChars, 8), ref decodingMap);
 
-        int i0 = Unsafe.Add(ref srcChars, srcLength - 4);
-        int i1 = Unsafe.Add(ref srcChars, srcLength - 3);
-        int i2 = Unsafe.Add(ref srcChars, srcLength - 2);
-        int i3 = Unsafe.Add(ref srcChars, srcLength - 1);
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 6), r);
+
+        int i0 = Unsafe.Add(ref srcChars, 12);
+        int i1 = Unsafe.Add(ref srcChars, 13);
+        int i2 = Unsafe.Add(ref srcChars, 14);
+        int i3 = Unsafe.Add(ref srcChars, 15);
+
         if (((i0 | i1 | i2 | i3) & 0xffffff00) != 0)
-            goto InvalidExit;
+            throw new FormatException();
 
         i0 = Unsafe.Add(ref decodingMap, i0);
         i1 = Unsafe.Add(ref decodingMap, i1);
+        i2 = Unsafe.Add(ref decodingMap, i2);
+        i3 = Unsafe.Add(ref decodingMap, i3);
 
         i0 <<= 18;
         i1 <<= 12;
+        i2 <<= 6;
 
         i0 |= i1;
+        i0 |= i3;
+        i0 |= i2;
 
-        if (i3 != EncodingPad)
-        {
-            i2 = Unsafe.Add(ref decodingMap, i2);
-            i3 = Unsafe.Add(ref decodingMap, i3);
+        if (i0 < 0) throw new FormatException();
 
-            i2 <<= 6;
-
-            i0 |= i3;
-            i0 |= i2;
-
-            if (i0 < 0)
-                goto InvalidExit;
-            if (destIndex > destLength - 3)
-                goto InvalidExit;
-            WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, destIndex), i0);
-            destIndex += 3;
-        }
-        else if (i2 != EncodingPad)
-        {
-            i2 = Unsafe.Add(ref decodingMap, i2);
-
-            i2 <<= 6;
-
-            i0 |= i2;
-
-            if (i0 < 0)
-                goto InvalidExit;
-            if (destIndex > destLength - 2)
-                goto InvalidExit;
-            Unsafe.Add(ref destBytes, destIndex) = (byte)(i0 >> 16);
-            Unsafe.Add(ref destBytes, destIndex + 1) = (byte)(i0 >> 8);
-            destIndex += 2;
-        }
-        else
-        {
-            if (i0 < 0)
-                goto InvalidExit;
-            if (destIndex > destLength - 1)
-                goto InvalidExit;
-            Unsafe.Add(ref destBytes, destIndex) = (byte)(i0 >> 16);
-            destIndex++;
-        }
-
-        sourceIndex += 4;
-
-        if (srcLength != utf16.Length)
-            goto InvalidExit;
-
-        DoneExit:
-        consumed = sourceIndex;
-        written = destIndex;
-        return true;
-
-    InvalidExit:
-        consumed = sourceIndex;
-        written = destIndex;
-        return false;
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 9), i0);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -172,8 +92,10 @@ internal static class Base64
 
         i0 |= i3;
         i1 |= i2;
-
         i0 |= i1;
+
+        if (i0 < 0) throw new FormatException();
+
         return i0;
     }
 
@@ -205,6 +127,4 @@ internal static class Base64
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     };
-
-    private const byte EncodingPad = (byte)'='; // '=', for padding
 }

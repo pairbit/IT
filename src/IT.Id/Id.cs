@@ -1198,7 +1198,7 @@ public String ToString(Idf format)
 
         Span<Byte> bytes = stackalloc Byte[12];
 
-        Base64.TryDecodeFromUtf16(value, bytes, out int cons, out var w);
+        Base64.TryDecodeFromUtf16(value, bytes);
 
         FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
 
