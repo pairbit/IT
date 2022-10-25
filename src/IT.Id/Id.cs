@@ -165,7 +165,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
         if (value.Length == 16) return ParseBase64(value.AsSpan());
 
-        if (value.Length == 18) return Parse(value, Idf.Path2);
+        if (value.Length == 18) return ParsePath2(value.AsSpan());
 
         if (value.Length == 19) return Parse(value, Idf.Path3);
 
@@ -873,7 +873,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
         Span<Byte> bytes = stackalloc Byte[12];
 
-        Base64.TryDecodeFromUtf16(value, bytes);
+        Base64.Parse(value, bytes);
 
         FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
 
@@ -895,11 +895,18 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
         var i1 = value[1];
         var i3 = value[3];
-        if (i1 != '\\' && i1 != '/' && i3 != '\\' && i3 != '/') throw new FormatException();
-        
+
+        if ((i1 != '\\' && i1 != '/') || (i3 != '\\' && i3 != '/')) throw new FormatException();
+
         //_\I\-TH145xA0ZPhqY
 
-        throw new NotImplementedException();
+        Span<Byte> bytes = stackalloc Byte[12];
+
+        Base64.ParsePath2(value, bytes);
+
+        FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
+
+        return new Id(timestamp, b, c);
     }
 
     private static Id ParsePath3(ReadOnlySpan<Char> value)
