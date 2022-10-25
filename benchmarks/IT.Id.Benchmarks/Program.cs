@@ -1,5 +1,5 @@
 ﻿
-var id = Id.Parse("Y1fvxj8PlIp6nO4h");
+var id = Id.New();
 
 var id1 = id.ToString();
 var id2 = id.ToString(Idf.Base64Url);
@@ -11,7 +11,7 @@ if (id1.Equals(id2) && id1.Equals(id3) && id1.Equals(id4))
     Console.WriteLine("Ok");
 }
 
-var idparsed = Id.Parse("Y1fvxj8PlIp6nO4h");
+var idparsed = Id.Parse(id3);
 
 if (idparsed.Equals(id))
 {
