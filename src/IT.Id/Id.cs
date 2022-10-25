@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Buffers;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security;
@@ -25,7 +26,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     #region Ctors
 
-    public Id(Byte[] bytes)
+    public Id(ReadOnlySpan<Byte> bytes)
     {
         if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 
@@ -296,13 +297,13 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     {
         if (value is null) throw new ArgumentNullException(nameof(value));
 
-        if (value.Length == 24) return Parse(value, Idf.HexLower);
-
-        if (value.Length == 19) return Parse(value, Idf.Path3);
+        if (value.Length == 16) return ParseBase64(value.AsSpan());
 
         if (value.Length == 18) return Parse(value, Idf.Path2);
 
-        if (value.Length == 16) return Parse(value, Idf.Base64);
+        if (value.Length == 19) return Parse(value, Idf.Path3);
+
+        if (value.Length == 24) return Parse(value, Idf.HexLower);
 
         throw new FormatException();
     }
@@ -607,7 +608,7 @@ public String ToString(Idf format)
 }
 */
 
-    public String ToString(String? format, IFormatProvider? formatProvider) => format switch
+    public String ToString(String? format, IFormatProvider? formatProvider = null) => format switch
     {
         "b64" or "64" or null => ToBase64Url(),
         "B64" => ToBase64(),
@@ -744,55 +745,6 @@ public String ToString(Idf format)
     //    h64 ^= h64 >> 32;
 
     //    return h64;
-    //}
-
-    //internal String ToStringArray()
-    //{
-    //    return Hex.ByteArrayToHexViaLookup32UnsafeDirect(new byte[]
-    //        {
-    //            (byte)(_timestamp >> 24),
-    //            (byte)(_timestamp >> 16),
-    //            (byte)(_timestamp >> 8),
-    //            (byte)(_timestamp),
-    //            (byte)(_b >> 24),
-    //            (byte)(_b >> 16),
-    //            (byte)(_b >> 8),
-    //            (byte)(_b),
-    //            (byte)(_c >> 24),
-    //            (byte)(_c >> 16),
-    //            (byte)(_c >> 8),
-    //            (byte)(_c),
-    //        });
-    //}
-
-    //internal String ToStringOrig()
-    //{
-    //    var c = new char[24];
-    //    c[0] = Hex.ToHexChar((_timestamp >> 28) & 0x0f);
-    //    c[1] = Hex.ToHexChar((_timestamp >> 24) & 0x0f);
-    //    c[2] = Hex.ToHexChar((_timestamp >> 20) & 0x0f);
-    //    c[3] = Hex.ToHexChar((_timestamp >> 16) & 0x0f);
-    //    c[4] = Hex.ToHexChar((_timestamp >> 12) & 0x0f);
-    //    c[5] = Hex.ToHexChar((_timestamp >> 8) & 0x0f);
-    //    c[6] = Hex.ToHexChar((_timestamp >> 4) & 0x0f);
-    //    c[7] = Hex.ToHexChar(_timestamp & 0x0f);
-    //    c[8] = Hex.ToHexChar((_b >> 28) & 0x0f);
-    //    c[9] = Hex.ToHexChar((_b >> 24) & 0x0f);
-    //    c[10] = Hex.ToHexChar((_b >> 20) & 0x0f);
-    //    c[11] = Hex.ToHexChar((_b >> 16) & 0x0f);
-    //    c[12] = Hex.ToHexChar((_b >> 12) & 0x0f);
-    //    c[13] = Hex.ToHexChar((_b >> 8) & 0x0f);
-    //    c[14] = Hex.ToHexChar((_b >> 4) & 0x0f);
-    //    c[15] = Hex.ToHexChar(_b & 0x0f);
-    //    c[16] = Hex.ToHexChar((_c >> 28) & 0x0f);
-    //    c[17] = Hex.ToHexChar((_c >> 24) & 0x0f);
-    //    c[18] = Hex.ToHexChar((_c >> 20) & 0x0f);
-    //    c[19] = Hex.ToHexChar((_c >> 16) & 0x0f);
-    //    c[20] = Hex.ToHexChar((_c >> 12) & 0x0f);
-    //    c[21] = Hex.ToHexChar((_c >> 8) & 0x0f);
-    //    c[22] = Hex.ToHexChar((_c >> 4) & 0x0f);
-    //    c[23] = Hex.ToHexChar(_c & 0x0f);
-    //    return new string(c);
     //}
 
     public override Boolean Equals(Object? obj) => obj is Id id && Equals(id);
@@ -1238,6 +1190,57 @@ public String ToString(Idf format)
 
 #endif
 
+    //YqhPZ0Ax541HT-I_
+    //YqhPZ0Ax541HT+I/
+    private static Id ParseBase64(ReadOnlySpan<Char> value)
+    {
+        if (value.Length != 16) throw new ArgumentException("String must be 16 characters long", nameof(value));
+
+        Span<Byte> bytes = stackalloc Byte[12];
+
+        Base64.TryDecodeFromUtf16(value, bytes, out int cons, out var w);
+
+        FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
+
+        return new Id(timestamp, b, c);
+    }
+
+    private static Id ParseHex(String value)
+    {
+        if (value.Length != 24) throw new ArgumentException("String must be 24 characters long", nameof(value));
+
+        FromByteArray(Hex.ParseHexString(value), 0, out var timestamp, out var b, out var c);
+
+        return new Id(timestamp, b, c);
+    }
+
+    private static Id ParsePath2(ReadOnlySpan<Char> value)
+    {
+        if (value.Length != 18) throw new ArgumentException("String must be 18 characters long", nameof(value));
+
+        var i1 = value[1];
+        var i3 = value[3];
+        if (i1 != '\\' && i1 != '/' && i3 != '\\' && i3 != '/') throw new FormatException();
+        
+        //_\I\-TH145xA0ZPhqY
+
+        throw new NotImplementedException();
+    }
+
+    private static Id ParsePath3(ReadOnlySpan<Char> value)
+    {
+        if (value.Length != 19) throw new ArgumentException("String must be 19 characters long", nameof(value));
+
+        var i1 = value[1];
+        var i3 = value[3];
+        var i5 = value[5];
+        if (i1 != '\\' && i1 != '/' && i3 != '\\' && i3 != '/' && i5 != '\\' && i5 != '/') throw new FormatException();
+
+        //_\I\-\TH145xA0ZPhqY
+
+        throw new NotImplementedException();
+    }
+
     private static long CalculateRandomValue()
     {
         var seed = (int)DateTime.UtcNow.Ticks ^ GetMachineHash() ^ GetPid();
@@ -1296,7 +1299,7 @@ public String ToString(Idf format)
         return (int)(uint)secondsSinceEpoch;
     }
 
-    private static void FromByteArray(byte[] bytes, int offset, out int timestamp, out int b, out int c)
+    private static void FromByteArray(ReadOnlySpan<byte> bytes, int offset, out int timestamp, out int b, out int c)
     {
         timestamp = (bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3];
         b = (bytes[offset + 4] << 24) | (bytes[offset + 5] << 16) | (bytes[offset + 6] << 8) | bytes[offset + 7];
