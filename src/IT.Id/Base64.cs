@@ -18,13 +18,6 @@ internal static class Base64
                                                  't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7',
                                                  '8', '9', '-', '_', '=' };
 
-    public static Byte[] ToBytes(String base64)
-    {
-        var repeat = base64.Length & 3;
-        if (repeat > 0) repeat = 4 - repeat;
-        return Convert.FromBase64String(new StringBuilder(base64).Replace('_', '/').Replace('-', '+').Append('=', repeat).ToString());
-    }
-
     public static void TryDecodeFromUtf16(ReadOnlySpan<char> utf16, Span<byte> bytes)
     {
         ref char srcChars = ref MemoryMarshal.GetReference(utf16);

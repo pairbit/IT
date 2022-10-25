@@ -8,13 +8,16 @@ namespace IT.Id.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class IdBenchmark
 {
-    private readonly String _id;
+    private readonly String _idBase64Url;
 
     public IdBenchmark()
     {
-        _id = System.Id.New().ToString(Idf.Base64Url);
+        _idBase64Url = System.Id.New().ToString();
     }
 
     [Benchmark]
-    public String Id_Base64Url() => System.Id.New().ToString(Idf.Base64Url);
+    public System.Id Id_Parse() => System.Id.Parse(_idBase64Url);
+
+    [Benchmark]
+    public System.Id Id_Parse_Old() => System.Id.Parse(_idBase64Url, Idf.Base64Url);
 }

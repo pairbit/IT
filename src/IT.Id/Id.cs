@@ -322,13 +322,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         }
         else if (format == Idf.Base64 || format == Idf.Base64Url)
         {
-            if (value.Length != 16) throw new ArgumentException("Byte array must be 16 bytes long", nameof(value));
-
-            if (format == Idf.Base64Url) value = value.Replace('_', '/').Replace('-', '+');
-
-            FromByteArray(Base64.ToBytes(value), 0, out var timestamp, out var b, out var c);
-
-            return new Id(timestamp, b, c);
+            return ParseBase64(value.AsSpan());
         }
         else if (format == Idf.Path2 || format == Idf.Path3)
         {
