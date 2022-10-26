@@ -1,5 +1,4 @@
-﻿using System.Buffers;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security;
@@ -159,32 +158,30 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     //    return bytes;
     //}
 
-    public static Id Parse(String value)
+    public static Id Parse(ReadOnlySpan<Char> value)
     {
-        if (value is null) throw new ArgumentNullException(nameof(value));
+        var len = value.Length;
 
-        if (value.Length == 16) return ParseBase64(value.AsSpan());
+        if (len == 16) return ParseBase64(value);
 
-        if (value.Length == 18) return ParsePath2(value.AsSpan());
+        if (len == 18) return ParsePath2(value);
 
-        if (value.Length == 19) return ParsePath3(value.AsSpan());
+        if (len == 19) return ParsePath3(value);
 
-        if (value.Length == 24) return ParseHex(value);
+        if (len == 24) return ParseHex(value);
 
         throw new FormatException();
     }
 
-    public static Id Parse(String value, Idf format)
+    public static Id Parse(ReadOnlySpan<Char> value, Idf format)
     {
-        if (value is null) throw new ArgumentNullException(nameof(value));
-
         if (format == Idf.HexUpper || format == Idf.HexLower) return ParseHex(value);
 
-        if (format == Idf.Base64 || format == Idf.Base64Url) return ParseBase64(value.AsSpan());
+        if (format == Idf.Base64 || format == Idf.Base64Url) return ParseBase64(value);
 
-        if (format == Idf.Path2) return ParsePath2(value.AsSpan());
+        if (format == Idf.Path2) return ParsePath2(value);
 
-        if (format == Idf.Path3) return ParsePath3(value.AsSpan());
+        if (format == Idf.Path3) return ParsePath3(value);
 
         throw new FormatException();
     }
@@ -871,11 +868,15 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         return new Id(timestamp, b, c);
     }
 
-    private static Id ParseHex(String value)
+    private static Id ParseHex(ReadOnlySpan<Char> value)
     {
         if (value.Length != 24) throw new ArgumentException("String must be 24 characters long", nameof(value));
 
-        FromByteArray(Hex.ParseHexString(value), 0, out var timestamp, out var b, out var c);
+        Span<Byte> bytes = stackalloc Byte[12];
+
+        Hex.Decode(value, bytes);
+
+        FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
 
         return new Id(timestamp, b, c);
     }

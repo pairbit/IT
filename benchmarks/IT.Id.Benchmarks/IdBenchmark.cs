@@ -8,16 +8,30 @@ namespace IT.Id.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class IdBenchmark
 {
+    private readonly String _idHexUpper;
+    private readonly String _idHexLower;
     private readonly String _idBase64Url;
 
     public IdBenchmark()
     {
-        _idBase64Url = System.Id.New().ToString();
+        var id = System.Id.New();
+        _idHexUpper = id.ToString(Idf.HexUpper);
+        _idHexLower = id.ToString(Idf.HexLower);
+        _idBase64Url = id.ToString();
     }
 
     [Benchmark]
-    public System.Id Id_Parse() => System.Id.Parse(_idBase64Url);
+    public System.Id Id_Parse_Base64Url() => System.Id.Parse(_idBase64Url);
 
     [Benchmark]
-    public System.Id Id_Parse_Old() => System.Id.Parse(_idBase64Url, Idf.Base64Url);
+    public System.Id Id_Parse_HexUpper() => System.Id.Parse(_idHexUpper);
+
+    [Benchmark]
+    public System.Id Id_Parse_HexLower() => System.Id.Parse(_idHexLower);
+
+    [Benchmark]
+    public System.Id Id_Parse_HexUpper_OLD() => System.Id.Parse(_idHexUpper, Idf.HexUpper);
+
+    [Benchmark]
+    public System.Id Id_Parse_HexLower_OLD() => System.Id.Parse(_idHexLower, Idf.HexLower);
 }

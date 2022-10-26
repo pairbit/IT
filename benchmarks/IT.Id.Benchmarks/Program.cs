@@ -1,38 +1,53 @@
 ﻿
-//var idb = new IT.Id.Benchmarks.IdBenchmark();
+var idb = new IT.Id.Benchmarks.IdBenchmark();
 
-//var id1 = idb.Id_Parse();
-//var id2 = idb.Id_Parse_Old();
+var id1 = idb.Id_Parse_HexLower();
+var id2 = idb.Id_Parse_HexUpper();
+var id3 = idb.Id_Parse_HexLower_OLD();
+var id4 = idb.Id_Parse_HexUpper_OLD();
 
-//if (!id1.Equals(id2))
-//    throw new InvalidOperationException();
+if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4)) throw new InvalidOperationException();
 
-//Console.WriteLine("Ok");
+Console.WriteLine("Ok");
 
 var id = Id.New();
 
-var id1 = id.ToString();
-var id2 = id.ToString(Idf.Base64Url);
-var id3 = id.ToString("b64");
-var id4 = $"{id:b64}";
+var f1 = id.ToString(Idf.Base64Url);
+var f2 = id.ToString("b64");
+var f3 = $"{id:b64}";
+var f4 = id.ToString();
 
-if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4) || !id.Equals(Id.Parse(id4)))
+if (!f1.Equals(f2) || !f1.Equals(f3) || !f1.Equals(f4) || !id.Equals(Id.Parse(f4)))
     throw new InvalidOperationException();
 
-id1 = id.ToString(Idf.Path2);
-id2 = id.ToString("p2");
-id3 = $"{id:p2}";
+f1 = id.ToString(Idf.Path2);
+f2 = id.ToString("p2");
+f3 = $"{id:p2}";
 
-if (!id1.Equals(id2) || !id1.Equals(id3) || !id.Equals(Id.Parse(id3)))
+if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)))
     throw new InvalidOperationException();
 
-id1 = id.ToString(Idf.Path3);
-id2 = id.ToString("p3");
-id3 = $"{id:p3}";
+f1 = id.ToString(Idf.Path3);
+f2 = id.ToString("p3");
+f3 = $"{id:p3}";
 
-if (!id1.Equals(id2) || !id1.Equals(id3) || !id.Equals(Id.Parse(id3)))
+if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)))
+    throw new InvalidOperationException();
+
+f1 = id.ToString(Idf.HexLower);
+f2 = id.ToString("h");
+f3 = $"{id:h}";
+
+if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)) || !id.Equals(Id.Parse(f3, Idf.HexUpper)))
+    throw new InvalidOperationException();
+
+f1 = id.ToString(Idf.HexUpper);
+f2 = id.ToString("H");
+f3 = $"{id:H}";
+
+if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)) || !id.Equals(Id.Parse(f3, Idf.HexUpper)))
     throw new InvalidOperationException();
 
 Console.WriteLine("Ok");
 
-//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));

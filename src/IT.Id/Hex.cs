@@ -26,105 +26,119 @@ internal static class Hex
         return result;
     }
 
-    public static byte[] ParseHexString(string hex)
+    public static void Decode(ReadOnlySpan<char> chars, Span<byte> bytes)
     {
-        if (hex == null) throw new ArgumentNullException(nameof(hex));
-
-        return TryParseHexString(hex, out byte[]? bytes) ? bytes! : throw new FormatException("String should contain only hexadecimal digits.");
-    }
-
-    public static bool TryParseHexString(string hex, out byte[]? bytes)
-    {
-        bytes = null;
-
-        if (hex == null) return false;
-
-        var buffer = new byte[(hex.Length + 1) / 2];
-
-        var i = 0;
-        var j = 0;
-
-        if (hex.Length % 2 == 1)
-        {
-            // if s has an odd length assume an implied leading "0"
-            int y;
-            if (!TryParseHexChar(hex[i++], out y))
-            {
-                return false;
-            }
-            buffer[j++] = (byte)y;
-        }
-
-        while (i < hex.Length)
-        {
-            int x, y;
-            if (!TryParseHexChar(hex[i++], out x))
-            {
-                return false;
-            }
-            if (!TryParseHexChar(hex[i++], out y))
-            {
-                return false;
-            }
-            buffer[j++] = (byte)(x << 4 | y);
-        }
-
-        bytes = buffer;
-        return true;
-    }
-
-    private static bool TryParseHexChar(char c, out int value)
-    {
-        if (c >= '0' && c <= '9')
-        {
-            value = c - '0';
-            return true;
-        }
-
-        if (c >= 'a' && c <= 'f')
-        {
-            value = 10 + (c - 'a');
-            return true;
-        }
-
-        if (c >= 'A' && c <= 'F')
-        {
-            value = 10 + (c - 'A');
-            return true;
-        }
-
-        value = 0;
-        return false;
+        bytes[0] = (byte)((FromChar(chars[0]) << 4) | FromChar(chars[1]));
+        bytes[1] = (byte)((FromChar(chars[2]) << 4) | FromChar(chars[3]));
+        bytes[2] = (byte)((FromChar(chars[4]) << 4) | FromChar(chars[5]));
+        bytes[3] = (byte)((FromChar(chars[6]) << 4) | FromChar(chars[7]));
+        bytes[4] = (byte)((FromChar(chars[8]) << 4) | FromChar(chars[9]));
+        bytes[5] = (byte)((FromChar(chars[10]) << 4) | FromChar(chars[11]));
+        bytes[6] = (byte)((FromChar(chars[12]) << 4) | FromChar(chars[13]));
+        bytes[7] = (byte)((FromChar(chars[14]) << 4) | FromChar(chars[15]));
+        bytes[8] = (byte)((FromChar(chars[16]) << 4) | FromChar(chars[17]));
+        bytes[9] = (byte)((FromChar(chars[18]) << 4) | FromChar(chars[19]));
+        bytes[10] = (byte)((FromChar(chars[20]) << 4) | FromChar(chars[21]));
+        bytes[11] = (byte)((FromChar(chars[22]) << 4) | FromChar(chars[23]));
     }
 
     public static bool TryDecodeFromUtf16(ReadOnlySpan<char> chars, Span<byte> bytes)
     {
-        int i = 0;
-        int j = 0;
-        int byteLo = 0;
-        int byteHi = 0;
-        while (j < bytes.Length)
-        {
-            byteLo = FromChar(chars[i + 1]);
-            byteHi = FromChar(chars[i]);
+        var byteHi = FromChar(chars[0]);
+        var byteLo = FromChar(chars[1]);
 
-            // byteHi hasn't been shifted to the high half yet, so the only way the bitwise or produces this pattern
-            // is if either byteHi or byteLo was not a hex character.
-            if ((byteLo | byteHi) == 0xFF)
-                break;
+        if ((byteLo | byteHi) == 0xFF) return false;
 
-            bytes[j++] = (byte)((byteHi << 4) | byteLo);
-            i += 2;
-        }
+        bytes[0] = (byte)((byteHi << 4) | byteLo);
 
-        if (byteLo == 0xFF)
-            i++;
+        byteHi = FromChar(chars[2]);
+        byteLo = FromChar(chars[3]);
 
-        return (byteLo | byteHi) != 0xFF;
+        if ((byteLo | byteHi) == 0xFF) return false;
+
+        bytes[1] = (byte)((byteHi << 4) | byteLo);
+
+        byteHi = FromChar(chars[4]);
+        byteLo = FromChar(chars[5]);
+
+        if ((byteLo | byteHi) == 0xFF) return false;
+
+        bytes[2] = (byte)((byteHi << 4) | byteLo);
+
+        byteHi = FromChar(chars[6]);
+        byteLo = FromChar(chars[7]);
+
+        if ((byteLo | byteHi) == 0xFF) return false;
+
+        bytes[3] = (byte)((byteHi << 4) | byteLo);
+
+        byteHi = FromChar(chars[8]);
+        byteLo = FromChar(chars[9]);
+
+        if ((byteLo | byteHi) == 0xFF) return false;
+
+        bytes[4] = (byte)((byteHi << 4) | byteLo);
+
+        byteHi = FromChar(chars[10]);
+        byteLo = FromChar(chars[11]);
+
+        if ((byteLo | byteHi) == 0xFF) return false;
+
+        bytes[5] = (byte)((byteHi << 4) | byteLo);
+
+        byteHi = FromChar(chars[12]);
+        byteLo = FromChar(chars[13]);
+
+        if ((byteLo | byteHi) == 0xFF) return false;
+
+        bytes[6] = (byte)((byteHi << 4) | byteLo);
+
+        byteHi = FromChar(chars[14]);
+        byteLo = FromChar(chars[15]);
+
+        if ((byteLo | byteHi) == 0xFF) return false;
+
+        bytes[7] = (byte)((byteHi << 4) | byteLo);
+
+        byteHi = FromChar(chars[16]);
+        byteLo = FromChar(chars[17]);
+
+        if ((byteLo | byteHi) == 0xFF) return false;
+
+        bytes[8] = (byte)((byteHi << 4) | byteLo);
+
+        byteHi = FromChar(chars[18]);
+        byteLo = FromChar(chars[19]);
+
+        if ((byteLo | byteHi) == 0xFF) return false;
+
+        bytes[9] = (byte)((byteHi << 4) | byteLo);
+
+        byteHi = FromChar(chars[20]);
+        byteLo = FromChar(chars[21]);
+
+        if ((byteLo | byteHi) == 0xFF) return false;
+
+        bytes[10] = (byte)((byteHi << 4) | byteLo);
+
+        byteHi = FromChar(chars[22]);
+        byteLo = FromChar(chars[23]);
+
+        if ((byteLo | byteHi) == 0xFF) return false;
+
+        bytes[11] = (byte)((byteHi << 4) | byteLo);
+
+        return true;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int FromChar(int c)
+    {
+        return c >= CharToHexLookup.Length ? throw new FormatException() : CharToHexLookup[c];
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int TryFromChar(int c)
     {
         return c >= CharToHexLookup.Length ? 0xFF : CharToHexLookup[c];
     }
