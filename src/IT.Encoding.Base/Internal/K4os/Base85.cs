@@ -5,6 +5,10 @@ namespace K4os.Text.BaseX
 	/// <summary>Static class with helper and factory methods for Base85 codec.</summary>
 	internal static class Base85
 	{
+		//http://facweb.cs.depaul.edu/sjost/it212/documents/ascii-pr.htm
+		//.,-_:;+=^!/*?()[]{|~}@%$#
+		private const string DigitsX85 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?|_,()[]{}@%$#";
+
 		private const string DigitsZ85 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#";
 
 		private const string Digits85 =
@@ -15,6 +19,9 @@ namespace K4os.Text.BaseX
 
 		/// <summary>Default Base85 codec.</summary>
 		public static Base85Codec Default { get; } = new Base85Codec(Digits85, DigitZ);
+
+		/// <summary>Z85 codec.</summary>
+		public static Base85ZCodec X85 { get; } = new Base85ZCodec(DigitsX85);
 
 		/// <summary>Z85 codec.</summary>
 		public static Base85ZCodec Z85 { get; } = new Base85ZCodec(DigitsZ85);
