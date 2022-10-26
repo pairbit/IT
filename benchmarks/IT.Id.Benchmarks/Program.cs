@@ -1,4 +1,10 @@
 ﻿
+var random = new Random(123);
+var high = random.Next();
+var low = random.Next();
+
+Console.WriteLine($"{high} - {low}");
+
 var idb = new IT.Id.Benchmarks.IdBenchmark();
 
 var id1 = idb.Id_Parse_HexLower();
@@ -18,6 +24,13 @@ var f3 = $"{id:b64}";
 var f4 = id.ToString();
 
 if (!f1.Equals(f2) || !f1.Equals(f3) || !f1.Equals(f4) || !id.Equals(Id.Parse(f4)))
+    throw new InvalidOperationException();
+
+f1 = id.ToString(Idf.Base64);
+f2 = id.ToString("B64");
+f3 = $"{id:B64}";
+
+if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)))
     throw new InvalidOperationException();
 
 f1 = id.ToString(Idf.Path2);
