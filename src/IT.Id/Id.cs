@@ -158,56 +158,23 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     //    return bytes;
     //}
 
-    public static Id Parse(ReadOnlySpan<Char> value)
+    public static Id Parse(ReadOnlySpan<Char> value) => value.Length switch
     {
-        var len = value.Length;
+        16 => ParseBase64(value),
+        18 => ParsePath2(value),
+        19 => ParsePath3(value),
+        24 => ParseHex(value),
+        _ => throw new FormatException()
+    };
 
-        if (len == 16) return ParseBase64(value);
-
-        if (len == 18) return ParsePath2(value);
-
-        if (len == 19) return ParsePath3(value);
-
-        if (len == 24) return ParseHex(value);
-
-        throw new FormatException();
-    }
-
-    public static Id Parse(ReadOnlySpan<Char> value, Idf format)
+    public static Id Parse(ReadOnlySpan<Char> value, Idf format) => format switch
     {
-        if (format == Idf.HexUpper || format == Idf.HexLower) return ParseHex(value);
-
-        if (format == Idf.Base64 || format == Idf.Base64Url) return ParseBase64(value);
-
-        if (format == Idf.Path2) return ParsePath2(value);
-
-        if (format == Idf.Path3) return ParsePath3(value);
-
-        throw new FormatException();
-    }
-
-    //public static Id Parse(String hex)
-    //{
-    //    if (hex == null) throw new ArgumentNullException(nameof(hex));
-
-    //    return TryParse(hex, out Id id) ? id : throw new FormatException($"'{hex}' is not a valid 24 digit hex string.");
-    //}
-
-    //public static Boolean TryParse(String hex, out Id id)
-    //{
-    //    // don't throw ArgumentNullException if s is null
-    //    if (hex != null && hex.Length == 24)
-    //    {
-    //        if (Hex.TryParseHexString(hex, out byte[]? bytes))
-    //        {
-    //            id = new Id(bytes!);
-    //            return true;
-    //        }
-    //    }
-
-    //    id = default;
-    //    return false;
-    //}
+        Idf.Base64Url or Idf.Base64 => ParseBase64(value),
+        Idf.HexLower or Idf.HexUpper => ParseHex(value),
+        Idf.Path2 => ParsePath2(value),
+        Idf.Path3 => ParsePath3(value),
+        _ => throw new FormatException()
+    };
 
     //public static void Unpack(Byte[] bytes, out Int32 timestamp, out Int32 machine, out Int16 pid, out Int32 increment)
     //{
@@ -235,10 +202,8 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         (byte)(_c)
     };
 
-    public void ToByteArray(Byte[] destination, Int32 offset)
+    public void ToByteArray(Span<Byte> destination, Int32 offset)
     {
-        if (destination == null) throw new ArgumentNullException(nameof(destination));
-
         if (offset + 12 > destination.Length) throw new ArgumentException("Not enough room in destination buffer.", nameof(offset));
 
         destination[offset + 0] = (byte)(_timestamp >> 24);
