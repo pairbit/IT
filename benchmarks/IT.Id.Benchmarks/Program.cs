@@ -26,6 +26,13 @@ id3 = $"{id:p2}";
 if (!id1.Equals(id2) || !id1.Equals(id3) || !id.Equals(Id.Parse(id3)))
     throw new InvalidOperationException();
 
+id1 = id.ToString(Idf.Path3);
+id2 = id.ToString("p3");
+id3 = $"{id:p3}";
+
+if (!id1.Equals(id2) || !id1.Equals(id3) || !id.Equals(Id.Parse(id3)))
+    throw new InvalidOperationException();
+
 Console.WriteLine("Ok");
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));

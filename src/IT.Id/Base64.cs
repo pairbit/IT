@@ -18,6 +18,50 @@ internal static class Base64
                                                  't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7',
                                                  '8', '9', '-', '_', '=' };
 
+    public static void ParsePath3(ReadOnlySpan<char> utf16, Span<byte> bytes)
+    {
+        ref char srcChars = ref MemoryMarshal.GetReference(utf16);
+        ref byte destBytes = ref MemoryMarshal.GetReference(bytes);
+        ref sbyte decodingMap = ref MemoryMarshal.GetReference(DecodingMap);
+
+        int r = DecodeReverse(ref Unsafe.Add(ref srcChars, 15), ref decodingMap);
+
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 0), r);
+
+        r = DecodeReverse(ref Unsafe.Add(ref srcChars, 11), ref decodingMap);
+
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 3), r);
+
+        r = DecodeReverse(ref Unsafe.Add(ref srcChars, 7), ref decodingMap);
+
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 6), r);
+
+        int i0 = Unsafe.Add(ref srcChars, 6);
+        int i1 = Unsafe.Add(ref srcChars, 4);
+        int i2 = Unsafe.Add(ref srcChars, 2);
+        int i3 = Unsafe.Add(ref srcChars, 0);
+
+        if (((i0 | i1 | i2 | i3) & 0xffffff00) != 0)
+            throw new FormatException();
+
+        i0 = Unsafe.Add(ref decodingMap, i0);
+        i1 = Unsafe.Add(ref decodingMap, i1);
+        i2 = Unsafe.Add(ref decodingMap, i2);
+        i3 = Unsafe.Add(ref decodingMap, i3);
+
+        i0 <<= 18;
+        i1 <<= 12;
+        i2 <<= 6;
+
+        i0 |= i1;
+        i0 |= i3;
+        i0 |= i2;
+
+        if (i0 < 0) throw new FormatException();
+
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 9), i0);
+    }
+
     public static void ParsePath2(ReadOnlySpan<char> utf16, Span<byte> bytes)
     {
         ref char srcChars = ref MemoryMarshal.GetReference(utf16);

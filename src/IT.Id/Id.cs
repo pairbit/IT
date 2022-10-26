@@ -167,9 +167,9 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
         if (value.Length == 18) return ParsePath2(value.AsSpan());
 
-        if (value.Length == 19) return Parse(value, Idf.Path3);
+        if (value.Length == 19) return ParsePath3(value.AsSpan());
 
-        if (value.Length == 24) return Parse(value, Idf.HexLower);
+        if (value.Length == 24) return ParseHex(value);
 
         throw new FormatException();
     }
@@ -178,22 +178,13 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     {
         if (value is null) throw new ArgumentNullException(nameof(value));
 
-        if (format == Idf.HexUpper || format == Idf.HexLower)
-        {
-            if (value.Length != 24) throw new ArgumentException("Byte array must be 12 bytes long", nameof(value));
+        if (format == Idf.HexUpper || format == Idf.HexLower) return ParseHex(value);
 
-            FromByteArray(Hex.ParseHexString(value), 0, out var timestamp, out var b, out var c);
+        if (format == Idf.Base64 || format == Idf.Base64Url) return ParseBase64(value.AsSpan());
 
-            return new Id(timestamp, b, c);
-        }
-        else if (format == Idf.Base64 || format == Idf.Base64Url)
-        {
-            return ParseBase64(value.AsSpan());
-        }
-        else if (format == Idf.Path2 || format == Idf.Path3)
-        {
-            throw new NotImplementedException();
-        }
+        if (format == Idf.Path2) return ParsePath2(value.AsSpan());
+
+        if (format == Idf.Path3) return ParsePath3(value.AsSpan());
 
         throw new FormatException();
     }
@@ -356,7 +347,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         if (format.SequenceEqual("p3"))
         {
             charsWritten = 19;
-            ToPath2(destination);
+            ToPath3(destination);
 
             return true;
         }
@@ -920,7 +911,13 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
         //_\I\-\TH145xA0ZPhqY
 
-        throw new NotImplementedException();
+        Span<Byte> bytes = stackalloc Byte[12];
+
+        Base64.ParsePath3(value, bytes);
+
+        FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
+
+        return new Id(timestamp, b, c);
     }
 
     private static long CalculateRandomValue()
