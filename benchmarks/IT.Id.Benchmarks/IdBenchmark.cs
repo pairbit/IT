@@ -12,6 +12,7 @@ public class IdBenchmark
     private readonly String _idHexLower;
     private readonly String _idBase64Url;
     private readonly String _idBase85;
+    private readonly String _ulid;
 
     public IdBenchmark()
     {
@@ -20,6 +21,9 @@ public class IdBenchmark
         _idHexUpper = id.ToString(Idf.HexUpper);
         _idHexLower = id.ToString(Idf.Hex);
         _idBase64Url = id.ToString();
+
+        var ulid = Ulid.NewUlid();
+        _ulid = ulid.ToString();
     }
 
     [Benchmark]
@@ -35,8 +39,5 @@ public class IdBenchmark
     public System.Id Id_Parse_HexLower() => System.Id.Parse(_idHexLower);
 
     [Benchmark]
-    public System.Id Id_Parse_HexUpper_OLD() => System.Id.Parse(_idHexUpper, Idf.HexUpper);
-
-    [Benchmark]
-    public System.Id Id_Parse_HexLower_OLD() => System.Id.Parse(_idHexLower, Idf.Hex);
+    public Ulid Ulid_Parse() => Ulid.Parse(_ulid);
 }

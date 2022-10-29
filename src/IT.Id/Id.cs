@@ -7,6 +7,7 @@ using System.Threading;
 namespace System;
 
 [Serializable]
+[DebuggerDisplay("{ToString(),nq}")]
 public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 #if NET6_0
 , ISpanFormattable

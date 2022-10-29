@@ -5,15 +5,19 @@ var low = random.Next();
 
 Console.WriteLine($"{high} - {low}");
 
+int sizeId = System.Runtime.InteropServices.Marshal.SizeOf<Id>(Id.New());
+
+Console.WriteLine($"SizeOf Id - {sizeId} bytes");
+
 var idb = new IT.Id.Benchmarks.IdBenchmark();
 
 var id1 = idb.Id_Parse_HexLower();
 var id2 = idb.Id_Parse_HexUpper();
-var id3 = idb.Id_Parse_HexLower_OLD();
-var id4 = idb.Id_Parse_HexUpper_OLD();
-var id5 = idb.Id_Parse_Base85();
+var id3 = idb.Id_Parse_Base85();
 
-if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4) || !id1.Equals(id5)) throw new InvalidOperationException();
+var ulid = idb.Ulid_Parse();
+
+if (!id1.Equals(id2) || !id1.Equals(id3)) throw new InvalidOperationException();
 
 Console.WriteLine("Ok");
 
