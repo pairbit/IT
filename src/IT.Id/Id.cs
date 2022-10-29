@@ -507,7 +507,16 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     private String ToBase85()
     {
-        return Base85.Encode(ToByteArray());
+        var result = new string((char)0, 15);
+        unsafe
+        {
+            var source = ToByteArray();
+            fixed (byte* sourceP = source)
+            fixed (char* targetP = result)
+                Base85.Encode(sourceP, targetP);
+        }
+
+        return result;
     }
 
     private String ToHexLower()
