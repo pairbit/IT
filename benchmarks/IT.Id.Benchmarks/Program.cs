@@ -11,13 +11,15 @@ Console.WriteLine($"SizeOf Id - {sizeId} bytes");
 
 var idb = new IT.Id.Benchmarks.IdBenchmark();
 
-var id1 = idb.Id_Parse_HexLower();
-var id2 = idb.Id_Parse_HexUpper();
-var id3 = idb.Id_Parse_Base85();
+var id1 = idb.Id_Decode_HexLower();
+var id2 = idb.Id_Decode_HexUpper();
+var id3 = idb.Id_Decode_Base85();
+var id4 = idb.Id_Decode_Path2();
+var id5 = idb.Id_Decode_Path3();
 
-var ulid = idb.Ulid_Parse();
+var ulid = idb.Ulid_Decode();
 
-if (!id1.Equals(id2) || !id1.Equals(id3)) throw new InvalidOperationException();
+if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4) || !id1.Equals(id5)) throw new InvalidOperationException();
 
 Console.WriteLine("Ok");
 
