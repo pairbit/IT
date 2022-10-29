@@ -19,16 +19,23 @@ Console.WriteLine("Ok");
 var id = Id.New();
 
 var f1 = id.ToString(Idf.Base64Url);
-var f2 = id.ToString("b64");
-var f3 = $"{id:b64}";
+var f2 = id.ToString("u64");
+var f3 = $"{id:u64}";
 var f4 = id.ToString();
 
 if (!f1.Equals(f2) || !f1.Equals(f3) || !f1.Equals(f4) || !id.Equals(Id.Parse(f4)))
     throw new InvalidOperationException();
 
 f1 = id.ToString(Idf.Base64);
-f2 = id.ToString("B64");
-f3 = $"{id:B64}";
+f2 = id.ToString("b64");
+f3 = $"{id:b64}";
+
+if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)))
+    throw new InvalidOperationException();
+
+f1 = id.ToString(Idf.Base85);
+f2 = id.ToString("85");
+f3 = $"{id:85}";
 
 if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)))
     throw new InvalidOperationException();
@@ -47,7 +54,7 @@ f3 = $"{id:p3}";
 if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)))
     throw new InvalidOperationException();
 
-f1 = id.ToString(Idf.HexLower);
+f1 = id.ToString(Idf.Hex);
 f2 = id.ToString("h");
 f3 = $"{id:h}";
 
@@ -63,4 +70,4 @@ if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)) || !id.Equals(I
 
 Console.WriteLine("Ok");
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));

@@ -3,23 +3,36 @@
 public enum Idf
 {
     /// <summary>
-    /// RFC 7515 (https://datatracker.ietf.org/doc/html/rfc7515#appendix-C) <br/>
-    /// Char '/' repalce to '_', '+' repalce to '-',
+    /// Base16 Lower
     /// </summary>
-    /// <example>YqhPZ0Ax541HT-I_</example>
-    Base64Url = 0,
+    /// <example>62a84f674031e78d474fe23f</example>
+    Hex,
+
+    /// <summary>
+    /// Base16 Upper
+    /// </summary>
+    /// <example>62A84F674031E78D474FE23F</example>
+    HexUpper,
+
+    //Base32,
+
+    //Base58,
 
     /// <example>YqhPZ0Ax541HT+I/</example>
     Base64,
 
     /// <summary>
-    /// Base16
+    /// RFC 7515 (https://datatracker.ietf.org/doc/html/rfc7515#appendix-C) <br/>
+    /// Char '/' repalce to '_', '+' repalce to '-'
     /// </summary>
-    /// <example>62a84f674031e78d474fe23f</example>
-    HexLower,
+    /// <example>YqhPZ0Ax541HT-I_</example>
+    Base64Url,
 
-    /// <example>62A84F674031E78D474FE23F</example>
-    HexUpper,
+    /// <summary>
+    /// Z85Xml (0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?_~|()[]{}@%$#) <br/>
+    /// Char '&amp;' repalce to '_', '&lt;' repalce to '~', '&gt;' repalce to '|'
+    /// </summary>
+    Base85,
 
     /// <summary>
     /// Win   = 38^2 + 38 = 1 482 max <br/>
@@ -33,7 +46,5 @@ public enum Idf
     /// Linux = 64^3 + 64^2 + 64 = 266 304 max
     /// </summary>
     /// <example>_\I\-\TH145xA0ZPhqY</example>
-    Path3,
-
-    //Base85
+    Path3
 }

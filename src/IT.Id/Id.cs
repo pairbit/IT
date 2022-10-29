@@ -160,6 +160,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     public static Id Parse(ReadOnlySpan<Char> value) => value.Length switch
     {
+        15 => ParseBase85(value),
         16 => ParseBase64(value),
         18 => ParsePath2(value),
         19 => ParsePath3(value),
@@ -169,8 +170,9 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     public static Id Parse(ReadOnlySpan<Char> value, Idf format) => format switch
     {
-        Idf.Base64Url or Idf.Base64 => ParseBase64(value),
-        Idf.HexLower or Idf.HexUpper => ParseHex(value),
+        Idf.Hex or Idf.HexUpper => ParseHex(value),
+        Idf.Base64 or Idf.Base64Url => ParseBase64(value),
+        Idf.Base85 => ParseBase85(value),
         Idf.Path2 => ParsePath2(value),
         Idf.Path3 => ParsePath3(value),
         _ => throw new FormatException()
@@ -238,10 +240,11 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     public String ToString(String? format, IFormatProvider? formatProvider = null) => format switch
     {
-        "b64" or "64" or null => ToBase64Url(),
-        "B64" => ToBase64(),
         "h" or "b16" or "16" => ToHexLower(),
         "H" or "B16" => ToHexUpper(),
+        "b64" or "64" => ToBase64(),
+        "u64" or null => ToBase64Url(),
+        "85" => ToBase85(),
         "p2" => ToPath2(),
         "p3" => ToPath3(),
         _ => throw new FormatException($"The '{format}' format string is not supported."),
@@ -249,10 +252,11 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     public String ToString(Idf format) => format switch
     {
-        Idf.Base64Url => ToBase64Url(),
-        Idf.Base64 => ToBase64(),
-        Idf.HexLower => ToHexLower(),
+        Idf.Hex => ToHexLower(),
         Idf.HexUpper => ToHexUpper(),
+        Idf.Base64 => ToBase64(),
+        Idf.Base64Url => ToBase64Url(),
+        Idf.Base85 => ToBase85(),
         Idf.Path2 => ToPath2(),
         Idf.Path3 => ToPath3(),
         _ => throw new FormatException($"The '{format}' format string is not supported."),
@@ -262,14 +266,14 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     public Boolean TryFormat(Span<Char> destination, out Int32 charsWritten, ReadOnlySpan<Char> format, IFormatProvider? provider)
     {
-        if (format.IsEmpty || format.SequenceEqual("b64") || format.SequenceEqual("64"))
+        if (format.IsEmpty || format.SequenceEqual("u64"))
         {
             charsWritten = 16;
             ToBase64(destination, Base64.tableUrl);
             return true;
         }
 
-        if (format.SequenceEqual("B64"))
+        if (format.SequenceEqual("b64") || format.SequenceEqual("64"))
         {
             charsWritten = 16;
             ToBase64(destination, Base64.table);
@@ -294,6 +298,14 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
             {
                 ToHex(destination, Hex._upperLookup32UnsafeP);
             }
+
+            return true;
+        }
+
+        if (format.SequenceEqual("85"))
+        {
+            charsWritten = 15;
+            ToBase85(destination);
 
             return true;
         }
@@ -488,6 +500,11 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
             }
         }
         return result;
+    }
+
+    private String ToBase85()
+    {
+        return Base85.Encode(ToByteArray());
     }
 
     private String ToHexLower()
@@ -695,6 +712,11 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         }
     }
 
+    private void ToBase85(Span<Char> destination)
+    {
+        Base85.Encode(ToByteArray(), destination);
+    }
+
     private unsafe void ToHex(Span<Char> destination, uint* lookupP)
     {
         fixed (char* resultP = destination)
@@ -818,8 +840,6 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
 #endif
 
-    //YqhPZ0Ax541HT-I_
-    //YqhPZ0Ax541HT+I/
     private static Id ParseBase64(ReadOnlySpan<Char> value)
     {
         if (value.Length != 16) throw new ArgumentException("String must be 16 characters long", nameof(value));
@@ -827,6 +847,19 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         Span<Byte> bytes = stackalloc Byte[12];
 
         Base64.Parse(value, bytes);
+
+        FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
+
+        return new Id(timestamp, b, c);
+    }
+
+    private static Id ParseBase85(ReadOnlySpan<Char> value)
+    {
+        if (value.Length != 15) throw new ArgumentException("String must be 15 characters long", nameof(value));
+
+        Span<Byte> bytes = stackalloc Byte[12];
+
+        Base85.Decode(value, bytes);
 
         FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
 
