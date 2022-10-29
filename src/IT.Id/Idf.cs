@@ -32,6 +32,7 @@ public enum Idf
     /// Z85Xml (0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?_~|()[]{}@%$#) <br/>
     /// Char '&amp;' repalce to '_', '&lt;' repalce to '~', '&gt;' repalce to '|'
     /// </summary>
+    /// <example>v{IV^PiNKcFO_~|</example>
     Base85,
 
     /// <summary>
