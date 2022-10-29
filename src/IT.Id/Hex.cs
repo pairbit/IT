@@ -28,18 +28,18 @@ internal static class Hex
 
     public static void Decode(ReadOnlySpan<char> chars, Span<byte> bytes)
     {
-        bytes[0] = (byte)((FromChar(chars[0]) << 4) | FromChar(chars[1]));
-        bytes[1] = (byte)((FromChar(chars[2]) << 4) | FromChar(chars[3]));
-        bytes[2] = (byte)((FromChar(chars[4]) << 4) | FromChar(chars[5]));
-        bytes[3] = (byte)((FromChar(chars[6]) << 4) | FromChar(chars[7]));
-        bytes[4] = (byte)((FromChar(chars[8]) << 4) | FromChar(chars[9]));
-        bytes[5] = (byte)((FromChar(chars[10]) << 4) | FromChar(chars[11]));
-        bytes[6] = (byte)((FromChar(chars[12]) << 4) | FromChar(chars[13]));
-        bytes[7] = (byte)((FromChar(chars[14]) << 4) | FromChar(chars[15]));
-        bytes[8] = (byte)((FromChar(chars[16]) << 4) | FromChar(chars[17]));
-        bytes[9] = (byte)((FromChar(chars[18]) << 4) | FromChar(chars[19]));
-        bytes[10] = (byte)((FromChar(chars[20]) << 4) | FromChar(chars[21]));
-        bytes[11] = (byte)((FromChar(chars[22]) << 4) | FromChar(chars[23]));
+        bytes[0] = (byte)((CharToHex[chars[0]] << 4) | CharToHex[chars[1]]);
+        bytes[1] = (byte)((CharToHex[chars[2]] << 4) | CharToHex[chars[3]]);
+        bytes[2] = (byte)((CharToHex[chars[4]] << 4) | CharToHex[chars[5]]);
+        bytes[3] = (byte)((CharToHex[chars[6]] << 4) | CharToHex[chars[7]]);
+        bytes[4] = (byte)((CharToHex[chars[8]] << 4) | CharToHex[chars[9]]);
+        bytes[5] = (byte)((CharToHex[chars[10]] << 4) | CharToHex[chars[11]]);
+        bytes[6] = (byte)((CharToHex[chars[12]] << 4) | CharToHex[chars[13]]);
+        bytes[7] = (byte)((CharToHex[chars[14]] << 4) | CharToHex[chars[15]]);
+        bytes[8] = (byte)((CharToHex[chars[16]] << 4) | CharToHex[chars[17]]);
+        bytes[9] = (byte)((CharToHex[chars[18]] << 4) | CharToHex[chars[19]]);
+        bytes[10] = (byte)((CharToHex[chars[20]] << 4) | CharToHex[chars[21]]);
+        bytes[11] = (byte)((CharToHex[chars[22]] << 4) | CharToHex[chars[23]]);
     }
 
     public static bool TryDecodeFromUtf16(ReadOnlySpan<char> chars, Span<byte> bytes)
@@ -134,17 +134,11 @@ internal static class Hex
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int FromChar(int c)
     {
-        return c >= CharToHexLookup.Length ? throw new FormatException() : CharToHexLookup[c];
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int TryFromChar(int c)
-    {
-        return c >= CharToHexLookup.Length ? 0xFF : CharToHexLookup[c];
+        return c >= CharToHex.Length ? 0xFF : CharToHex[c];
     }
 
     /// <summary>Map from an ASCII char to its hex value, e.g. arr['b'] == 11. 0xFF means it's not a hex digit.</summary>
-    public static ReadOnlySpan<byte> CharToHexLookup => new byte[]
+    private static ReadOnlySpan<byte> CharToHex => new byte[]
     {
             0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // 15
             0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // 31
