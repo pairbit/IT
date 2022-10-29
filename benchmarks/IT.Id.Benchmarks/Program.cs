@@ -11,8 +11,9 @@ var id1 = idb.Id_Parse_HexLower();
 var id2 = idb.Id_Parse_HexUpper();
 var id3 = idb.Id_Parse_HexLower_OLD();
 var id4 = idb.Id_Parse_HexUpper_OLD();
+var id5 = idb.Id_Parse_Base85();
 
-if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4)) throw new InvalidOperationException();
+if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4) || !id1.Equals(id5)) throw new InvalidOperationException();
 
 Console.WriteLine("Ok");
 
@@ -70,4 +71,4 @@ if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)) || !id.Equals(I
 
 Console.WriteLine("Ok");
 
-//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));
