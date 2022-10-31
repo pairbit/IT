@@ -14,7 +14,10 @@ public enum Idf
     /// <example>62A84F674031E78D474FE23F</example>
     HexUpper,
 
-    //Base32,
+    /// <summary>
+    /// Crockford's Base32 (0123456789ABCDEFGHJKMNPQRSTVWXYZ)
+    /// </summary>
+    Base32,
 
     //Base58,
 

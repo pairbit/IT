@@ -9,6 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
+    <PackageReference Include="NeuroSpeech.CrockfordBase32" Version="1.0.4" />
+    <PackageReference Include="SimpleBase" Version="3.1.0" />
     <PackageReference Include="Ulid" Version="1.2.6" />
   </ItemGroup>
 

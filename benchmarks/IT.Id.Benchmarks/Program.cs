@@ -11,19 +11,41 @@ Console.WriteLine($"SizeOf Id - {sizeId} bytes");
 
 var idb = new IT.Id.Benchmarks.IdBenchmark();
 
+var ulid = idb.Ulid_Decode();
+
+var bytes = ulid.ToByteArray();
+
+var base32 = SimpleBase.Base32.Crockford.Encode(bytes);
+
+if (!base32.Equals(idb._ulidString))
+    Console.WriteLine($"Ulid '{idb._ulidString}' != Crockford base32 '{base32}'");
+
+//var base32_2 = Wiry.Base32.Base32Encoding.Base32.GetString(bytes);
+
 var id1 = idb.Id_Decode_HexLower();
 var id2 = idb.Id_Decode_HexUpper();
 var id3 = idb.Id_Decode_Base85();
 var id4 = idb.Id_Decode_Path2();
 var id5 = idb.Id_Decode_Path3();
+var id6 = idb.Id_Decode_Base32();
 
-var ulid = idb.Ulid_Decode();
+//if (!idb._idBase32.Equals("CDF3X28R6E0ACQ4NEVR0")) throw new InvalidOperationException();
 
-if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4) || !id1.Equals(id5)) throw new InvalidOperationException();
+if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4) || !id1.Equals(id5) || !id1.Equals(id6)) throw new InvalidOperationException();
 
 Console.WriteLine("Ok");
 
 var id = Id.New();
+
+//var lengths = new List<Int32>();
+
+//for (int i = 0; i < 10000; i++)
+//{
+//    var id58 = Id.New();
+//    var bitcoin = SimpleBase.Base58.Bitcoin.Encode(id.ToByteArray());
+
+//    if (!lengths.Contains(bitcoin.Length)) lengths.Add(bitcoin.Length);
+//}
 
 var f1 = id.ToString(Idf.Base64Url);
 var f2 = id.ToString("u64");
@@ -65,7 +87,7 @@ f1 = id.ToString(Idf.Hex);
 f2 = id.ToString("h");
 f3 = $"{id:h}";
 
-if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)) || !id.Equals(Id.Parse(f3, Idf.HexUpper)))
+if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)) || !id.Equals(Id.Parse(f3, Idf.Hex)))
     throw new InvalidOperationException();
 
 f1 = id.ToString(Idf.HexUpper);
@@ -75,6 +97,13 @@ f3 = $"{id:H}";
 if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)) || !id.Equals(Id.Parse(f3, Idf.HexUpper)))
     throw new InvalidOperationException();
 
+f1 = id.ToString(Idf.Base32);
+f2 = id.ToString("32");
+//f3 = $"{id:H}";
+
+if (!f1.Equals(f2) || !id.Equals(Id.Parse(f2)) || !id.Equals(Id.Parse(f2, Idf.Base32)))
+    throw new InvalidOperationException();
+
 Console.WriteLine("Ok");
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));

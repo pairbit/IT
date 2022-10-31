@@ -9,11 +9,12 @@ namespace IT.Id.Benchmarks;
 public class IdBenchmark
 {
     private readonly Ulid _ulid;
-    private readonly String _ulidString;
+    internal readonly String _ulidString;
 
     private readonly System.Id _id;
     private readonly String _idHexLower;
     private readonly String _idHexUpper;
+    internal readonly String _idBase32;
     private readonly String _idBase64Url;
     private readonly String _idBase85;
     private readonly String _idPath2;
@@ -21,9 +22,11 @@ public class IdBenchmark
 
     public IdBenchmark()
     {
+        //_id = System.Id.Parse("Y14-iRgzgKZclXbw");
         _id = System.Id.New();
         _idHexUpper = Id_Encode_HexUpper();
         _idHexLower = Id_Encode_HexLower();
+        _idBase32 = Id_Encode_Base32();
         _idBase64Url = Id_Encode_Base64Url();
         _idBase85 = Id_Encode_Base85();
         _idPath2 = Id_Encode_Path2();
@@ -44,6 +47,12 @@ public class IdBenchmark
 
     [Benchmark]
     public System.Id Id_Decode_HexUpper() => System.Id.Parse(_idHexUpper);
+
+    [Benchmark]
+    public String Id_Encode_Base32() => _id.ToString(Idf.Base32);
+
+    [Benchmark]
+    public System.Id Id_Decode_Base32() => System.Id.Parse(_idBase32);
 
     [Benchmark]
     public String Id_Encode_Base64Url() => _id.ToString();

@@ -165,8 +165,10 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     {
         15 => ParseBase85(value),
         16 => ParseBase64(value),
+        //17 => Base58
         18 => ParsePath2(value),
         19 => ParsePath3(value),
+        20 => ParseBase32(value),
         24 => ParseHex(value),
         _ => throw new FormatException()
     };
@@ -174,6 +176,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     public static Id Parse(ReadOnlySpan<Char> value, Idf format) => format switch
     {
         Idf.Hex or Idf.HexUpper => ParseHex(value),
+        Idf.Base32 => ParseBase32(value),
         Idf.Base64 or Idf.Base64Url => ParseBase64(value),
         Idf.Base85 => ParseBase85(value),
         Idf.Path2 => ParsePath2(value),
@@ -245,6 +248,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     {
         "h" or "b16" or "16" => ToHexLower(),
         "H" or "B16" => ToHexUpper(),
+        "32" => ToBase32(),
         "b64" or "64" => ToBase64(),
         "u64" or null => ToBase64Url(),
         "85" => ToBase85(),
@@ -257,6 +261,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     {
         Idf.Hex => ToHexLower(),
         Idf.HexUpper => ToHexUpper(),
+        Idf.Base32 => ToBase32(),
         Idf.Base64 => ToBase64(),
         Idf.Base64Url => ToBase64Url(),
         Idf.Base85 => ToBase85(),
@@ -404,6 +409,11 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     #endregion Public Methods
 
     #region Private Methods
+
+    private String ToBase32()
+    {
+        return Base32.Encode(ToByteArray());
+    }
 
     private String ToBase64Url()
     {
@@ -851,6 +861,21 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     }
 
 #endif
+
+    private static Id ParseBase32(ReadOnlySpan<Char> value)
+    {
+        if (value.Length != 20) throw new ArgumentException("String must be 20 characters long", nameof(value));
+
+        // Span<Byte> bytes = stackalloc Byte[12];
+
+        var bytes = Wiry.Base32.Base32Encoding.Base32.ToBytes(value);
+
+        //Base32.Decode(value, bytes);
+
+        FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
+
+        return new Id(timestamp, b, c);
+    }
 
     private static Id ParseBase64(ReadOnlySpan<Char> value)
     {
