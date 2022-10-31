@@ -310,6 +310,13 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
             return true;
         }
 
+        if (format.SequenceEqual("32"))
+        {
+            charsWritten = 20;
+            ToBase32(destination);
+            return true;
+        }
+
         if (format.SequenceEqual("85"))
         {
             charsWritten = 15;
@@ -687,6 +694,11 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     }
 
 #if NET6_0
+
+    private void ToBase32(Span<Char> destination)
+    {
+        Base32.Encode(ToByteArray(), destination);
+    }
 
     private void ToBase64(Span<Char> destination, Char[] table)
     {

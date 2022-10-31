@@ -33,11 +33,6 @@ internal class Base32
         _lookupValues = table;
     }
 
-    public static void Encode(ReadOnlySpan<byte> bytes, Span<char> span)
-    {
-        throw new InvalidOperationException();
-    }
-
     public static String Encode(ReadOnlySpan<byte> bytes)
     {
 #if NETSTANDARD2_0
@@ -49,14 +44,14 @@ internal class Base32
             {
                 return String.Create(20, (IntPtr)dataPtr, (encoded, state) =>
                 {
-                    ToBase32Unsafe(new ReadOnlySpan<Byte>((Byte*)state, 12), encoded);
+                    Encode(new ReadOnlySpan<Byte>((Byte*)state, 12), encoded);
                 });
             }
         }
 #endif
     }
 
-    private static unsafe void ToBase32Unsafe(ReadOnlySpan<Byte> input, Span<Char> output)
+    public static unsafe void Encode(ReadOnlySpan<byte> input, Span<char> output)
     {
         fixed (byte* pInput = input)
         fixed (char* pOutput = output)
