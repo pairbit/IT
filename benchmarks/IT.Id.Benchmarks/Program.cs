@@ -99,11 +99,13 @@ if (!f1.Equals(f2) || !f1.Equals(f3) || !id.Equals(Id.Parse(f3)) || !id.Equals(I
 
 f1 = id.ToString(Idf.Base32);
 f2 = id.ToString("32");
-//f3 = $"{id:H}";
+//f3 = $"{id:32}";
 
-if (!f1.Equals(f2) || !id.Equals(Id.Parse(f2)) || !id.Equals(Id.Parse(f2, Idf.Base32)))
+f4 = SimpleBase.Base32.Crockford.Encode(id.ToByteArray());
+
+if (!f1.Equals(f2) || !f1.Equals(f4) || !id.Equals(Id.Parse(f2)) || !id.Equals(Id.Parse(f2, Idf.Base32)))
     throw new InvalidOperationException();
 
 Console.WriteLine("Ok");
 
-//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));

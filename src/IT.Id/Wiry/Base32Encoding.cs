@@ -48,7 +48,20 @@ namespace Wiry.Base32
         /// </summary>
         public virtual string GetString(ReadOnlySpan<Byte> bytes)
         {
-            return ToBase32(bytes, Alphabet, PadSymbol);
+#if NETSTANDARD2_0
+            throw new InvalidOperationException();
+#else
+            unsafe
+            {
+                fixed (byte* dataPtr = bytes)
+                {
+                    return String.Create(20, (IntPtr)dataPtr, (encoded, state) =>
+                    {
+                        ToBase32Unsafe(new ReadOnlySpan<Byte>((Byte*)state, 12), encoded);
+                    });
+                }
+            }
+#endif
         }
 
         /// <summary>
@@ -99,80 +112,68 @@ namespace Wiry.Base32
             return new LookupTable(min, table);
         }
 
-        private static unsafe void ToBase32GroupsUnsafe(byte* pInput, char* pOutput, char* pAlphabet,
-            int inputGroupsCount)
-        {
-            for (int i = 0; i < inputGroupsCount; i++)
-            {
-                ulong value = *pInput++;
-                for (int j = 0; j < 4; j++)
-                {
-                    value <<= 8;
-                    value |= *pInput++;
-                }
-
-                pOutput += 7;
-                char* pNextPos = pOutput + 1;
-                for (int j = 0; j < 7; j++)
-                {
-                    *pOutput-- = pAlphabet[value & 0x1F];
-                    value >>= 5;
-                }
-
-                *pOutput = pAlphabet[value];
-                pOutput = pNextPos;
-            }
-        }
-
-        private static unsafe int ToBase32RemainderUnsafe(byte* pInput, char* pOutput, char* pAlphabet, int remainder)
+        private static unsafe void ToBase32GroupsUnsafe(byte* pInput, char* pOutput, char* pAlphabet)
         {
             ulong value = *pInput++;
-            for (int j = 1; j < remainder; j++)
-            {
-                value <<= 8;
-                value |= *pInput++;
-            }
+            value = (value << 8) | (*pInput++);
+            value = (value << 8) | (*pInput++);
+            value = (value << 8) | (*pInput++);
+            value = (value << 8) | (*pInput++);
 
-            int symbols = GetSymbolsCount(remainder);
-            value <<= (5 - remainder) * 8 - (8 - symbols) * 5;
+            pOutput += 7;
+            char* pNextPos = pOutput + 1;
 
-            pOutput += symbols - 1;
-            for (int j = 1; j < symbols; j++)
-            {
-                *pOutput-- = pAlphabet[value & 0x1F];
-                value >>= 5;
-            }
+            *pOutput-- = pAlphabet[value & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 5) & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 10) & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 15) & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 20) & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 25) & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 30) & 0x1F];
+            *pOutput = pAlphabet[(value >> 35)];
 
-            *pOutput = pAlphabet[value];
+            pOutput = pNextPos;
 
-            return symbols;
+            value = *pInput++;
+            value = (value << 8) | (*pInput++);
+            value = (value << 8) | (*pInput++);
+            value = (value << 8) | (*pInput++);
+            value = (value << 8) | (*pInput++);
+
+            pOutput += 7;
+            pNextPos = pOutput + 1;
+
+            *pOutput-- = pAlphabet[value & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 5) & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 10) & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 15) & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 20) & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 25) & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 30) & 0x1F];
+            *pOutput = pAlphabet[(value >> 35)];
+
+            pOutput = pNextPos;
+
+            //pInput += 10;
+            //pOutput += 16;
+
+            value = (((ulong)(*pInput++) << 8) | *pInput++) << 4;
+
+            pOutput += 3;
+
+            *pOutput-- = pAlphabet[value & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 5) & 0x1F];
+            *pOutput-- = pAlphabet[(value >> 10) & 0x1F];
+            *pOutput = pAlphabet[value >> 15];
         }
 
-        private static unsafe void ToBase32Unsafe(ReadOnlySpan<Byte> input, Span<Char> output,
-            int inputGroupsCount, int remainder, string alphabet, char? padSymbol)
+        private static unsafe void ToBase32Unsafe(ReadOnlySpan<Byte> input, Span<Char> output)
         {
             fixed (byte* pInput = input)
             fixed (char* pOutput = output)
-            fixed (char* pAlphabet = alphabet)
+            fixed (char* pAlphabet = ALPHABET)
             {
-                if (inputGroupsCount > 0)
-                    ToBase32GroupsUnsafe(pInput, pOutput, pAlphabet, inputGroupsCount);
-
-                if (remainder <= 0)
-                    return;
-
-                byte* pInputRemainder = pInput + inputGroupsCount * 5;
-                char* pOutputRemainder = pOutput + inputGroupsCount * 8;
-                int symbols = ToBase32RemainderUnsafe(pInputRemainder, pOutputRemainder, pAlphabet, remainder);
-                if (padSymbol == null)
-                    return;
-
-                char padChar = padSymbol.Value;
-                pOutputRemainder += symbols;
-                for (int i = symbols; i < 8; i++)
-                {
-                    *pOutputRemainder++ = padChar;
-                }
+                ToBase32GroupsUnsafe(pInput, pOutput, pAlphabet);
             }
         }
 
@@ -268,44 +269,7 @@ namespace Wiry.Base32
             }
         }
 
-        internal static string ToBase32(ReadOnlySpan<Byte> bytes, string alphabet, char? padSymbol)
-        {
-            var count = bytes.Length;
-
-            if (count == 0)
-                return string.Empty;
-
-            int groupsCount = count / 5;
-            int remainder = count % 5;
-
-            int symbolsCount = groupsCount * 8;
-            if (padSymbol == null)
-            {
-                symbolsCount += GetSymbolsCount(remainder);
-            }
-            else if (remainder != 0)
-            {
-                symbolsCount += 8;
-            }
-
-#if NETSTANDARD2_0
-            throw new InvalidOperationException();
-#else
-        unsafe
-        {
-            fixed (byte* dataPtr = bytes)
-            {
-                return String.Create(symbolsCount, (Ptr: (IntPtr)dataPtr, bytes.Length, groupsCount, remainder, alphabet, padSymbol), (encoded, state) =>
-                {
-                    var data = new ReadOnlySpan<Byte>((Byte*)state.Ptr, state.Length);
-
-                    ToBase32Unsafe(data, encoded, state.groupsCount, state.remainder, state.alphabet, state.padSymbol);
-                });
-            }
-        }
-#endif
-        }
-
+        static string ALPHABET => "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 
         private static int GetRemainderWithChecks(ReadOnlySpan<Char> encoded, char? padSymbol)
         {
