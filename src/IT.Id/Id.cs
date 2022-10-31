@@ -866,11 +866,9 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     {
         if (value.Length != 20) throw new ArgumentException("String must be 20 characters long", nameof(value));
 
-        // Span<Byte> bytes = stackalloc Byte[12];
+        Span<Byte> bytes = stackalloc Byte[12];
 
-        var bytes = Wiry.Base32.Base32Encoding.Base32.ToBytes(value);
-
-        //Base32.Decode(value, bytes);
+        Base32.Decode(value, bytes);
 
         FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
 
