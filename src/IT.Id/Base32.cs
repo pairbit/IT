@@ -74,19 +74,14 @@ internal class Base32
         value = (value << 8) | (*pInput++);
         value = (value << 8) | (*pInput++);
 
-        pOutput += 7;
-        char* pNextPos = pOutput + 1;
-
-        *pOutput-- = pAlphabet[value & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 5) & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 10) & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 15) & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 20) & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 25) & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 30) & 0x1F];
-        *pOutput = pAlphabet[(value >> 35)];
-
-        pOutput = pNextPos;
+        *pOutput++ = pAlphabet[value >> 35];
+        *pOutput++ = pAlphabet[(value >> 30) & 0x1F];
+        *pOutput++ = pAlphabet[(value >> 25) & 0x1F];
+        *pOutput++ = pAlphabet[(value >> 20) & 0x1F];
+        *pOutput++ = pAlphabet[(value >> 15) & 0x1F];
+        *pOutput++ = pAlphabet[(value >> 10) & 0x1F];
+        *pOutput++ = pAlphabet[(value >> 5) & 0x1F];
+        *pOutput++ = pAlphabet[value & 0x1F];
 
         value = *pInput++;
         value = (value << 8) | (*pInput++);
@@ -94,28 +89,21 @@ internal class Base32
         value = (value << 8) | (*pInput++);
         value = (value << 8) | (*pInput++);
 
-        pOutput += 7;
-        pNextPos = pOutput + 1;
+        *pOutput++ = pAlphabet[value >> 35];
+        *pOutput++ = pAlphabet[(value >> 30) & 0x1F];
+        *pOutput++ = pAlphabet[(value >> 25) & 0x1F];
+        *pOutput++ = pAlphabet[(value >> 20) & 0x1F];
+        *pOutput++ = pAlphabet[(value >> 15) & 0x1F];
+        *pOutput++ = pAlphabet[(value >> 10) & 0x1F];
+        *pOutput++ = pAlphabet[(value >> 5) & 0x1F];
+        *pOutput++ = pAlphabet[value & 0x1F];
 
-        *pOutput-- = pAlphabet[value & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 5) & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 10) & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 15) & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 20) & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 25) & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 30) & 0x1F];
-        *pOutput = pAlphabet[(value >> 35)];
+        value = (((ulong)(*pInput++) << 8) | *pInput) << 4;
 
-        pOutput = pNextPos;
-
-        value = (((ulong)(*pInput++) << 8) | *pInput++) << 4;
-
-        pOutput += 3;
-
-        *pOutput-- = pAlphabet[value & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 5) & 0x1F];
-        *pOutput-- = pAlphabet[(value >> 10) & 0x1F];
-        *pOutput = pAlphabet[value >> 15];
+        *pOutput++ = pAlphabet[value >> 15];
+        *pOutput++ = pAlphabet[(value >> 10) & 0x1F];
+        *pOutput++ = pAlphabet[(value >> 5) & 0x1F];
+        *pOutput = pAlphabet[value & 0x1F];
     }
 
     public static unsafe void Decode(ReadOnlySpan<char> encoded, Span<byte> output)
