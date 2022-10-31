@@ -36,13 +36,13 @@ public class IdBenchmark
         _ulidString = Ulid_Encode();
     }
 
-    [Benchmark]
+    //[Benchmark]
     public String Id_Encode_HexLower() => _id.ToString(Idf.Hex);
 
     [Benchmark]
     public System.Id Id_Decode_HexLower() => System.Id.Parse(_idHexLower);
 
-    [Benchmark]
+    //[Benchmark]
     public String Id_Encode_HexUpper() => _id.ToString(Idf.HexUpper);
 
     [Benchmark]
@@ -54,7 +54,7 @@ public class IdBenchmark
     [Benchmark]
     public System.Id Id_Decode_Base32() => System.Id.Parse(_idBase32);
 
-    [Benchmark]
+    //[Benchmark]
     public String Id_Encode_Base64Url() => _id.ToString();
 
     [Benchmark]
@@ -66,13 +66,13 @@ public class IdBenchmark
     [Benchmark]
     public System.Id Id_Decode_Base85() => System.Id.Parse(_idBase85);
 
-    [Benchmark]
+    //[Benchmark]
     public String Id_Encode_Path2() => _id.ToString(Idf.Path2);
 
     [Benchmark]
     public System.Id Id_Decode_Path2() => System.Id.Parse(_idPath2);
 
-    [Benchmark]
+    //[Benchmark]
     public String Id_Encode_Path3() => _id.ToString(Idf.Path3);
 
     [Benchmark]

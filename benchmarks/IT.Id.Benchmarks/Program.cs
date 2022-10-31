@@ -108,4 +108,4 @@ if (!f1.Equals(f2) || !f1.Equals(f3) || !f1.Equals(f4) ||
 
 Console.WriteLine("Ok");
 
-//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));
+BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));
