@@ -320,6 +320,12 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
             return true;
         }
 
+        if (format.SequenceEqual("58"))
+        {
+            Base58.Encode(ToByteArray(), destination, out charsWritten);
+            return true;
+        }
+
         if (format.SequenceEqual("85"))
         {
             charsWritten = 15;

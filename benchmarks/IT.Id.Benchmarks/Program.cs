@@ -111,10 +111,10 @@ if (!f1.Equals(f2) || !f1.Equals(f3) || !f1.Equals(f4) ||
 
 f1 = id.ToString(Idf.Base58);
 f2 = id.ToString("58");
-//f3 = $"{id:58}";
+f3 = $"{id:58}";
 f4 = SimpleBase.Base58.Bitcoin.Encode(id.ToByteArray());
 
-if (!f1.Equals(f2) || !f1.Equals(f4) ||
+if (!f1.Equals(f2) || !f1.Equals(f3) || !f1.Equals(f4) ||
     !id.Equals(Id.Parse(f2)) || !id.Equals(Id.Parse(f2, Idf.Base58)))
     throw new InvalidOperationException();
 
