@@ -17,13 +17,13 @@ public enum Idf
     /// <summary>
     /// Crockford's (0123456789ABCDEFGHJKMNPQRSTVWXYZ)
     /// </summary>
-    /// <example></example>
+    /// <example>CAM4YST067KRTHTFW8ZG</example>
     Base32,
 
     /// <summary>
     /// Bitcoin (123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz)
     /// </summary>
-    /// <example></example>
+    /// <example>2ryw1nk6d1eiGQSL6</example>
     Base58,
 
     /// <example>YqhPZ0Ax541HT+I/</example>
