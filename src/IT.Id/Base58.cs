@@ -5,6 +5,8 @@ internal static class Base58
     private const int AlphabetLength = 58;
     private const int AlphabetMaxLength = 127;
     private const int reductionFactor = 733; // https://github.com/bitcoin/bitcoin/blob/master/src/base58.cpp#L48
+    private const string Zero = "111111111111";
+    private const Char ZeroChar = '1';
 
     private static readonly String _alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
     private static readonly char _zeroChar;
@@ -49,14 +51,19 @@ internal static class Base58
 
     public static unsafe string Encode(ReadOnlySpan<byte> bytes)
     {
-        int bytesLen = bytes.Length;
-        if (bytesLen == 0)
-        {
-            return string.Empty;
-        }
+        int bytesLen = 12;
 
         int numZeroes = getZeroCount(bytes, bytesLen);
-        int outputLen = getSafeCharCountForEncoding(bytesLen, numZeroes);
+        if (numZeroes == 12) return Zero;
+        /*
+         0,1 -> 17
+         2,4 -> 16
+         5,6 -> 15
+         7,8,9 -> 14
+         10,11 -> 13
+         12 -> 12
+         */
+        int outputLen = numZeroes + ((12 - numZeroes) * 138 / 100) + 1;
         string output = new string('\0', outputLen);
 
         // 29.70µs (64.9x slower)   | 31.63µs (40.8x slower)
@@ -110,6 +117,24 @@ internal static class Base58
         {
             int inputLen = input.Length;
             int numZeroes = getZeroCount(input, inputLen);
+            if (numZeroes == 12)
+            {
+                output[0] = ZeroChar;
+                output[1] = ZeroChar;
+                output[2] = ZeroChar;
+                output[3] = ZeroChar;
+                output[4] = ZeroChar;
+                output[5] = ZeroChar;
+                output[6] = ZeroChar;
+                output[7] = ZeroChar;
+                output[8] = ZeroChar;
+                output[9] = ZeroChar;
+                output[10] = ZeroChar;
+                output[11] = ZeroChar;
+                output[12] = ZeroChar;
+                numCharsWritten = 12;
+                return true;
+            }
             return internalEncode(inputPtr, inputLen, outputPtr, output.Length, numZeroes, out numCharsWritten);
         }
     }
@@ -202,35 +227,10 @@ internal static class Base58
         int numZeroes,
         out int numCharsWritten)
     {
-        if (inputLen == 0)
-        {
-            numCharsWritten = 0;
-            return true;
-        }
-
         fixed (char* alphabetPtr = _alphabet)
         {
             byte* pInput = inputPtr + numZeroes;
             byte* pInputEnd = inputPtr + inputLen;
-            char zeroChar = alphabetPtr[0];
-
-            // optimized path for an all zero buffer
-            if (pInput == pInputEnd)
-            {
-                if (outputLen < numZeroes)
-                {
-                    numCharsWritten = 0;
-                    return false;
-                }
-
-                for (int i = 0; i < numZeroes; i++)
-                {
-                    *outputPtr++ = zeroChar;
-                }
-
-                numCharsWritten = numZeroes;
-                return true;
-            }
 
             int length = 0;
             char* pOutput = outputPtr;
@@ -285,11 +285,6 @@ internal static class Base58
 
     private static unsafe int getZeroCount(ReadOnlySpan<byte> bytes, int bytesLen)
     {
-        if (bytesLen == 0)
-        {
-            return 0;
-        }
-
         int numZeroes = 0;
         fixed (byte* inputPtr = bytes)
         {

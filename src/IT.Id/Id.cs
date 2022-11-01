@@ -163,8 +163,11 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     public static Id Parse(ReadOnlySpan<Char> value) => value.Length switch
     {
-        15 => ParseBase85(value),
-        16 => ParseBase64(value),
+        12 => ParseBase58(value),
+        13 => ParseBase58(value),
+        14 => ParseBase58(value),
+        15 => ParseBase85(value),//conflict with Base58
+        16 => ParseBase64(value),//conflict with Base58
         17 => ParseBase58(value),
         18 => ParsePath2(value),
         19 => ParsePath3(value),
@@ -322,8 +325,12 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
         if (format.SequenceEqual("58"))
         {
-            Base58.Encode(ToByteArray(), destination, out charsWritten);
-            return true;
+            //if (!SimpleBase.Base58.Bitcoin.TryEncode(ToByteArray(), destination, out charsWritten))
+            //     throw new InvalidOperationException();
+
+            //var encoded = Base58.Encode(ToByteArray());
+
+            return Base58.Encode(ToByteArray(), destination, out charsWritten);
         }
 
         if (format.SequenceEqual("85"))
@@ -903,7 +910,8 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     private static Id ParseBase58(ReadOnlySpan<Char> value)
     {
-        if (value.Length != 17) throw new ArgumentException("String must be 17 characters long", nameof(value));
+        var len = value.Length;
+        if (len < 12 || len > 17) throw new ArgumentOutOfRangeException(nameof(value), len, "String must be 12 to 17 characters long");
 
         Span<Byte> bytes = stackalloc Byte[12];
 
