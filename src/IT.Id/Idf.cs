@@ -15,11 +15,16 @@ public enum Idf
     HexUpper,
 
     /// <summary>
-    /// Crockford's Base32 (0123456789ABCDEFGHJKMNPQRSTVWXYZ)
+    /// Crockford's (0123456789ABCDEFGHJKMNPQRSTVWXYZ)
     /// </summary>
+    /// <example></example>
     Base32,
 
-    //Base58,
+    /// <summary>
+    /// Bitcoin (123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz)
+    /// </summary>
+    /// <example></example>
+    Base58,
 
     /// <example>YqhPZ0Ax541HT+I/</example>
     Base64,

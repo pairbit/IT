@@ -2,7 +2,7 @@
 
 namespace System;
 
-internal class Base32
+internal static class Base32
 {
     private const int AlphabetLength = 32;
     private const int LookupTableNullItem = -1;

@@ -12,9 +12,11 @@ public class IdBenchmark
     internal readonly String _ulidString;
 
     private readonly System.Id _id;
+    private readonly Byte[] _idBytes;
     private readonly String _idHexLower;
     private readonly String _idHexUpper;
     internal readonly String _idBase32;
+    private readonly String _idBase58;
     private readonly String _idBase64Url;
     private readonly String _idBase85;
     private readonly String _idPath2;
@@ -24,9 +26,11 @@ public class IdBenchmark
     {
         //_id = System.Id.Parse("Y14-iRgzgKZclXbw");
         _id = System.Id.New();
+        _idBytes = _id.ToByteArray();
         _idHexUpper = Id_Encode_HexUpper();
         _idHexLower = Id_Encode_HexLower();
         _idBase32 = Id_Encode_Base32();
+        _idBase58 = Id_Encode_Base58();
         _idBase64Url = Id_Encode_Base64Url();
         _idBase85 = Id_Encode_Base85();
         _idPath2 = Id_Encode_Path2();
@@ -53,6 +57,18 @@ public class IdBenchmark
 
     [Benchmark]
     public System.Id Id_Decode_Base32() => System.Id.Parse(_idBase32);
+
+    [Benchmark]
+    public String Id_Encode_Base58() => _id.ToString(Idf.Base58);
+
+    [Benchmark]
+    public String Id_Encode_Base58_SimpleBase() => SimpleBase.Base58.Bitcoin.Encode(_idBytes);
+
+    [Benchmark]
+    public System.Id Id_Decode_Base58() => System.Id.Parse(_idBase58);
+
+    [Benchmark]
+    public System.Id Id_Decode_Base58_SimpleBase() => new System.Id(SimpleBase.Base58.Bitcoin.Decode(_idBase58));
 
     //[Benchmark]
     public String Id_Encode_Base64Url() => _id.ToString();

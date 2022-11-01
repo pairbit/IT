@@ -28,14 +28,17 @@ var id3 = idb.Id_Decode_Base85();
 var id4 = idb.Id_Decode_Path2();
 var id5 = idb.Id_Decode_Path3();
 var id6 = idb.Id_Decode_Base32();
+var id7 = idb.Id_Decode_Base58();
 
 //if (!idb._idBase32.Equals("CDF3X28R6E0ACQ4NEVR0")) throw new InvalidOperationException();
 
-if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4) || !id1.Equals(id5) || !id1.Equals(id6)) throw new InvalidOperationException();
+if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4) || 
+    !id1.Equals(id5) || !id1.Equals(id6) || !id1.Equals(id7)) throw new InvalidOperationException();
 
 Console.WriteLine("Ok");
 
 var id = Id.New();
+var idBytes = id.ToByteArray();
 
 //var lengths = new List<Int32>();
 
@@ -106,6 +109,15 @@ if (!f1.Equals(f2) || !f1.Equals(f3) || !f1.Equals(f4) ||
     !id.Equals(Id.Parse(f2)) || !id.Equals(Id.Parse(f2, Idf.Base32)))
     throw new InvalidOperationException();
 
+f1 = id.ToString(Idf.Base58);
+f2 = id.ToString("58");
+//f3 = $"{id:58}";
+f4 = SimpleBase.Base58.Bitcoin.Encode(id.ToByteArray());
+
+if (!f1.Equals(f2) || !f1.Equals(f4) ||
+    !id.Equals(Id.Parse(f2)) || !id.Equals(Id.Parse(f2, Idf.Base58)))
+    throw new InvalidOperationException();
+
 Console.WriteLine("Ok");
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));

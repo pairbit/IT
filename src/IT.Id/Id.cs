@@ -165,7 +165,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     {
         15 => ParseBase85(value),
         16 => ParseBase64(value),
-        //17 => Base58
+        17 => ParseBase58(value),
         18 => ParsePath2(value),
         19 => ParsePath3(value),
         20 => ParseBase32(value),
@@ -177,6 +177,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     {
         Idf.Hex or Idf.HexUpper => ParseHex(value),
         Idf.Base32 => ParseBase32(value),
+        Idf.Base58 => ParseBase58(value),
         Idf.Base64 or Idf.Base64Url => ParseBase64(value),
         Idf.Base85 => ParseBase85(value),
         Idf.Path2 => ParsePath2(value),
@@ -249,6 +250,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         "h" or "b16" or "16" => ToHexLower(),
         "H" or "B16" => ToHexUpper(),
         "32" => ToBase32(),
+        "58" => ToBase58(),
         "b64" or "64" => ToBase64(),
         "u64" or null => ToBase64Url(),
         "85" => ToBase85(),
@@ -262,6 +264,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         Idf.Hex => ToHexLower(),
         Idf.HexUpper => ToHexUpper(),
         Idf.Base32 => ToBase32(),
+        Idf.Base58 => ToBase58(),
         Idf.Base64 => ToBase64(),
         Idf.Base64Url => ToBase64Url(),
         Idf.Base85 => ToBase85(),
@@ -420,6 +423,11 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     private String ToBase32()
     {
         return Base32.Encode(ToByteArray());
+    }
+
+    private String ToBase58()
+    {
+        return Base58.Encode(ToByteArray());
     }
 
     private String ToBase64Url()
@@ -881,6 +889,19 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         Span<Byte> bytes = stackalloc Byte[12];
 
         Base32.Decode(value, bytes);
+
+        FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
+
+        return new Id(timestamp, b, c);
+    }
+
+    private static Id ParseBase58(ReadOnlySpan<Char> value)
+    {
+        if (value.Length != 17) throw new ArgumentException("String must be 17 characters long", nameof(value));
+
+        Span<Byte> bytes = stackalloc Byte[12];
+
+        Base58.Decode(value, bytes);
 
         FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
 
