@@ -202,7 +202,6 @@ static void Base32ZTest()
     //if (!b.SequenceEqual(b8)) throw new InvalidOperationException();
 }
 
-
 static void Base64Test()
 {
     var encoder = new Base64_Encode_Benchmark();
