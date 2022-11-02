@@ -118,22 +118,28 @@ if (f1.Length != 17 || !f1.Equals(f2) || !f1.Equals(f3) || !f1.Equals(f4) ||
     !id.Equals(Id.Parse(f2)) || !id.Equals(Id.Parse(f2, Idf.Base58)))
     throw new InvalidOperationException();
 
-idBytes[0] = 0;
-idBytes[1] = 0;
+for (int i = 0; i < 12; i++)
+{
+    idBytes[i] = 0;
+    id = new Id(idBytes);
+    var id58 = id.ToString("58");
+    Console.WriteLine($"{i,2} -> {id.Created} -> {id58,17} -> {id58.Length}");
+}
 
-//0 -> 
-//1 -> 
-//2 -> 
-//3 -> 
-//4 -> 
-//5 -> 
-//6 -> 
-//7 -> 
-//8 -> 
-//9 -> 
-//10 -> 
-//11 ->
-//12 ->
+/*
+ 0 -> 15.03.1970 19:16:33 ->  1R8QhKd5DFL1skqt -> 16
+ 1 -> 01.01.1970  5:26:41 ->  115JVswC8Es7Q54S -> 16
+ 2 -> 01.01.1970  0:02:25 ->  1112rDCsNHWP4hhg -> 16
+ 3 -> 01.01.1970  0:00:00 ->   1111AQNTfShuUfg -> 15
+ 4 -> 01.01.1970  0:00:00 ->   1111136ntErHRgi -> 15
+ 5 -> 01.01.1970  0:00:00 ->    111111uTNTr2FQ -> 14
+ 6 -> 01.01.1970  0:00:00 ->    1111111AjDiNpE -> 14
+ 7 -> 01.01.1970  0:00:00 ->    111111112TzzYW -> 14
+ 8 -> 01.01.1970  0:00:00 ->     111111111VhUr -> 13
+ 9 -> 01.01.1970  0:00:00 ->     11111111119Yi -> 13
+10 -> 01.01.1970  0:00:00 ->     111111111112N -> 13
+11 -> 01.01.1970  0:00:00 ->      111111111111 -> 12
+ */
 id = Id.MinValue;
 //id = Id.New(new DateTime(1998, 3, 5));
 f1 = id.ToString(Idf.Base58);
