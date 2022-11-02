@@ -37,7 +37,7 @@ if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4) ||
 
 Console.WriteLine("Ok");
 
-var id = Id.New();
+var id = Id.Parse("62A84F674031E78D474FE23F");
 var idBytes = id.ToByteArray();
 
 //var lengths = new List<Int32>();

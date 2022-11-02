@@ -63,8 +63,8 @@ internal static class Base58
          10,11 -> 13
          12 -> 12
          */
-        int outputLen = numZeroes + ((12 - numZeroes) * 138 / 100) + 1;
-        string output = new string('\0', outputLen);
+        //int outputLen = numZeroes + ((12 - numZeroes) * 138 / 100) + 1;
+        string output = new string('\0', 17);
 
         // 29.70µs (64.9x slower)   | 31.63µs (40.8x slower)
         // 30.93µs (first tryencode impl)
@@ -73,7 +73,7 @@ internal static class Base58
         fixed (byte* inputPtr = bytes)
         fixed (char* outputPtr = output)
         {
-            return internalEncode(inputPtr, bytesLen, outputPtr, outputLen, numZeroes, out int length)
+            return internalEncode(inputPtr, outputPtr, numZeroes, out int length)
                 ? output.Substring(0, length)
                 : throw new InvalidOperationException("Output buffer with insufficient size generated");
         }
@@ -112,30 +112,38 @@ internal static class Base58
 
     public static unsafe bool Encode(ReadOnlySpan<byte> input, Span<char> output, out int numCharsWritten)
     {
-        fixed (byte* inputPtr = input)
-        fixed (char* outputPtr = output)
+        int numZeroes = getZeroCount(input, 12);
+        if (numZeroes == 12)
         {
-            int inputLen = input.Length;
-            int numZeroes = getZeroCount(input, inputLen);
-            if (numZeroes == 12)
-            {
-                output[0] = ZeroChar;
-                output[1] = ZeroChar;
-                output[2] = ZeroChar;
-                output[3] = ZeroChar;
-                output[4] = ZeroChar;
-                output[5] = ZeroChar;
-                output[6] = ZeroChar;
-                output[7] = ZeroChar;
-                output[8] = ZeroChar;
-                output[9] = ZeroChar;
-                output[10] = ZeroChar;
-                output[11] = ZeroChar;
-                output[12] = ZeroChar;
-                numCharsWritten = 12;
-                return true;
-            }
-            return internalEncode(inputPtr, inputLen, outputPtr, output.Length, numZeroes, out numCharsWritten);
+            output[0] = ZeroChar;
+            output[1] = ZeroChar;
+            output[2] = ZeroChar;
+            output[3] = ZeroChar;
+            output[4] = ZeroChar;
+            output[5] = ZeroChar;
+            output[6] = ZeroChar;
+            output[7] = ZeroChar;
+            output[8] = ZeroChar;
+            output[9] = ZeroChar;
+            output[10] = ZeroChar;
+            output[11] = ZeroChar;
+            output[12] = ZeroChar;
+            numCharsWritten = 12;
+            return true;
+        }
+
+        Span<char> buffer = stackalloc char[17];
+
+        fixed (byte* inputPtr = input)
+        fixed (char* bufferPtr = buffer)
+        {
+            var result = internalEncode(inputPtr, bufferPtr, numZeroes, out _);
+
+            buffer.CopyTo(output);
+
+            numCharsWritten = 17;
+
+            return result;
         }
     }
 
@@ -221,26 +229,24 @@ internal static class Base58
 
     private static unsafe bool internalEncode(
         byte* inputPtr,
-        int inputLen,
         char* outputPtr,
-        int outputLen,
         int numZeroes,
         out int numCharsWritten)
     {
         fixed (char* alphabetPtr = _alphabet)
         {
             byte* pInput = inputPtr + numZeroes;
-            byte* pInputEnd = inputPtr + inputLen;
+            byte* pInputEnd = inputPtr + 12;
 
             int length = 0;
             char* pOutput = outputPtr;
-            char* pLastChar = pOutput + outputLen - 1;
+            char* pLastChar = pOutput + 16;
+
             while (pInput != pInputEnd)
             {
                 int carry = *pInput;
                 int i = 0;
-                for (char* pDigit = pLastChar; (carry != 0 || i < length)
-                    && pDigit >= outputPtr; pDigit--, i++)
+                for (char* pDigit = pLastChar; (carry != 0 || i < length) && pDigit >= outputPtr; pDigit--, i++)
                 {
                     carry += *pDigit << 8;
                     carry = Math.DivRem(carry, 58, out int remainder);
@@ -251,7 +257,7 @@ internal static class Base58
                 pInput++;
             }
 
-            var pOutputEnd = pOutput + outputLen;
+            var pOutputEnd = pOutput + 17;
 
             // copy the characters to the beginning of the buffer
             // and translate them at the same time. if no copying
