@@ -1,5 +1,8 @@
 ﻿namespace System;
 
+/// <summary>
+/// 14 bytes
+/// </summary>
 public readonly struct Id16
 {
     private readonly Id _id;
@@ -13,7 +16,7 @@ public readonly struct Id16
 
     public Id16(Id id, UInt16 type)
     {
-        if (type > 4095) throw new ArgumentOutOfRangeException(nameof(type), "Value cannot be greater than 4095");
+        if (type > 4095) throw new ArgumentOutOfRangeException(nameof(type), "The type value cannot be greater than 4095");
 
         _id = id;
         _type = type;

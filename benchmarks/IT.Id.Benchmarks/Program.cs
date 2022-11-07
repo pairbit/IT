@@ -5,9 +5,12 @@ var low = random.Next();
 
 Console.WriteLine($"{high} - {low}");
 
-int sizeId = System.Runtime.InteropServices.Marshal.SizeOf<Id>(Id.New());
+Console.WriteLine($"SizeOf Id - {System.Runtime.InteropServices.Marshal.SizeOf<Id>()} bytes");
+Console.WriteLine($"SizeOf Id8 - {System.Runtime.InteropServices.Marshal.SizeOf<Id8>()} bytes");
+Console.WriteLine($"SizeOf Id16 - {System.Runtime.InteropServices.Marshal.SizeOf<Id16>()} bytes");
+Console.WriteLine($"SizeOf Id8i - {System.Runtime.InteropServices.Marshal.SizeOf<Id8i>()} bytes");
 
-Console.WriteLine($"SizeOf Id - {sizeId} bytes");
+var id8i = new Id8i(Id.New(), Id8i.MaxType, Id8i.MaxIndex-215);
 
 var idb = new IT.Id.Benchmarks.IdBenchmark();
 
