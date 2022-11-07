@@ -10,7 +10,23 @@ Console.WriteLine($"SizeOf Id8 - {System.Runtime.InteropServices.Marshal.SizeOf<
 Console.WriteLine($"SizeOf Id16 - {System.Runtime.InteropServices.Marshal.SizeOf<Id16>()} bytes");
 Console.WriteLine($"SizeOf Id8i - {System.Runtime.InteropServices.Marshal.SizeOf<Id8i>()} bytes");
 
-var id8i = new Id8i(Id.New(), Id8i.MaxType, Id8i.MaxIndex-215);
+var id = Id.Parse("62A84F674031E78D474FE23F");
+byte type8 = 60;
+
+var id8 = new Id8(id, type8);
+if (!id8.Id.Equals(id) || id8.Type != type8)
+    throw new InvalidOperationException();
+
+var index = Id8i.MaxIndex - 215;
+var id8i = new Id8i(id, type8, index);
+if (!id8i.Id.Equals(id) || id8i.Type != type8 || id8i.Index != index)
+    throw new InvalidOperationException();
+
+ushort type16 = (64 * 64) - 10;
+
+var id16 = new Id16(id, type16);
+if (!id16.Id.Equals(id) || id16.Type != type16)
+    throw new InvalidOperationException();
 
 var idb = new IT.Id.Benchmarks.IdBenchmark();
 
@@ -40,7 +56,7 @@ if (!id1.Equals(id2) || !id1.Equals(id3) || !id1.Equals(id4) ||
 
 Console.WriteLine("Ok");
 
-var id = Id.Parse("62A84F674031E78D474FE23F");
+
 var idBytes = id.ToByteArray();
 
 //var lengths = new List<Int32>();

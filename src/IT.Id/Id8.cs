@@ -1,11 +1,17 @@
-﻿namespace System;
+﻿using System.Runtime.InteropServices;
+
+namespace System;
 
 /// <summary>
 /// 13 bytes
 /// </summary>
+[StructLayout(LayoutKind.Explicit, Size = 13)]
 public readonly struct Id8
 {
+    [FieldOffset(0)]
     private readonly Id _id;
+
+    [FieldOffset(12)]
     private readonly Byte _type;
 
     public static readonly Byte MinType = 0;
@@ -18,7 +24,7 @@ public readonly struct Id8
 
     public Byte Type => _type;
 
-    public Id8(Id id, Byte type) 
+    public Id8(Id id, Byte type)
     {
         if (type > 63) throw new ArgumentOutOfRangeException(nameof(type), "The type value cannot be greater than 63");
 

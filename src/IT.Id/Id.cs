@@ -1,12 +1,14 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading;
 
 namespace System;
 
 [Serializable]
+[StructLayout(LayoutKind.Explicit, Size = 12)]
 [DebuggerDisplay("{ToString(),nq}")]
 public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 #if NET6_0
@@ -22,8 +24,13 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     public static readonly Id MinValue = new(0, 0, 0);
     public static readonly Id MaxValue = new(-1, -1, -1);
 
+    [FieldOffset(0)]
     internal readonly Int32 _timestamp;
+
+    [FieldOffset(4)]
     internal readonly Int32 _b;
+
+    [FieldOffset(8)]
     internal readonly Int32 _c;
 
     #region Ctors
