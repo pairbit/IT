@@ -1,7 +1,7 @@
 ﻿namespace System;
 
 /// <summary>
-/// 16 bytes
+/// 16 bytes and from 19 to 22 chars
 /// </summary>
 public readonly struct Id6i
 {
@@ -16,15 +16,18 @@ public readonly struct Id6i
     public static readonly Id6i Min = new(Id.Min, Id6.MinValue, MinIndex);
     public static readonly Id6i Max = new(Id.Max, Id6.MaxValue, MaxIndex);
 
+    /// <summary>
+    /// 12 bytes and 16 chars
+    /// </summary>
     public Id Id => _id;
 
     /// <summary>
-    /// 6 bits
+    /// 6 bits and 1 char
     /// </summary>
     public Byte Value => _value;
 
     /// <summary>
-    /// 3 bytes
+    /// 3 bytes and from 1 to 4 chars
     /// </summary>
     public Int32 Index => (_index1 << 8) + _index2;
 

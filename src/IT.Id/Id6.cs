@@ -3,7 +3,7 @@
 namespace System;
 
 /// <summary>
-/// 13 bytes
+/// 13 bytes and 17 chars
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 13)]
 public readonly struct Id6
@@ -20,10 +20,13 @@ public readonly struct Id6
     public static readonly Id6 Min = new(Id.Min, MinValue);
     public static readonly Id6 Max = new(Id.Max, MaxValue);
 
+    /// <summary>
+    /// 12 bytes and 16 chars
+    /// </summary>
     public Id Id => _id;
 
     /// <summary>
-    /// 6 bits
+    /// 6 bits and 1 char
     /// </summary>
     public Byte Value => _value;
 

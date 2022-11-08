@@ -3,7 +3,7 @@
 namespace System;
 
 /// <summary>
-/// 16 bytes
+/// 16 bytes and from 20 to 22 chars
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 16)]
 public readonly struct Id12i
@@ -23,15 +23,18 @@ public readonly struct Id12i
     public static readonly Id12i Min = new(Id.Min, Id12.MinValue, MinIndex);
     public static readonly Id12i Max = new(Id.Max, Id12.MaxValue, MaxIndex);
 
+    /// <summary>
+    /// 12 bytes and 16 chars
+    /// </summary>
     public Id Id => _id;
 
     /// <summary>
-    /// 12 bits
+    /// 12 bits and 2 chars
     /// </summary>
     public UInt16 Value => _value;
 
     /// <summary>
-    /// 2 bytes
+    /// 2 bytes and from 1 to 3 chars
     /// </summary>
     public Int32 Index => _index;
 
