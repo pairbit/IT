@@ -142,8 +142,22 @@ for (int i = 0; i < 12; i++)
 {
     idBytes[i] = 0;
     id = new Id(idBytes);
-    var id58 = id.ToString("58");
-    Console.WriteLine($"{i,2} -> {id.Created} -> {id58,17} -> {id58.Length}");
+
+    var id58 = $"{id:58}";
+
+    var id58o = SimpleBase.Base58.Bitcoin.Encode(idBytes);
+
+    if (!id.ToString("58").Equals(id58)) throw new InvalidOperationException();
+
+    if (!id58.EndsWith(id58o)) throw new InvalidOperationException();
+
+    if (!id.Equals(Id.Parse(id58o, Idf.Base58))) throw new InvalidOperationException();
+
+    if (!id.Equals(Id.Parse(id58))) throw new InvalidOperationException();
+
+    //Console.WriteLine($"{i,2} -> {id.Created,19} -> {id,17:58}");
+
+    Console.WriteLine($"{i,2} -> {id.Created,19} -> {id58,17} -> {id58o,17} -> {id58o.Length}");
 }
 
 /*
@@ -167,13 +181,13 @@ f2 = id.ToString("58");
 f3 = $"{id:58}";
 f4 = SimpleBase.Base58.Bitcoin.Encode(id.ToByteArray());
 
-if (!f1.Equals(f2) || !f1.Equals(f3) || !f1.Equals(f4))
+if (!f1.Equals(f2) || !f1.Equals(f3) || !f1.EndsWith(f4))
     throw new InvalidOperationException();
 
 if (!id.Equals(Id.Parse(f2, Idf.Base58)))
     throw new InvalidOperationException();
 
-if (f1.Length != 16) throw new InvalidOperationException();
+//if (f1.Length != 16) throw new InvalidOperationException();
 
 Console.WriteLine("Ok");
 

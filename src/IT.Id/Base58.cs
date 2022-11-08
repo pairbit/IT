@@ -5,7 +5,7 @@ internal static class Base58
     private const int AlphabetLength = 58;
     private const int AlphabetMaxLength = 127;
     private const int reductionFactor = 733; // https://github.com/bitcoin/bitcoin/blob/master/src/base58.cpp#L48
-    private const string Zero = "111111111111";
+    private const string Zero = "11111111111111111";
     private const Char ZeroChar = '1';
 
     private static readonly String _alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -29,31 +29,15 @@ internal static class Base58
         _lookupTable = lookupTable;
     }
 
-    public static int GetSafeByteCountForDecoding(ReadOnlySpan<char> text)
-    {
-        int textLen = text.Length;
-        return GetSafeByteCountForDecoding(textLen, getPrefixCount(text, textLen, _zeroChar));
-    }
-
     public static int GetSafeByteCountForDecoding(int textLen, int numZeroes)
     {
         //Debug.Assert(textLen >= numZeroes, "Number of zeroes cannot be longer than text length");
         return numZeroes + ((textLen - numZeroes + 1) * reductionFactor / 1000) + 1;
     }
 
-    public static int GetSafeCharCountForEncoding(ReadOnlySpan<byte> bytes)
-    {
-        int bytesLen = bytes.Length;
-        int numZeroes = getZeroCount(bytes, bytesLen);
-
-        return getSafeCharCountForEncoding(bytesLen, numZeroes);
-    }
-
     public static unsafe string Encode(ReadOnlySpan<byte> bytes)
     {
-        int bytesLen = 12;
-
-        int numZeroes = getZeroCount(bytes, bytesLen);
+        int numZeroes = getZeroCount(bytes, 12);
         if (numZeroes == 12) return Zero;
         /*
          0,1 -> 17
@@ -64,7 +48,7 @@ internal static class Base58
          12 -> 12
          */
         //int outputLen = numZeroes + ((12 - numZeroes) * 138 / 100) + 1;
-        string output = new string('\0', 17);
+        var output = new string('\0', 17);
 
         // 29.70µs (64.9x slower)   | 31.63µs (40.8x slower)
         // 30.93µs (first tryencode impl)
@@ -73,40 +57,15 @@ internal static class Base58
         fixed (byte* inputPtr = bytes)
         fixed (char* outputPtr = output)
         {
-            return internalEncode(inputPtr, outputPtr, numZeroes, out int length)
-                ? output.Substring(0, length)
-                : throw new InvalidOperationException("Output buffer with insufficient size generated");
-        }
-    }
+            if (!internalEncode(inputPtr, outputPtr, numZeroes, out int length))
+                throw new InvalidOperationException("Output buffer with insufficient size generated");
 
-    public static unsafe Span<byte> Decode(ReadOnlySpan<char> text)
-    {
-        int textLen = text.Length;
-        if (textLen == 0)
-        {
-            return Array.Empty<byte>();
-        }
-
-        char zeroChar = _zeroChar;
-        int numZeroes = getPrefixCount(text, textLen, zeroChar);
-        int outputLen = GetSafeByteCountForDecoding(textLen, numZeroes);
-        byte[] output = new byte[outputLen];
-        fixed (char* inputPtr = text)
-        fixed (byte* outputPtr = output)
-        {
-#pragma warning disable IDE0046 // Convert to conditional expression - prefer clarity
-            if (!internalDecode(
-                inputPtr,
-                textLen,
-                outputPtr,
-                outputLen,
-                numZeroes))
+            if (length != 17)
             {
-                throw new InvalidOperationException("Output buffer was too small while decoding Base58");
+                output = new string(ZeroChar, 17 - length) + output.Substring(0, length);
             }
 
-            return output.AsSpan().Slice(0, 12);
-#pragma warning restore IDE0046 // Convert to conditional expression
+            return output;
         }
     }
 
@@ -128,7 +87,11 @@ internal static class Base58
             output[10] = ZeroChar;
             output[11] = ZeroChar;
             output[12] = ZeroChar;
-            numCharsWritten = 12;
+            output[13] = ZeroChar;
+            output[14] = ZeroChar;
+            output[15] = ZeroChar;
+            output[16] = ZeroChar;
+            numCharsWritten = 17;
             return true;
         }
 
@@ -137,26 +100,38 @@ internal static class Base58
         fixed (byte* inputPtr = input)
         fixed (char* bufferPtr = buffer)
         {
-            var result = internalEncode(inputPtr, bufferPtr, numZeroes, out _);
+            if (!internalEncode(inputPtr, bufferPtr, numZeroes, out int length))
+            {
+                numCharsWritten = 0;
+                return false;
+            }
+
+            if (length != 17)
+            {
+                buffer = buffer.Slice(0, length);
+
+                length = 17 - length;
+
+                for (int i = 0; i < length; i++)
+                {
+                    output[i] = ZeroChar;
+                }
+
+                output = output.Slice(length);
+            }
 
             buffer.CopyTo(output);
 
             numCharsWritten = 17;
 
-            return result;
+            return true;
         }
     }
 
     /// <inheritdoc/>
-    public static unsafe bool Decode(ReadOnlySpan<char> input, Span<byte> output)
+    public static unsafe bool Decode(ReadOnlySpan<char> input, Span<byte> output, out int numBytesWritten)
     {
-        int inputLen = input.Length;
-        if (inputLen == 0)
-        {
-            return true;
-        }
-
-        int zeroCount = getPrefixCount(input, inputLen, _zeroChar);
+        int zeroCount = getPrefixCount(input, input.Length, _zeroChar);
         fixed (char* inputPtr = input)
         fixed (byte* outputPtr = output)
         {
@@ -165,16 +140,17 @@ internal static class Base58
                 input.Length,
                 outputPtr,
                 output.Length,
-                zeroCount);
+                zeroCount, out numBytesWritten);
         }
     }
 
     private static unsafe bool internalDecode(
-        char* inputPtr,
-        int inputLen,
-        byte* outputPtr,
-        int outputLen,
-        int numZeroes)
+            char* inputPtr,
+            int inputLen,
+            byte* outputPtr,
+            int outputLen,
+            int numZeroes,
+            out int numBytesWritten)
     {
         char* pInputEnd = inputPtr + inputLen;
         char* pInput = inputPtr + numZeroes;
@@ -182,6 +158,7 @@ internal static class Base58
         {
             if (numZeroes > outputLen)
             {
+                numBytesWritten = 0;
                 return false;
             }
 
@@ -191,6 +168,7 @@ internal static class Base58
                 *pOutput++ = 0;
             }
 
+            numBytesWritten = numZeroes;
             return true;
         }
 
@@ -222,7 +200,7 @@ internal static class Base58
         }
 
         int startIndex = (int)(pMinOutput - numZeroes - outputPtr);
-        var numBytesWritten = outputLen - startIndex;
+        numBytesWritten = outputLen - startIndex;
         Buffer.MemoryCopy(outputPtr + startIndex, outputPtr, numBytesWritten, numBytesWritten);
         return true;
     }
@@ -324,12 +302,5 @@ internal static class Base58
         }
 
         return numZeroes;
-    }
-
-    private static int getSafeCharCountForEncoding(int bytesLen, int numZeroes)
-    {
-        const int growthPercentage = 138;
-
-        return numZeroes + ((bytesLen - numZeroes) * growthPercentage / 100) + 1;
     }
 }

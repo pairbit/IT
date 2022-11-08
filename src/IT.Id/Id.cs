@@ -170,11 +170,8 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     public static Id Parse(ReadOnlySpan<Char> value) => value.Length switch
     {
-        12 => ParseBase58(value),
-        13 => ParseBase58(value),
-        14 => ParseBase58(value),
-        15 => ParseBase85(value),//conflict with Base58
-        16 => ParseBase64(value),//conflict with Base58
+        15 => ParseBase85(value),
+        16 => ParseBase64(value),
         17 => ParseBase58(value),
         18 => ParsePath2(value),
         19 => ParsePath3(value),
@@ -920,9 +917,11 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         var len = value.Length;
         if (len < 12 || len > 17) throw new ArgumentOutOfRangeException(nameof(value), len, "String must be 12 to 17 characters long");
 
-        Span<Byte> bytes = stackalloc Byte[12];
+        Span<Byte> bytes = stackalloc Byte[18];
 
-        Base58.Decode(value, bytes);
+        Base58.Decode(value, bytes, out var written);
+
+        bytes = bytes.Slice(written - 12, 12);
 
         FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
 
