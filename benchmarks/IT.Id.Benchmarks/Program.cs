@@ -147,7 +147,7 @@ for (int i = 0; i < 12; i++)
 
     var id58o = SimpleBase.Base58.Bitcoin.Encode(idBytes);
 
-    if (!id.ToString("58").Equals(id58)) throw new InvalidOperationException();
+    if (id58.Length != 17 || !id.ToString("58").Equals(id58)) throw new InvalidOperationException();
 
     if (!id58.EndsWith(id58o)) throw new InvalidOperationException();
 
@@ -187,7 +187,7 @@ if (!f1.Equals(f2) || !f1.Equals(f3) || !f1.EndsWith(f4))
 if (!id.Equals(Id.Parse(f2, Idf.Base58)))
     throw new InvalidOperationException();
 
-//if (f1.Length != 16) throw new InvalidOperationException();
+if (f1.Length != 17) throw new InvalidOperationException();
 
 Console.WriteLine("Ok");
 
