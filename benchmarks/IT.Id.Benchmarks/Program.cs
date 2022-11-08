@@ -6,26 +6,27 @@ var low = random.Next();
 Console.WriteLine($"{high} - {low}");
 
 Console.WriteLine($"SizeOf Id - {System.Runtime.InteropServices.Marshal.SizeOf<Id>()} bytes");
-Console.WriteLine($"SizeOf Id8 - {System.Runtime.InteropServices.Marshal.SizeOf<Id8>()} bytes");
-Console.WriteLine($"SizeOf Id16 - {System.Runtime.InteropServices.Marshal.SizeOf<Id16>()} bytes");
-Console.WriteLine($"SizeOf Id8i - {System.Runtime.InteropServices.Marshal.SizeOf<Id8i>()} bytes");
+Console.WriteLine($"SizeOf Id8 - {System.Runtime.InteropServices.Marshal.SizeOf<Id6>()} bytes");
+Console.WriteLine($"SizeOf Id16 - {System.Runtime.InteropServices.Marshal.SizeOf<Id12>()} bytes");
+Console.WriteLine($"SizeOf Id8i - {System.Runtime.InteropServices.Marshal.SizeOf<Id6i>()} bytes");
+Console.WriteLine($"SizeOf Id12i - {System.Runtime.InteropServices.Marshal.SizeOf<Id12i>()} bytes");
 
 var id = Id.Parse("62A84F674031E78D474FE23F");
-byte type8 = 60;
+byte value6 = 60;
 
-var id8 = new Id8(id, type8);
-if (!id8.Id.Equals(id) || id8.Type != type8)
+var id8 = new Id6(id, value6);
+if (!id8.Id.Equals(id) || id8.Value != value6)
     throw new InvalidOperationException();
 
-var index = Id8i.MaxIndex - 215;
-var id8i = new Id8i(id, type8, index);
-if (!id8i.Id.Equals(id) || id8i.Type != type8 || id8i.Index != index)
+var index = Id6i.MaxIndex - 215;
+var id8i = new Id6i(id, value6, index);
+if (!id8i.Id.Equals(id) || id8i.Value != value6 || id8i.Index != index)
     throw new InvalidOperationException();
 
-ushort type16 = (64 * 64) - 10;
+ushort value12 = (64 * 64) - 10;
 
-var id16 = new Id16(id, type16);
-if (!id16.Id.Equals(id) || id16.Type != type16)
+var id16 = new Id12(id, value12);
+if (!id16.Id.Equals(id) || id16.Value != value12)
     throw new InvalidOperationException();
 
 var idb = new IT.Id.Benchmarks.IdBenchmark();
@@ -159,7 +160,7 @@ for (int i = 0; i < 12; i++)
 10 -> 01.01.1970  0:00:00 ->     111111111112N -> 13
 11 -> 01.01.1970  0:00:00 ->      111111111111 -> 12
  */
-id = Id.MinValue;
+id = Id.Min;
 //id = Id.New(new DateTime(1998, 3, 5));
 f1 = id.ToString(Idf.Base58);
 f2 = id.ToString("58");

@@ -21,8 +21,8 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     private static readonly Int64 _random = CalculateRandomValue();
     private static Int32 _staticIncrement = new Random().Next();
     public static readonly Id Empty = default;
-    public static readonly Id MinValue = new(0, 0, 0);
-    public static readonly Id MaxValue = new(-1, -1, -1);
+    public static readonly Id Min = new(0, 0, 0);
+    public static readonly Id Max = new(-1, -1, -1);
 
     [FieldOffset(0)]
     internal readonly Int32 _timestamp;
