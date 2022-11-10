@@ -30,7 +30,7 @@ Console.WriteLine($"{id} = {process.Id} == {id.Pid}, machine = {id.Machine}");
 
 var pid = (short)process.Id;
 
-id = new Id(id.Timestamp, 23, pid, 0);
+if (!process.Id.Equals(Environment.ProcessId)) throw new InvalidOperationException();
 
 //byte value6 = 60;
 

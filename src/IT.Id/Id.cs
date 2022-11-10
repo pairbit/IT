@@ -1042,7 +1042,14 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     /// before throwing an exception requiring the try/catch at an even higher level that we don't necessarily control.
     /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static int GetCurrentProcessId() => Process.GetCurrentProcess().Id;
+    private static int GetCurrentProcessId()
+    {
+#if NET6_0_OR_GREATER
+        return Environment.ProcessId;
+#else
+        return Process.GetCurrentProcess().Id;
+#endif
+    }
 
     private static int GetMachineHash()
     {
