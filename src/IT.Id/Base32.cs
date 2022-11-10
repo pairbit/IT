@@ -36,7 +36,19 @@ internal static class Base32
     public static String Encode(ReadOnlySpan<byte> bytes)
     {
 #if NETSTANDARD2_0
-        throw new InvalidOperationException();
+        var result = new string((char)0, 20);
+
+        unsafe
+        {
+            fixed (byte* pInput = bytes)
+            fixed (char* pOutput = result)
+            fixed (char* pAlphabet = ALPHABET)
+            {
+                ToBase32GroupsUnsafe(pInput, pOutput, pAlphabet);
+            }
+        }
+
+        return result;
 #else
         unsafe
         {

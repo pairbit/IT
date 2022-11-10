@@ -140,6 +140,9 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     #region NewObjectId
 
+    /// <summary>
+    /// https://www.mongodb.com/docs/manual/reference/method/ObjectId/
+    /// </summary>
     public static Id NewObjectId()
     {
         // only use low order 3 bytes
@@ -347,11 +350,6 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
         if (format.SequenceEqual("58"))
         {
-            //if (!SimpleBase.Base58.Bitcoin.TryEncode(ToByteArray(), destination, out charsWritten))
-            //     throw new InvalidOperationException();
-
-            //var encoded = Base58.Encode(ToByteArray());
-
             return Base58.Encode(ToByteArray(), destination, out charsWritten);
         }
 
