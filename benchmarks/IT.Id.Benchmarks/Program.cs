@@ -28,8 +28,6 @@ var process = Process.GetCurrentProcess();
 
 Console.WriteLine($"{id} = {process.Id} == {id.Pid}, machine = {id.Machine}");
 
-Console.ReadLine();
-
 var pid = (short)process.Id;
 
 id = new Id(id.Timestamp, 23, pid, 0);

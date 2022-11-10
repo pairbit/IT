@@ -33,9 +33,26 @@ internal static class Base32
         _lookupValues = table;
     }
 
+//    public static String Encode6(ReadOnlySpan<byte> bytes)
+//    {
+//#if NETSTANDARD2_0
+//        throw new NotImplementedException();
+//#else
+//        unsafe
+//        {
+//            fixed (byte* dataPtr = bytes)
+//            {
+//                return String.Create(20, (IntPtr)dataPtr, (encoded, state) =>
+//                {
+//                    Encode(new ReadOnlySpan<Byte>((Byte*)state, 12), encoded);
+//                });
+//            }
+//        }
+//#endif
+//    }
+
     public static String Encode(ReadOnlySpan<byte> bytes)
     {
-#if NETSTANDARD2_0
         var result = new string((char)0, 20);
 
         unsafe
@@ -49,18 +66,6 @@ internal static class Base32
         }
 
         return result;
-#else
-        unsafe
-        {
-            fixed (byte* dataPtr = bytes)
-            {
-                return String.Create(20, (IntPtr)dataPtr, (encoded, state) =>
-                {
-                    Encode(new ReadOnlySpan<Byte>((Byte*)state, 12), encoded);
-                });
-            }
-        }
-#endif
     }
 
     public static unsafe void Encode(ReadOnlySpan<byte> input, Span<char> output)
