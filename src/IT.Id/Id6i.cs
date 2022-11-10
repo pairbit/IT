@@ -3,7 +3,7 @@
 /// <summary>
 /// 16 bytes and from 19 to 22 chars
 /// </summary>
-public readonly struct Id6i
+internal readonly struct Id6i
 {
     private readonly Id _id;
     private readonly UInt16 _index1;

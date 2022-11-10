@@ -14,13 +14,13 @@ internal static unsafe class XXH64
 
     public static unsafe ulong DigestOf(void* bytes, int length) => XXH64_hash(bytes, length, 0);
 
-    public static unsafe ulong DigestOf(byte[] bytes, int offset, int length)
+    public static unsafe ulong DigestOf(byte[] bytes)
     {
-        if (bytes == null || offset < 0 || length < 0 || offset + length > bytes.Length)
+        if (bytes == null)
             throw new ArgumentException("Invalid buffer boundaries");
 
         fixed (byte* bytes0 = bytes)
-            return DigestOf(bytes0 + offset, length);
+            return DigestOf(bytes0, bytes.Length);
     }
 
     #endregion

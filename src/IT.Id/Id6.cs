@@ -6,7 +6,7 @@ namespace System;
 /// 13 bytes and 17 chars
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 13)]
-public readonly struct Id6
+internal readonly struct Id6
 {
     [FieldOffset(0)]
     private readonly Id _id;

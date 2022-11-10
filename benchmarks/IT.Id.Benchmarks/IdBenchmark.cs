@@ -24,7 +24,7 @@ public class IdBenchmark
     public IdBenchmark()
     {
         //_id = System.Id.Parse("Y14-iRgzgKZclXbw");
-        _id = System.Id.New();
+        _id = System.Id.NewObjectId();
         _idHexUpper = Id_Encode_HexUpper();
         _idHexLower = Id_Encode_HexLower();
         _idBase32 = Id_Encode_Base32();

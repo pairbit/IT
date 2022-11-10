@@ -1,33 +1,55 @@
 ﻿
-var random = new Random(123);
-var high = random.Next();
-var low = random.Next();
+using System.Diagnostics;
 
-Console.WriteLine($"{high} - {low}");
+//var random = new Random(123);
+//var high = random.Next();
+//var low = random.Next();
 
-Console.WriteLine($"SizeOf Id - {System.Runtime.InteropServices.Marshal.SizeOf<Id>()} bytes");
-Console.WriteLine($"SizeOf Id8 - {System.Runtime.InteropServices.Marshal.SizeOf<Id6>()} bytes");
-Console.WriteLine($"SizeOf Id16 - {System.Runtime.InteropServices.Marshal.SizeOf<Id12>()} bytes");
-Console.WriteLine($"SizeOf Id8i - {System.Runtime.InteropServices.Marshal.SizeOf<Id6i>()} bytes");
-Console.WriteLine($"SizeOf Id12i - {System.Runtime.InteropServices.Marshal.SizeOf<Id12i>()} bytes");
+//Console.WriteLine($"{high} - {low}");
+
+//Console.WriteLine($"SizeOf Id - {System.Runtime.InteropServices.Marshal.SizeOf<Id>()} bytes");
+//Console.WriteLine($"SizeOf Id8 - {System.Runtime.InteropServices.Marshal.SizeOf<Id6>()} bytes");
+//Console.WriteLine($"SizeOf Id16 - {System.Runtime.InteropServices.Marshal.SizeOf<Id12>()} bytes");
+//Console.WriteLine($"SizeOf Id8i - {System.Runtime.InteropServices.Marshal.SizeOf<Id6i>()} bytes");
+//Console.WriteLine($"SizeOf Id12i - {System.Runtime.InteropServices.Marshal.SizeOf<Id12i>()} bytes");
+
+//Console.WriteLine($"{Id.GetMachineHash()} - {Id.GetMachineXXHash()}");
 
 var id = Id.Parse("62A84F674031E78D474FE23F");
-byte value6 = 60;
 
-var id8 = new Id6(id, value6);
-if (!id8.Id.Equals(id) || id8.Value != value6)
-    throw new InvalidOperationException();
+id = Id.New();
 
-var index = Id6i.MaxIndex - 215;
-var id8i = new Id6i(id, value6, index);
-if (!id8i.Id.Equals(id) || id8i.Value != value6 || id8i.Index != index)
-    throw new InvalidOperationException();
+var idCopy2 = new Id(id.Timestamp, id.B, id.C);
+var idCopy3 = new Id(id.Timestamp, id.Machine, id.Pid, id.Increment);
 
-ushort value12 = (64 * 64) - 10;
+if (!id.Equals(idCopy2) || !id.Equals(idCopy3)) throw new InvalidOperationException();
 
-var id16 = new Id12(id, value12);
-if (!id16.Id.Equals(id) || id16.Value != value12)
-    throw new InvalidOperationException();
+var process = Process.GetCurrentProcess();
+
+Console.WriteLine($"{id} = {process.Id} == {id.Pid}, machine = {id.Machine}");
+
+Console.ReadLine();
+
+var pid = (short)process.Id;
+
+id = new Id(id.Timestamp, 23, pid, 0);
+
+//byte value6 = 60;
+
+//var id8 = new Id6(id, value6);
+//if (!id8.Id.Equals(id) || id8.Value != value6)
+//    throw new InvalidOperationException();
+
+//var index = Id6i.MaxIndex - 215;
+//var id8i = new Id6i(id, value6, index);
+//if (!id8i.Id.Equals(id) || id8i.Value != value6 || id8i.Index != index)
+//    throw new InvalidOperationException();
+
+//ushort value12 = (64 * 64) - 10;
+
+//var id16 = new Id12(id, value12);
+//if (!id16.Id.Equals(id) || id16.Value != value12)
+//    throw new InvalidOperationException();
 
 var idb = new IT.Id.Benchmarks.IdBenchmark();
 
@@ -191,4 +213,4 @@ if (f1.Length != 17) throw new InvalidOperationException();
 
 Console.WriteLine("Ok");
 
-BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));
+//BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));

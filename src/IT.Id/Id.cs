@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Text;
 using System.Threading;
 
 namespace System;
@@ -18,6 +19,8 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     private static readonly DateTime _unixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     private static readonly Int64 _unixEpochTicks = _unixEpoch.Ticks;
 
+    private static readonly Int16 _pid = GetPid();
+    private static readonly Int32 _machinePid = (GetMachineXXHash() << 8) | ((_pid >> 8) & 0xff);
     private static readonly Int64 _random = CalculateRandomValue();
     private static Int32 _staticIncrement = new Random().Next();
     public static readonly Id Empty = default;
@@ -44,26 +47,21 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         FromByteArray(bytes, 0, out _timestamp, out _b, out _c);
     }
 
-    //public Id(Byte[] bytes, Int32 index)
-    //{
-    //    FromByteArray(bytes, index, out _timestamp, out _b, out _c);
-    //}
+    public Id(DateTime timestamp, Int32 machine, Int16 pid, Int32 increment)
+        : this(GetTimestampFromDateTime(timestamp), machine, pid, increment)
+    {
+    }
 
-    //public Id(DateTime timestamp, Int32 machine, Int16 pid, Int32 increment)
-    //    : this(GetTimestampFromDateTime(timestamp), machine, pid, increment)
-    //{
-    //}
+    public Id(Int32 timestamp, Int32 machine, Int16 pid, Int32 increment)
+    {
+        if ((machine & 0xff000000) != 0) throw new ArgumentOutOfRangeException(nameof(machine), "The machine value must be between 0 and 16777215 (it must fit in 3 bytes).");
 
-    //public Id(Int32 timestamp, Int32 machine, Int16 pid, Int32 increment)
-    //{
-    //    if ((machine & 0xff000000) != 0) throw new ArgumentOutOfRangeException(nameof(machine), "The machine value must be between 0 and 16777215 (it must fit in 3 bytes).");
+        if ((increment & 0xff000000) != 0) throw new ArgumentOutOfRangeException(nameof(increment), "The increment value must be between 0 and 16777215 (it must fit in 3 bytes).");
 
-    //    if ((increment & 0xff000000) != 0) throw new ArgumentOutOfRangeException(nameof(increment), "The increment value must be between 0 and 16777215 (it must fit in 3 bytes).");
-
-    //    _timestamp = timestamp;
-    //    _b = (machine << 8) | (((int)pid >> 8) & 0xff);
-    //    _c = ((int)pid << 24) | increment;
-    //}
+        _timestamp = timestamp;
+        _b = (machine << 8) | ((pid >> 8) & 0xff);
+        _c = (pid << 24) | increment;
+    }
 
     public Id(Int32 timestamp, Int32 b, Int32 c)
     {
@@ -82,13 +80,13 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     public Int32 C => _c;
 
-    //public Int32 Machine => (_b >> 8) & 0xffffff;
+    public Int32 Machine => (_b >> 8) & 0xffffff;
 
-    //public Int16 Pid => (short)(((_b << 8) & 0xff00) | ((_c >> 24) & 0x00ff));
+    public Int16 Pid => (short)(((_b << 8) & 0xff00) | ((_c >> 24) & 0x00ff));
 
-    //public Int32 Increment => _c & 0xffffff;
+    public Int32 Increment => _c & 0xffffff;
 
-    public DateTime Created => _unixEpoch.AddSeconds((uint)_timestamp);
+    public DateTimeOffset Created => _unixEpoch.AddSeconds((uint)_timestamp);
 
     #endregion Props
 
@@ -118,21 +116,12 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     public static Id New()
     {
-        //var ticks = ((ulong)(Interop.Sys.GetSystemTimeAsTicks() + UnixEpochTicks)) | KindUtc;
-
-        var totalSeconds = (double)(DateTime.UtcNow.Ticks - _unixEpochTicks) / TimeSpan.TicksPerSecond;
-
-        var timestamp = (int)(uint)(long)Math.Floor(totalSeconds);
-
         // only use low order 3 bytes
         int increment = Interlocked.Increment(ref _staticIncrement) & 0x00ffffff;
 
-        var random = _random;
+        var c = (_pid << 24) | increment;
 
-        var b = (int)(random >> 8); // first 4 bytes of random
-        var c = (int)(random << 24) | increment; // 5th byte of random and 3 byte increment
-
-        return new Id(timestamp, b, c);
+        return new Id(GetTimestamp(), _machinePid, c);
     }
 
     public static Id New(DateTime timestamp) => New(GetTimestampFromDateTime(timestamp));
@@ -141,10 +130,39 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     {
         // only use low order 3 bytes
         int increment = Interlocked.Increment(ref _staticIncrement) & 0x00ffffff;
-        return Create(timestamp, _random, increment);
+
+        var c = (_pid << 24) | increment;
+
+        return new Id(timestamp, _machinePid, c);
     }
 
     #endregion New
+
+    #region NewObjectId
+
+    public static Id NewObjectId()
+    {
+        // only use low order 3 bytes
+        int increment = Interlocked.Increment(ref _staticIncrement) & 0x00ffffff;
+
+        var random = _random;
+
+        var b = (int)(random >> 8); // first 4 bytes of random
+        var c = (int)(random << 24) | increment; // 5th byte of random and 3 byte increment
+
+        return new Id(GetTimestamp(), b, c);
+    }
+
+    public static Id NewObjectId(DateTime timestamp) => NewObjectId(GetTimestampFromDateTime(timestamp));
+
+    public static Id NewObjectId(Int32 timestamp)
+    {
+        // only use low order 3 bytes
+        int increment = Interlocked.Increment(ref _staticIncrement) & 0x00ffffff;
+        return Create(timestamp, _random, increment);
+    }
+
+    #endregion NewObjectId
 
     //public static Byte[] Pack(Int32 timestamp, Int32 machine, Int16 pid, Int32 increment)
     //{
@@ -367,17 +385,9 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
 #endif
 
-    public UInt32 Hash32()
-    {
-        var bytes = ToByteArray();
-        return XXH32.DigestOf(bytes, 0, bytes.Length);
-    }
+    public UInt32 Hash32() => XXH32.DigestOf(ToByteArray());
 
-    public UInt64 Hash64()
-    {
-        var bytes = ToByteArray();
-        return XXH64.DigestOf(bytes, 0, bytes.Length);
-    }
+    public UInt64 Hash64() => XXH64.DigestOf(ToByteArray());
 
     //public unsafe UInt64 Hash64_Fast()
     //{
@@ -1041,6 +1051,22 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         // use instead of Dns.HostName so it will work offline
         var machineName = Environment.MachineName;
         return 0x00ffffff & machineName.GetHashCode(); // use first 3 bytes of hash
+    }
+
+    private static int GetMachineXXHash()
+    {
+        var machineName = Environment.MachineName;
+        var bytes = Encoding.UTF8.GetBytes(machineName);
+        var hash = (int)XXH32.DigestOf(bytes);
+        return 0x00ffffff & hash; // use first 3 bytes of hash
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static Int32 GetTimestamp()
+    {
+        var totalSeconds = (double)(DateTime.UtcNow.Ticks - _unixEpochTicks) / TimeSpan.TicksPerSecond;
+
+        return (int)(uint)(long)Math.Floor(totalSeconds);
     }
 
     private static short GetPid()
