@@ -1,15 +1,22 @@
 ﻿using System;
 
-namespace IT.Id.Samples.Framework461
+namespace Framework461
 {
+    class MyClass
+    {
+        public Id Id { get; set; }
+
+        public Int32 Value { get; set; }
+    }
+
     internal class Program
     {
         static void Main(string[] args)
         {
-            var id = System.Id.New();
+            var id = Id.New();
 
-            var id2 = new System.Id(id.Timestamp, id.B, id.C);
-            var id3 = new System.Id(id.Timestamp, id.Machine, id.Pid, id.Increment);
+            var id2 = new Id(id.Timestamp, id.B, id.C);
+            var id3 = new Id(id.Timestamp, id.Machine, id.Pid, id.Increment);
 
             if (!id.Equals(id2) || !id.Equals(id3)) throw new InvalidOperationException();
 
@@ -25,6 +32,20 @@ namespace IT.Id.Samples.Framework461
 
             Console.WriteLine($"{"XXH32",9} -> {id.Hash32()}");
             Console.WriteLine($"{"XXH64",9} -> {id.Hash64()}");
+
+            var ids = System.Text.Json.JsonSerializer.Serialize(id);
+
+            var idd = System.Text.Json.JsonSerializer.Deserialize<Id>(ids);
+
+            if (!idd.Equals(id)) throw new InvalidOperationException();
+
+            var obj = new MyClass { Id = id, Value = 123 };
+
+            var objs = System.Text.Json.JsonSerializer.Serialize(obj);
+
+            obj = System.Text.Json.JsonSerializer.Deserialize<MyClass>(objs);
+
+            if (obj == null || !obj.Id.Equals(id)) throw new InvalidOperationException();
         }
     }
 }
