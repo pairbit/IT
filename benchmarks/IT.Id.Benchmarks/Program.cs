@@ -21,7 +21,8 @@ var id = Id.Parse("62A84F674031E78D474FE23F");
 #region Json
 
 var serializerOptions = new JsonSerializerOptions();
-serializerOptions.Converters.Add(new IdJsonConverter { Format = Idf.Hex });
+serializerOptions.Converters.Add(new IdJsonConverter { Format = Idf.Base64 });
+serializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
 
 var ids = JsonSerializer.Serialize(id, serializerOptions);
 
