@@ -16,12 +16,13 @@ using System.Text.Json.Serialization;
 
 //Console.WriteLine($"{Id.GetMachineHash()} - {Id.GetMachineXXHash()}");
 
-var id = Id.Parse("62A84F674031E78D474FE23F");
+//var id = Id.Parse("62A84F674031E78D474FE23F");
+var id = Id.New();
 
 #region Json
 
 var serializerOptions = new JsonSerializerOptions();
-serializerOptions.Converters.Add(new IdJsonConverter { Format = Idf.Base64 });
+serializerOptions.Converters.Add(new IdJsonConverter { Format = Idf.Base85 });
 serializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
 
 var ids = JsonSerializer.Serialize(id, serializerOptions);
@@ -39,8 +40,6 @@ myobj = JsonSerializer.Deserialize<MyClass>(myobjser);
 if (myobj == null || !myobj.Id.Equals(id)) throw new InvalidOperationException();
 
 #endregion Json
-
-id = Id.New();
 
 var idCopy2 = new Id(id.Timestamp, id.B, id.C);
 var idCopy3 = new Id(id.Timestamp, id.Machine, id.Pid, id.Increment);
