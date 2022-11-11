@@ -1,5 +1,6 @@
-﻿
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 //var random = new Random(123);
 //var high = random.Next();
@@ -17,13 +18,26 @@ using System.Diagnostics;
 
 var id = Id.Parse("62A84F674031E78D474FE23F");
 
+#region Json
+
+var serializerOptions = new JsonSerializerOptions();
+serializerOptions.Converters.Add(new IdJsonConverter { Format = Idf.Hex });
+
+var ids = JsonSerializer.Serialize(id, serializerOptions);
+
+var idd = JsonSerializer.Deserialize<Id>(ids);
+
+if (!idd.Equals(id)) throw new InvalidOperationException();
+
 var myobj = new MyClass { Id = id, Value = 234 };
 
-var myobjser = System.Text.Json.JsonSerializer.Serialize(myobj);
+var myobjser = JsonSerializer.Serialize(myobj, serializerOptions);
 
-myobj = System.Text.Json.JsonSerializer.Deserialize<MyClass>(myobjser);
+myobj = JsonSerializer.Deserialize<MyClass>(myobjser);
 
 if (myobj == null || !myobj.Id.Equals(id)) throw new InvalidOperationException();
+
+#endregion Json
 
 id = Id.New();
 
@@ -223,6 +237,7 @@ Console.WriteLine("Ok");
 
 class MyClass
 {
+    //[JsonConverter(typeof(DateTimeOffsetJsonConverter))]
     public Id Id { get; set; }
 
     public Int32 Value { get; set; }

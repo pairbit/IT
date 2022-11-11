@@ -9,8 +9,14 @@ internal static class Hex
     private static readonly uint[] _lowerLookup32Unsafe = CreateLookup32Unsafe("x2");
     private static readonly uint[] _upperLookup32Unsafe = CreateLookup32Unsafe("X2");
 
+    private static readonly ushort[] _lowerLookup16Unsafe = CreateLookup16Unsafe("x2");
+    private static readonly ushort[] _upperLookup16Unsafe = CreateLookup16Unsafe("X2");
+
     internal static readonly unsafe uint* _lowerLookup32UnsafeP = (uint*)GCHandle.Alloc(_lowerLookup32Unsafe, GCHandleType.Pinned).AddrOfPinnedObject();
     internal static readonly unsafe uint* _upperLookup32UnsafeP = (uint*)GCHandle.Alloc(_upperLookup32Unsafe, GCHandleType.Pinned).AddrOfPinnedObject();
+
+    internal static readonly unsafe ushort* _lowerLookup16UnsafeP = (ushort*)GCHandle.Alloc(_lowerLookup16Unsafe, GCHandleType.Pinned).AddrOfPinnedObject();
+    internal static readonly unsafe ushort* _upperLookup16UnsafeP = (ushort*)GCHandle.Alloc(_upperLookup16Unsafe, GCHandleType.Pinned).AddrOfPinnedObject();
 
     private static uint[] CreateLookup32Unsafe(string format)
     {
@@ -26,7 +32,37 @@ internal static class Hex
         return result;
     }
 
+    private static ushort[] CreateLookup16Unsafe(string format)
+    {
+        var result = new ushort[256];
+        for (int i = 0; i < 256; i++)
+        {
+            string s = i.ToString(format);
+            if (BitConverter.IsLittleEndian)
+                result[i] = (ushort)(s[0] + (s[1] << 8));
+            else
+                result[i] = (ushort)(s[1] + (s[0] << 8));
+        }
+        return result;
+    }
+
     public static void Decode(ReadOnlySpan<char> chars, Span<byte> bytes)
+    {
+        bytes[0] = (byte)((CharToHex[chars[0]] << 4) | CharToHex[chars[1]]);
+        bytes[1] = (byte)((CharToHex[chars[2]] << 4) | CharToHex[chars[3]]);
+        bytes[2] = (byte)((CharToHex[chars[4]] << 4) | CharToHex[chars[5]]);
+        bytes[3] = (byte)((CharToHex[chars[6]] << 4) | CharToHex[chars[7]]);
+        bytes[4] = (byte)((CharToHex[chars[8]] << 4) | CharToHex[chars[9]]);
+        bytes[5] = (byte)((CharToHex[chars[10]] << 4) | CharToHex[chars[11]]);
+        bytes[6] = (byte)((CharToHex[chars[12]] << 4) | CharToHex[chars[13]]);
+        bytes[7] = (byte)((CharToHex[chars[14]] << 4) | CharToHex[chars[15]]);
+        bytes[8] = (byte)((CharToHex[chars[16]] << 4) | CharToHex[chars[17]]);
+        bytes[9] = (byte)((CharToHex[chars[18]] << 4) | CharToHex[chars[19]]);
+        bytes[10] = (byte)((CharToHex[chars[20]] << 4) | CharToHex[chars[21]]);
+        bytes[11] = (byte)((CharToHex[chars[22]] << 4) | CharToHex[chars[23]]);
+    }
+
+    public static void Decode(ReadOnlySpan<byte> chars, Span<byte> bytes)
     {
         bytes[0] = (byte)((CharToHex[chars[0]] << 4) | CharToHex[chars[1]]);
         bytes[1] = (byte)((CharToHex[chars[2]] << 4) | CharToHex[chars[3]]);

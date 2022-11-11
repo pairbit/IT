@@ -191,6 +191,30 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     //    return bytes;
     //}
 
+    public static Int32 GetLength(Idf format) => format switch
+    {
+        Idf.Base85 => 15,
+        Idf.Base64 or Idf.Base64Url => 16,
+        Idf.Base58 => 17,
+        Idf.Path2 => 18,
+        Idf.Path3 => 19,
+        Idf.Base32 => 20,
+        Idf.Hex or Idf.HexUpper => 24,
+        _ => throw new NotImplementedException($"id format '{format}' not supported")
+    };
+
+    public static Idf? TryGetFormat(Int32 length) => length switch
+    {
+        15 => Idf.Base85,
+        16 => Idf.Base64,
+        17 => Idf.Base58,
+        18 => Idf.Path2,
+        19 => Idf.Path3,
+        20 => Idf.Base32,
+        24 => Idf.Hex,
+        _ => null
+    };
+
     /// <exception cref="ArgumentException"/>
     /// <exception cref="FormatException"/>
     public static Id Parse(ReadOnlySpan<Char> value) => value.Length switch
@@ -207,7 +231,17 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     /// <exception cref="ArgumentException"/>
     /// <exception cref="FormatException"/>
-    public static Id Parse(ReadOnlySpan<Byte> value) => ParseBase64(value);
+    public static Id Parse(ReadOnlySpan<Byte> value) => value.Length switch
+    {
+        //15 => ParseBase85(value),
+        16 => ParseBase64(value),
+        //17 => ParseBase58(value),
+        //18 => ParsePath2(value),
+        //19 => ParsePath3(value),
+        //20 => ParseBase32(value),
+        24 => ParseHex(value),
+        _ => throw new FormatException("The id must be between 15 and 20 or 24")
+    };
 
     /// <exception cref="ArgumentException"/>
     /// <exception cref="FormatException"/>
@@ -313,20 +347,67 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
     public Boolean TryFormat(Span<Byte> destination, out Int32 charsWritten, ReadOnlySpan<Char> format, IFormatProvider? provider)
     {
-        if (!format.IsEmpty || destination.Length < 16)
+        if (format.IsEmpty)
         {
-            charsWritten = 0;
-            return false;
+            return TryFormat(destination, out charsWritten, Idf.Base64Url, provider);
         }
 
-        ToBase64(destination, Base64.bytesUrl);
-        charsWritten = 16;
+        charsWritten = 0;
+        return false;
+    }
 
-        return true;
+    public Boolean TryFormat(Span<Byte> destination, out Int32 charsWritten, Idf format, IFormatProvider? provider)
+    {
+        var length = destination.Length;
+
+        if (length >= 24)
+        {
+            if (format == Idf.Hex)
+            {
+                charsWritten = 24;
+                unsafe
+                {
+                    ToHex(destination, Hex._lowerLookup16UnsafeP);
+                }
+                return true;
+            }
+
+            if (format == Idf.HexUpper)
+            {
+                charsWritten = 24;
+                unsafe
+                {
+                    ToHex(destination, Hex._upperLookup16UnsafeP);
+                }
+                return true;
+            }
+        }
+
+        if (length >= 16)
+        {
+            if (format == Idf.Base64)
+            {
+                ToBase64(destination, Base64.bytes);
+                charsWritten = 16;
+                return true;
+            }
+
+            if (format == Idf.Base64Url)
+            {
+                ToBase64(destination, Base64.bytesUrl);
+                charsWritten = 16;
+                return true;
+            }
+        }
+
+        charsWritten = 0;
+        return false;
     }
 
     public Boolean TryFormat(Span<Char> destination, out Int32 charsWritten, ReadOnlySpan<Char> format, IFormatProvider? provider)
     {
+        //check destination.Length
+
         if (format.IsEmpty || format.SequenceEqual("u64"))
         {
             charsWritten = 16;
@@ -868,6 +949,26 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         }
     }
 
+    private unsafe void ToHex(Span<Byte> destination, ushort* lookupP)
+    {
+        fixed (byte* resultP = destination)
+        {
+            ushort* resultP2 = (ushort*)resultP;
+            resultP2[0] = lookupP[(byte)(_timestamp >> 24)];
+            resultP2[1] = lookupP[(byte)(_timestamp >> 16)];
+            resultP2[2] = lookupP[(byte)(_timestamp >> 8)];
+            resultP2[3] = lookupP[(byte)(_timestamp)];
+            resultP2[4] = lookupP[(byte)(_b >> 24)];
+            resultP2[5] = lookupP[(byte)(_b >> 16)];
+            resultP2[6] = lookupP[(byte)(_b >> 8)];
+            resultP2[7] = lookupP[(byte)(_b)];
+            resultP2[8] = lookupP[(byte)(_c >> 24)];
+            resultP2[9] = lookupP[(byte)(_c >> 16)];
+            resultP2[10] = lookupP[(byte)(_c >> 8)];
+            resultP2[11] = lookupP[(byte)(_c)];
+        }
+    }
+
     private void ToPath2(Span<Char> destination)
     {
         var table = Base64.tableUrl;
@@ -1038,6 +1139,19 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     }
 
     private static Id ParseHex(ReadOnlySpan<Char> value)
+    {
+        if (value.Length != 24) throw new ArgumentException("String must be 24 characters long", nameof(value));
+
+        Span<Byte> bytes = stackalloc Byte[12];
+
+        Hex.Decode(value, bytes);
+
+        FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
+
+        return new Id(timestamp, b, c);
+    }
+
+    private static Id ParseHex(ReadOnlySpan<Byte> value)
     {
         if (value.Length != 24) throw new ArgumentException("String must be 24 characters long", nameof(value));
 

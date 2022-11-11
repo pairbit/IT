@@ -4,6 +4,10 @@ namespace System.Text.Json.Serialization;
 
 public class IdJsonConverter : JsonConverter<Id>
 {
+    private Idf _format = Idf.Base64Url;
+
+    public Idf Format { get => _format; set => _format = value; }
+
     public override Id Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.String) throw new JsonException("Expected string");
@@ -12,9 +16,11 @@ public class IdJsonConverter : JsonConverter<Id>
         {
             var seq = reader.ValueSequence;
 
-            if (seq.Length != 16) throw new JsonException("Id must be 16 bytes long");
+            var llen = seq.Length;
 
-            Span<byte> buffer = stackalloc byte[16];
+            if (llen < 15 || (llen != 24 && llen > 20)) throw new JsonException($"The id cannot be {llen} long. The id must be 24 long or between 15 and 20");
+
+            Span<byte> buffer = stackalloc byte[(Int32)llen];
 
             seq.CopyTo(buffer);
 
@@ -26,9 +32,10 @@ public class IdJsonConverter : JsonConverter<Id>
 
     public override void Write(Utf8JsonWriter writer, Id value, JsonSerializerOptions options)
     {
-        Span<byte> bytes = stackalloc byte[16];
+        Span<byte> bytes = stackalloc byte[Id.GetLength(_format)];
 
-        value.TryFormat(bytes, out _, default, null);
+        if (!value.TryFormat(bytes, out _, _format, null))
+            throw new JsonException($"The id does not support the format '{_format}'");
 
         writer.WriteStringValue(bytes);
     }
