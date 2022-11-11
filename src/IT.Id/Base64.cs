@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace System;
 
@@ -16,6 +17,8 @@ internal static class Base64
                                                  'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
                                                  't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7',
                                                  '8', '9', '-', '_', '=' };
+
+    internal static readonly Byte[] bytesUrl = Encoding.UTF8.GetBytes(tableUrl);
 
     public static void ParsePath3(ReadOnlySpan<char> utf16, Span<byte> bytes)
     {
@@ -149,6 +152,50 @@ internal static class Base64
         WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 9), i0);
     }
 
+    public static void Parse(ReadOnlySpan<byte> utf16, Span<byte> bytes)
+    {
+        ref byte srcBytes = ref MemoryMarshal.GetReference(utf16);
+        ref byte destBytes = ref MemoryMarshal.GetReference(bytes);
+        ref sbyte decodingMap = ref MemoryMarshal.GetReference(DecodingMap);
+
+        int r = Decode(ref Unsafe.Add(ref srcBytes, 0), ref decodingMap);
+
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 0), r);
+
+        r = Decode(ref Unsafe.Add(ref srcBytes, 4), ref decodingMap);
+
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 3), r);
+
+        r = Decode(ref Unsafe.Add(ref srcBytes, 8), ref decodingMap);
+
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 6), r);
+
+        int i0 = Unsafe.Add(ref srcBytes, 12);
+        int i1 = Unsafe.Add(ref srcBytes, 13);
+        int i2 = Unsafe.Add(ref srcBytes, 14);
+        int i3 = Unsafe.Add(ref srcBytes, 15);
+
+        if (((i0 | i1 | i2 | i3) & 0xffffff00) != 0)
+            throw new FormatException();
+
+        i0 = Unsafe.Add(ref decodingMap, i0);
+        i1 = Unsafe.Add(ref decodingMap, i1);
+        i2 = Unsafe.Add(ref decodingMap, i2);
+        i3 = Unsafe.Add(ref decodingMap, i3);
+
+        i0 <<= 18;
+        i1 <<= 12;
+        i2 <<= 6;
+
+        i0 |= i1;
+        i0 |= i3;
+        i0 |= i2;
+
+        if (i0 < 0) throw new FormatException();
+
+        WriteThreeLowOrderBytes(ref Unsafe.Add(ref destBytes, 9), i0);
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int Decode(ref char encodedChars, ref sbyte decodingMap)
     {
@@ -156,6 +203,35 @@ internal static class Base64
         int i1 = Unsafe.Add(ref encodedChars, 1);
         int i2 = Unsafe.Add(ref encodedChars, 2);
         int i3 = Unsafe.Add(ref encodedChars, 3);
+
+        if (((i0 | i1 | i2 | i3) & 0xffffff00) != 0)
+            return -1; // One or more chars falls outside the 00..ff range. This cannot be a valid Base64 character.
+
+        i0 = Unsafe.Add(ref decodingMap, i0);
+        i1 = Unsafe.Add(ref decodingMap, i1);
+        i2 = Unsafe.Add(ref decodingMap, i2);
+        i3 = Unsafe.Add(ref decodingMap, i3);
+
+        i0 <<= 18;
+        i1 <<= 12;
+        i2 <<= 6;
+
+        i0 |= i3;
+        i1 |= i2;
+        i0 |= i1;
+
+        if (i0 < 0) throw new FormatException();
+
+        return i0;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int Decode(ref byte encodedBytes, ref sbyte decodingMap)
+    {
+        int i0 = encodedBytes;
+        int i1 = Unsafe.Add(ref encodedBytes, 1);
+        int i2 = Unsafe.Add(ref encodedBytes, 2);
+        int i3 = Unsafe.Add(ref encodedBytes, 3);
 
         if (((i0 | i1 | i2 | i3) & 0xffffff00) != 0)
             return -1; // One or more chars falls outside the 00..ff range. This cannot be a valid Base64 character.

@@ -17,6 +17,14 @@ using System.Diagnostics;
 
 var id = Id.Parse("62A84F674031E78D474FE23F");
 
+var myobj = new MyClass { Id = id, Value = 234 };
+
+var myobjser = System.Text.Json.JsonSerializer.Serialize(myobj);
+
+myobj = System.Text.Json.JsonSerializer.Deserialize<MyClass>(myobjser);
+
+if (myobj == null || !myobj.Id.Equals(id)) throw new InvalidOperationException();
+
 id = Id.New();
 
 var idCopy2 = new Id(id.Timestamp, id.B, id.C);
@@ -212,3 +220,10 @@ if (f1.Length != 17) throw new InvalidOperationException();
 Console.WriteLine("Ok");
 
 //BenchmarkDotNet.Running.BenchmarkRunner.Run(typeof(IT.Id.Benchmarks.IdBenchmark));
+
+class MyClass
+{
+    public Id Id { get; set; }
+
+    public Int32 Value { get; set; }
+}

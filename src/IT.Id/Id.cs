@@ -11,11 +11,13 @@ namespace System;
 [Serializable]
 [StructLayout(LayoutKind.Explicit, Size = 12)]
 [DebuggerDisplay("{ToString(),nq}")]
+[Text.Json.Serialization.JsonConverter(typeof(Text.Json.Serialization.IdJsonConverter))]
 public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
-#if NET6_0
+#if NET6_0_OR_GREATER
 , ISpanFormattable
 #endif
 {
+    //DateTime.UnixEpoch
     private static readonly DateTime _unixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     private static readonly Int64 _unixEpochTicks = _unixEpoch.Ticks;
 
@@ -189,6 +191,8 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     //    return bytes;
     //}
 
+    /// <exception cref="ArgumentException"/>
+    /// <exception cref="FormatException"/>
     public static Id Parse(ReadOnlySpan<Char> value) => value.Length switch
     {
         15 => ParseBase85(value),
@@ -198,9 +202,15 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         19 => ParsePath3(value),
         20 => ParseBase32(value),
         24 => ParseHex(value),
-        _ => throw new FormatException()
+        _ => throw new FormatException("The id must be between 15 and 20 or 24")
     };
 
+    /// <exception cref="ArgumentException"/>
+    /// <exception cref="FormatException"/>
+    public static Id Parse(ReadOnlySpan<Byte> value) => ParseBase64(value);
+
+    /// <exception cref="ArgumentException"/>
+    /// <exception cref="FormatException"/>
     public static Id Parse(ReadOnlySpan<Char> value, Idf format) => format switch
     {
         Idf.Hex or Idf.HexUpper => ParseHex(value),
@@ -301,7 +311,19 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         _ => throw new FormatException($"The '{format}' format string is not supported."),
     };
 
-#if NET6_0
+    public Boolean TryFormat(Span<Byte> destination, out Int32 charsWritten, ReadOnlySpan<Char> format, IFormatProvider? provider)
+    {
+        if (!format.IsEmpty || destination.Length < 16)
+        {
+            charsWritten = 0;
+            return false;
+        }
+
+        ToBase64(destination, Base64.bytesUrl);
+        charsWritten = 16;
+
+        return true;
+    }
 
     public Boolean TryFormat(Span<Char> destination, out Int32 charsWritten, ReadOnlySpan<Char> format, IFormatProvider? provider)
     {
@@ -380,8 +402,6 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         charsWritten = 0;
         return false;
     }
-
-#endif
 
     public UInt32 Hash32() => XXH32.DigestOf(ToByteArray());
 
@@ -726,8 +746,6 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         return result;
     }
 
-#if NET6_0
-
     private void ToBase32(Span<Char> destination)
     {
         Base32.Encode(ToByteArray(), destination);
@@ -739,6 +757,52 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         {
             fixed (char* resultP = destination)
             fixed (char* base64 = &table[0])
+            {
+                var byte0 = (byte)(_timestamp >> 24);
+                var byte1 = (byte)(_timestamp >> 16);
+                var byte2 = (byte)(_timestamp >> 8);
+
+                resultP[0] = base64[(byte0 & 0xfc) >> 2];
+                resultP[1] = base64[((byte0 & 0x03) << 4) | ((byte1 & 0xf0) >> 4)];
+                resultP[2] = base64[((byte1 & 0x0f) << 2) | ((byte2 & 0xc0) >> 6)];
+                resultP[3] = base64[byte2 & 0x3f];
+
+                var byte3 = (byte)(_timestamp);
+                var byte4 = (byte)(_b >> 24);
+                var byte5 = (byte)(_b >> 16);
+
+                resultP[4] = base64[(byte3 & 0xfc) >> 2];
+                resultP[5] = base64[((byte3 & 0x03) << 4) | ((byte4 & 0xf0) >> 4)];
+                resultP[6] = base64[((byte4 & 0x0f) << 2) | ((byte5 & 0xc0) >> 6)];
+                resultP[7] = base64[byte5 & 0x3f];
+
+                var byte6 = (byte)(_b >> 8);
+                var byte7 = (byte)(_b);
+                var byte8 = (byte)(_c >> 24);
+
+                resultP[8] = base64[(byte6 & 0xfc) >> 2];
+                resultP[9] = base64[((byte6 & 0x03) << 4) | ((byte7 & 0xf0) >> 4)];
+                resultP[10] = base64[((byte7 & 0x0f) << 2) | ((byte8 & 0xc0) >> 6)];
+                resultP[11] = base64[byte8 & 0x3f];
+
+                var byte9 = (byte)(_c >> 16);
+                var byte10 = (byte)(_c >> 8);
+                var byte11 = (byte)(_c);
+
+                resultP[12] = base64[(byte9 & 0xfc) >> 2];
+                resultP[13] = base64[((byte9 & 0x03) << 4) | ((byte10 & 0xf0) >> 4)];
+                resultP[14] = base64[((byte10 & 0x0f) << 2) | ((byte11 & 0xc0) >> 6)];
+                resultP[15] = base64[byte11 & 0x3f];
+            }
+        }
+    }
+
+    private void ToBase64(Span<Byte> destination, Byte[] table)
+    {
+        unsafe
+        {
+            fixed (byte* resultP = destination)
+            fixed (byte* base64 = &table[0])
             {
                 var byte0 = (byte)(_timestamp >> 24);
                 var byte1 = (byte)(_timestamp >> 16);
@@ -905,8 +969,6 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         }
     }
 
-#endif
-
     private static Id ParseBase32(ReadOnlySpan<Char> value)
     {
         if (value.Length != 20) throw new ArgumentException("String must be 20 characters long", nameof(value));
@@ -939,6 +1001,19 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
     private static Id ParseBase64(ReadOnlySpan<Char> value)
     {
         if (value.Length != 16) throw new ArgumentException("String must be 16 characters long", nameof(value));
+
+        Span<Byte> bytes = stackalloc Byte[12];
+
+        Base64.Parse(value, bytes);
+
+        FromByteArray(bytes, 0, out var timestamp, out var b, out var c);
+
+        return new Id(timestamp, b, c);
+    }
+
+    private static Id ParseBase64(ReadOnlySpan<Byte> value)
+    {
+        if (value.Length != 16) throw new ArgumentException("Id must be 16 bytes long", nameof(value));
 
         Span<Byte> bytes = stackalloc Byte[12];
 
