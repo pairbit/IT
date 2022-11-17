@@ -39,6 +39,12 @@ public class IdBenchmark
     }
 
     [Benchmark]
+    public UInt32 Id_Hash32() => _id.Hash32();
+
+    [Benchmark]
+    public UInt64 Id_Hash64() => _id.Hash64();
+
+    [Benchmark]
     public String Id_Encode_HexLower() => _id.ToString(Idf.Hex);
 
     [Benchmark]
