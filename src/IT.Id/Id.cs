@@ -345,18 +345,7 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
         _ => throw new FormatException($"The '{format}' format string is not supported."),
     };
 
-    public Boolean TryFormat(Span<Byte> destination, out Int32 charsWritten, ReadOnlySpan<Char> format, IFormatProvider? provider)
-    {
-        if (format.IsEmpty)
-        {
-            return TryFormat(destination, out charsWritten, Idf.Base64Url, provider);
-        }
-
-        charsWritten = 0;
-        return false;
-    }
-
-    public Boolean TryFormat(Span<Byte> destination, out Int32 charsWritten, Idf format, IFormatProvider? provider)
+    public Boolean TryFormat(Span<Byte> destination, out Int32 charsWritten, Idf format)
     {
         if (format == Idf.Hex && destination.Length >= 24)
         {
@@ -452,7 +441,9 @@ public readonly struct Id : IComparable<Id>, IEquatable<Id>, IFormattable
 
         if (format.SequenceEqual("58"))
         {
-            return Base58.Encode(ToByteArray(), destination, out charsWritten);
+            var res = Base58.Encode(ToByteArray(), destination);
+            charsWritten = 17;
+            return res;
         }
 
         if (format.SequenceEqual("85"))

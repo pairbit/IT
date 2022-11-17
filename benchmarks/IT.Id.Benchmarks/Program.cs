@@ -16,8 +16,8 @@ using System.Text.Json.Serialization;
 
 //Console.WriteLine($"{Id.GetMachineHash()} - {Id.GetMachineXXHash()}");
 
-//var id = Id.Parse("62A84F674031E78D474FE23F");
-var id = Id.New();
+var id = Id.Parse("62A84F674031E78D474FE23F");
+//var id = Id.New();
 
 #region Json
 

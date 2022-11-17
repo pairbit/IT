@@ -69,7 +69,7 @@ internal static class Base58
         }
     }
 
-    public static unsafe bool Encode(ReadOnlySpan<byte> input, Span<char> output, out int numCharsWritten)
+    public static unsafe bool Encode(ReadOnlySpan<byte> input, Span<char> output)
     {
         int numZeroes = getZeroCount(input, 12);
         if (numZeroes == 12)
@@ -91,7 +91,6 @@ internal static class Base58
             output[14] = ZeroChar;
             output[15] = ZeroChar;
             output[16] = ZeroChar;
-            numCharsWritten = 17;
             return true;
         }
 
@@ -102,7 +101,6 @@ internal static class Base58
         {
             if (!internalEncode(inputPtr, bufferPtr, numZeroes, out int length))
             {
-                numCharsWritten = 0;
                 return false;
             }
 
@@ -121,8 +119,6 @@ internal static class Base58
             }
 
             buffer.CopyTo(output);
-
-            numCharsWritten = 17;
 
             return true;
         }
