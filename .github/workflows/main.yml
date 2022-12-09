@@ -32,12 +32,6 @@ jobs:
       - name: Test System
         run: dotnet test tests/IT.Tests/IT.Tests.csproj
             
-      - name: Test Generation
-        run: dotnet test tests/IT.Generation.Tests/IT.Generation.Tests.csproj
-        
-      - name: Test Mapping
-        run: dotnet test tests/IT.Mapping.Tests/IT.Mapping.Tests.csproj
-        
       - name: Publish IT
         uses: pairbit/publish-nuget@v2.5.9
         with:
@@ -73,21 +67,6 @@ jobs:
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
 
-      - name: Publish IT.Generation
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Generation/IT.Generation.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            INCLUDE_SYMBOLS: true
-            
-      - name: Publish IT.Generation.KGySoft
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Generation.KGySoft/IT.Generation.KGySoft.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            
       - name: Publish IT.Security.Cryptography
         uses: pairbit/publish-nuget@v2.5.9
         with:
@@ -155,26 +134,5 @@ jobs:
         uses: pairbit/publish-nuget@v2.5.9
         with:
             PROJECT_FILE_PATH: src/IT.Working.Redis/IT.Working.Redis.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            
-      - name: Publish IT.Mapping
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Mapping/IT.Mapping.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            
-      - name: Publish IT.Mapping.AutoMapper
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Mapping.AutoMapper/IT.Mapping.AutoMapper.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            
-      - name: Publish IT.Mapping.Mapster
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Mapping.Mapster/IT.Mapping.Mapster.csproj
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
