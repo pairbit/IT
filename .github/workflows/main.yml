@@ -35,9 +35,6 @@ jobs:
       - name: Test Generation
         run: dotnet test tests/IT.Generation.Tests/IT.Generation.Tests.csproj
         
-      - name: Test Serialization
-        run: dotnet test tests/IT.Serialization.Tests/IT.Serialization.Tests.csproj
-        
       - name: Test Mapping
         run: dotnet test tests/IT.Mapping.Tests/IT.Mapping.Tests.csproj
         
@@ -61,35 +58,7 @@ jobs:
             PROJECT_FILE_PATH: src/IT.Bcl/IT.Bcl.csproj
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
-      
-      - name: Publish IT.Locking
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Locking/IT.Locking.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
             
-      - name: Publish IT.Locking.Redis
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Locking.Redis/IT.Locking.Redis.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-
-      - name: Publish IT.Locking.Redis.RedLock
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Locking.Redis.RedLock/IT.Locking.Redis.RedLock.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-
-      - name: Publish IT.Locking.Medallion
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Locking.Medallion/IT.Locking.Medallion.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-
       - name: Publish IT.PubSub
         uses: pairbit/publish-nuget@v2.5.9
         with:
@@ -116,34 +85,6 @@ jobs:
         uses: pairbit/publish-nuget@v2.5.9
         with:
             PROJECT_FILE_PATH: src/IT.Generation.KGySoft/IT.Generation.KGySoft.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            
-      - name: Publish IT.Serialization
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Serialization/IT.Serialization.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            
-      - name: Publish IT.Serialization.Json
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Serialization.Json/IT.Serialization.Json.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            
-      - name: Publish IT.Serialization.MessagePack
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Serialization.MessagePack/IT.Serialization.MessagePack.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            
-      - name: Publish IT.Serialization.Utf8Json
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Serialization.Utf8Json/IT.Serialization.Utf8Json.csproj
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             
@@ -200,27 +141,6 @@ jobs:
         uses: pairbit/publish-nuget@v2.5.9
         with:
             PROJECT_FILE_PATH: src/IT.Pdf.PDFSharp/IT.Pdf.PDFSharp.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            
-      - name: Publish IT.Redis
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Redis/IT.Redis.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            
-      - name: Publish IT.Data
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Data/IT.Data.csproj
-            NUGET_KEY: ${{secrets.NUGET}}
-            TAG_COMMIT: false
-            
-      - name: Publish IT.Data.Redis
-        uses: pairbit/publish-nuget@v2.5.9
-        with:
-            PROJECT_FILE_PATH: src/IT.Data.Redis/IT.Data.Redis.csproj
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: false
             
