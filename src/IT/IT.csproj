@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+	<TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;</TargetFrameworks>
 	<LangVersion>latest</LangVersion>
 	<Nullable>enable</Nullable>
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -18,7 +18,7 @@
 	<PackageReadmeFile>Readme.md</PackageReadmeFile>
 	<PackageIcon>Icon.png</PackageIcon>
 	<PackageReleaseNotes>
-		add IT.Bcl and IT.Memory
+		add netcoreapp3.1
 	</PackageReleaseNotes>
 	<SignAssembly>true</SignAssembly>
 	<AssemblyOriginatorKeyFile>..\..\IT.snk</AssemblyOriginatorKeyFile>
