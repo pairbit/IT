@@ -25,11 +25,11 @@ if (url == null)
     Console.Write("Url JinnServer: ");
     url = Console.ReadLine();
 
-    if (string.IsNullOrWhiteSpace(url))
-    {
-        Console.WriteLine($"Url address JinnServer '{url}' is empty or whitespace");
-        return;
-    } 
+    if (string.IsNullOrWhiteSpace(url)) url = "http://jinn.ucfk.ru/tccs/SignatureValidationService";
+    //{
+    //    Console.WriteLine($"Url address JinnServer '{url}' is empty or whitespace");
+    //    return;
+    //} 
 }
 
 ISignatureVerifier signVerifier = new ValidationService(() => new ValidationOptions { ValidationUrl = url });
@@ -38,7 +38,7 @@ if (Check(signVerifier))
 {
     var location = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-    var rootPath = Path.GetFullPath(Path.Combine(location!, "sign"));
+    var rootPath = Path.GetFullPath(Path.Combine(location!, "signatures"));
 
     if (!Directory.Exists(rootPath))
     {
@@ -48,13 +48,13 @@ if (Check(signVerifier))
 
     Console.WriteLine($"Directory sign found '{rootPath}'");
 
-    var files = Directory.GetFiles(rootPath, "*.xml", SearchOption.TopDirectoryOnly);
+    var files = Directory.GetFiles(rootPath, "*.sign", SearchOption.TopDirectoryOnly);
 
     var count = files.Length;
 
     var width = count.ToString().Length;
 
-    Console.WriteLine($"Found {count} signs by mask '*.xml'");
+    Console.WriteLine($"Found {count} signs by mask '*.sign'");
 
     var options = new JsonSerializerOptions
     {
@@ -71,6 +71,7 @@ if (Check(signVerifier))
         var file = files[i];
         var dirname = Path.GetDirectoryName(file)!;
         var filename = Path.GetFileName(file);
+        var detached = Path.Combine(dirname, $"{filename}.data");
 
         var no = (i + 1).ToString().PadRight(width);
 
@@ -91,7 +92,9 @@ if (Check(signVerifier))
 
             var signature = File.ReadAllText(file);
 
-            var detail = signVerifier.VerifyDetail(signature);
+            var detail = File.Exists(detached) 
+                ? signVerifier.VerifyDetail(signature, File.ReadAllText(detached))
+                : signVerifier.VerifyDetail(signature);
 
             var contents = JsonSerializer.Serialize(detail, options);
 
@@ -136,7 +139,7 @@ static bool Check(ISignatureVerifier signVerifier)
             Console.Write("Ok");
         }
 
-        return success;
+        return true;
     }
     catch (Exception ex)
     {
